@@ -354,6 +354,16 @@ const sendTransactionalEmail = async ({ toEmail, subject, text, html, logPrefix 
     return false;
   }
 
+  if (process.env.BREVO_API_KEY) {
+    try {
+      await sendWithBrevoApi({ senderEmail, toEmail, subject, text, html });
+      return true;
+    } catch (err) {
+      console.error(`[${logPrefix}] Brevo API send failed: ${getMailErrorMessage(err)}`);
+      throw err;
+    }
+  }
+
   if (hasSmtpConfig()) {
     const transporter = createMailerTransport();
     try {
@@ -367,16 +377,6 @@ const sendTransactionalEmail = async ({ toEmail, subject, text, html, logPrefix 
       return true;
     } catch (err) {
       console.error(`[${logPrefix}] SMTP send failed: ${getMailErrorMessage(err)}`);
-      throw err;
-    }
-  }
-
-  if (process.env.BREVO_API_KEY) {
-    try {
-      await sendWithBrevoApi({ senderEmail, toEmail, subject, text, html });
-      return true;
-    } catch (err) {
-      console.error(`[${logPrefix}] Brevo API send failed: ${getMailErrorMessage(err)}`);
       throw err;
     }
   }

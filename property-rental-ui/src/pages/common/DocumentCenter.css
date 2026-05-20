@@ -1,0 +1,103 @@
+.document-center {
+  display: grid;
+  gap: 1rem;
+}
+
+.document-center-head h2 {
+  margin: 0;
+}
+
+.document-center-head p {
+  margin: 0.3rem 0 0;
+  color: var(--text-muted);
+}
+
+.doc-error {
+  margin: 0;
+  color: #ef4444;
+}
+
+.doc-summary-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.doc-summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.95rem;
+}
+
+.doc-summary-card strong {
+  display: block;
+  font-size: 1.5rem;
+}
+
+.doc-summary-card span {
+  color: var(--text-muted);
+}
+
+.doc-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.doc-section h3 {
+  margin: 0 0 0.7rem;
+}
+
+.doc-empty {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.doc-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.doc-row {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.doc-row h4 {
+  margin: 0;
+}
+
+.doc-row p {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.doc-btn {
+  border: 1px solid color-mix(in srgb, var(--accent, #0a7f5a) 45%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a7f5a) 14%, transparent);
+  color: var(--accent, #0a7f5a);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .doc-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

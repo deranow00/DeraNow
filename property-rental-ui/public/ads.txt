@@ -1,0 +1,3 @@
+# ads.txt for derama.netlify.app
+
+google.com, pub-2141842823391084, DIRECT, f08c47fec0942fa0

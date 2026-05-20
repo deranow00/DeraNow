@@ -1,0 +1,132 @@
+.admin-kyc-page {
+  animation: kycFadeIn 220ms ease;
+}
+
+.admin-kyc-message {
+  margin: 0 0 0.9rem;
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #9f1239;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.admin-kyc-table-wrap {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.admin-kyc-table th,
+.admin-kyc-table td {
+  vertical-align: top;
+}
+
+.admin-kyc-table tbody tr {
+  transition: background-color 160ms ease;
+}
+
+.admin-kyc-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.admin-kyc-user-cell {
+  min-width: 220px;
+}
+
+.admin-kyc-user-name {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.admin-kyc-user-email {
+  margin-top: 0.15rem;
+  color: #64748b;
+  font-size: 0.82rem;
+  word-break: break-word;
+}
+
+.admin-kyc-reject-text {
+  margin-top: 0.4rem;
+  color: #b91c1c;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.admin-kyc-doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.55rem;
+  min-width: 250px;
+}
+
+.admin-kyc-doc-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.45rem;
+  background: #fff;
+  display: grid;
+  gap: 0.4rem;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.admin-kyc-doc-card:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+  box-shadow: 0 10px 16px rgba(15, 23, 42, 0.08);
+}
+
+.admin-kyc-doc-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.admin-kyc-doc-type {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.35;
+}
+
+.admin-kyc-reason-input {
+  width: 100%;
+  min-width: 180px;
+  resize: vertical;
+  font-size: 0.88rem;
+}
+
+.admin-kyc-actions {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 116px;
+}
+
+.admin-kyc-empty-cell {
+  text-align: center;
+  color: #64748b;
+  padding: 1.2rem;
+}
+
+@keyframes kycFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 840px) {
+  .admin-kyc-doc-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    min-width: 210px;
+  }
+
+  .admin-kyc-actions {
+    min-width: 100px;
+  }
+}

@@ -1,0 +1,75 @@
+.settings-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  font-family: var(--font-body);
+}
+
+.settings-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.settings-card h2 {
+  margin-bottom: 0.5rem;
+}
+
+.settings-group {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.toggle,
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.settings-field {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.settings-field select {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  background: #fff;
+  color: var(--text);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.settings-message {
+  margin-bottom: 1rem;
+  color: var(--text-muted);
+}
+
+.settings-language-trigger {
+  justify-self: start;
+  background: color-mix(in srgb, var(--accent) 88%, white);
+}
+
+@media (max-width: 600px) {
+  .settings-page {
+    padding: 1.5rem 1rem;
+  }
+
+  .settings-language-trigger {
+    width: 100%;
+    justify-self: stretch;
+  }
+}

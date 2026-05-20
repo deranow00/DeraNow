@@ -1,0 +1,170 @@
+.rule-engine-page {
+  display: grid;
+  gap: 1rem;
+}
+
+.rule-status-chip {
+  border-radius: 999px;
+  padding: 0.32rem 0.62rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.rule-status-chip.clean {
+  background: #ecfdf5;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.rule-status-chip.dirty {
+  background: #fffbeb;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
+.rule-preset-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.rule-preset-group {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.rule-preset-group span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.rule-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.rule-grid .card {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.rule-grid h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.rule-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.rule-field label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.rule-field input,
+.rule-field select {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0.5rem 0.62rem;
+  font: inherit;
+  min-height: 36px;
+}
+
+.rule-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.rule-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rule-summary-card {
+  grid-column: span 2;
+}
+
+.rule-empty {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.rule-change-list {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.rule-change-item {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto auto;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.rule-change-item code {
+  border-radius: 8px;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 0.16rem 0.38rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+.rule-alert {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 0.62rem 0.75rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.rule-alert.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.rule-alert.success {
+  background: #ecfdf5;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.rule-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 980px) {
+  .rule-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rule-summary-card {
+    grid-column: span 1;
+  }
+
+  .rule-change-item {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+}

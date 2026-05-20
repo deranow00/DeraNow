@@ -1,0 +1,572 @@
+:root {
+  --font-body: 'Work Sans', 'Noto Sans', sans-serif;
+  --font-display: 'Space Grotesk', 'Work Sans', sans-serif;
+  --app-height: 100dvh;
+  --keyboard-offset: 0px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --bg: #f6f3ee;
+  --bg-strong: #efe9e1;
+  --surface: #ffffff;
+  --surface-muted: #f7f4ef;
+  --text: #1e1a16;
+  --text-muted: #5f584f;
+  --text-subtle: #8a837a;
+  --accent: #0f766e;
+  --accent-strong: #115e59;
+  --accent-warm: #d97706;
+  --border: #e3ddd2;
+  --shadow: 0 10px 30px rgba(25, 20, 12, 0.08);
+  --shadow-soft: 0 6px 18px rgba(25, 20, 12, 0.08);
+  --success-bg: #d1fae5;
+  --success-text: #065f46;
+  --success-border: #6ee7b7;
+  --warning-bg: #fef3c7;
+  --warning-text: #92400e;
+  --warning-border: #fcd34d;
+  --danger-bg: #fee2e2;
+  --danger-text: #991b1b;
+  --danger-border: #fca5a5;
+  --info-bg: #ecfeff;
+  --info-text: #0f766e;
+  --info-border: #99f6e4;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --transition: 180ms ease;
+  --space-factor: 1;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0f172a;
+  --bg-strong: #111827;
+  --surface: #111827;
+  --surface-muted: #1f2937;
+  --text: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-subtle: #6b7280;
+  --accent: #14b8a6;
+  --accent-strong: #0d9488;
+  --accent-warm: #f59e0b;
+  --border: #374151;
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.28);
+  --success-bg: #042f2e;
+  --success-text: #99f6e4;
+  --success-border: #134e4a;
+  --warning-bg: #422006;
+  --warning-text: #fde68a;
+  --warning-border: #78350f;
+  --danger-bg: #3f0a0a;
+  --danger-text: #fecaca;
+  --danger-border: #7f1d1d;
+  --info-bg: #082f49;
+  --info-text: #bae6fd;
+  --info-border: #0c4a6e;
+  color-scheme: dark;
+}
+
+:root[data-compact='true'] {
+  --space-factor: 0.86;
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-sm: 8px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: var(--app-height);
+  font-family: var(--font-body);
+  color: var(--text);
+  background: radial-gradient(circle at top, var(--surface) 0%, var(--bg) 45%, var(--bg-strong) 100%);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  min-height: var(--app-height);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+button {
+  font-family: var(--font-body);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  padding: calc(0.65rem * var(--space-factor)) calc(1.1rem * var(--space-factor));
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+  box-shadow: var(--shadow-soft);
+}
+
+button:hover {
+  transform: translateY(-1px);
+  background: var(--accent-strong);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: calc(0.65rem * var(--space-factor)) calc(0.8rem * var(--space-factor));
+  transition: border var(--transition), box-shadow var(--transition);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  margin: 0;
+  color: var(--text);
+}
+
+p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.container {
+  width: min(1200px, 92%);
+  margin: 0 auto;
+}
+
+:root[data-compact='true'] .dashboard-content,
+:root[data-compact='true'] .settings-page,
+:root[data-compact='true'] .listings-page,
+:root[data-compact='true'] .dashboard-container {
+  padding: 1rem !important;
+}
+
+.surface-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.ios-app-shell,
+.ios-app-shell .main,
+.ios-app-shell .dashboard-content {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ios-app-shell .dashboard-content > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ios-app-shell .dashboard-content {
+  overflow-x: clip;
+}
+
+@media (max-width: 900px) {
+  .ios-app-shell .main,
+  .ios-app-shell .dashboard-content {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --font-body: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Noto Sans', sans-serif;
+    --font-display: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Noto Sans', sans-serif;
+    --bg: #f2f2f7;
+    --bg-strong: #e9ecf3;
+    --surface: #ffffff;
+    --surface-muted: #f5f5f7;
+    --text: #111827;
+    --text-muted: #667085;
+    --text-subtle: #8e8e93;
+    --border: rgba(120, 120, 128, 0.18);
+    --shadow: 0 22px 48px rgba(15, 23, 42, 0.08);
+    --shadow-soft: 0 12px 28px rgba(15, 23, 42, 0.08);
+    --radius-lg: 28px;
+    --radius-md: 20px;
+    --radius-sm: 14px;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top, rgba(255, 255, 255, 0.98) 0%, transparent 30%),
+      linear-gradient(180deg, #fbfbfd 0%, #eef1f7 100%);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    min-height: 46px;
+  }
+
+  input,
+  select,
+  textarea {
+    border-radius: 14px;
+    font-size: 16px;
+  }
+
+  .surface-card,
+  .property-card,
+  .payment-card,
+  .summary-card,
+  .history-card,
+  .settings-card,
+  .profile-card,
+  .favorite-card,
+  .complaint-item,
+  .chat-window,
+  .chat-sidebar {
+    border-radius: 22px !important;
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08) !important;
+  }
+
+  .bookings-table,
+  .owner-payment-table,
+  .payment-status-table,
+  .table {
+    min-width: 680px;
+  }
+
+  .dashboard-container,
+  .listings-page,
+  .payment-page,
+  .favorites-container,
+  .add-property-container,
+  .my-properties-container,
+  .bookings-container,
+  .owner-payment-page,
+  .owner-complaints-container,
+  .complaint-container,
+  .message-page,
+  .settings-page,
+  .profile-page,
+  .document-center-page,
+  .agreements-page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+  }
+
+  .dashboard-container,
+  .listings-page,
+  .payment-page,
+  .favorites-container,
+  .add-property-container,
+  .my-properties-container,
+  .bookings-container,
+  .owner-payment-page,
+  .owner-complaints-container,
+  .complaint-container,
+  .settings-page,
+  .profile-page,
+  .document-center-page,
+  .agreements-page {
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .dashboard-hero,
+  .profile-header-card,
+  .settings-card,
+  .document-center-page > *,
+  .agreements-page > *,
+  .chart-card,
+  .recent-properties,
+  .action-panel,
+  .owner-verification-card,
+  .owner-payment-status,
+  .dashboard-stat-card,
+  .payment-card,
+  .summary-card,
+  .history-card,
+  .qr-box,
+  .complaint-item,
+  .favorite-card,
+  .property-card,
+  .table-wrap,
+  .table-wrapper {
+    border-color: rgba(120, 120, 128, 0.16) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .dashboard-hero,
+  .settings-card,
+  .profile-header-card,
+  .profile-card,
+  .document-center-page > *,
+  .agreements-page > * {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .listings-grid,
+  .properties-grid,
+  .favorites-grid,
+  .dashboard-cards,
+  .dashboard-grid-two,
+  .chart-section,
+  .owner-payment-cards {
+    grid-template-columns: 1fr !important;
+  }
+
+  .property-card,
+  .favorite-card,
+  .modal-content,
+  .property-details-popup,
+  .chat-window,
+  .chat-sidebar {
+    width: 100%;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .chart-card,
+  .recent-properties,
+  .action-panel,
+  .owner-verification-card,
+  .owner-payment-status,
+  .dashboard-stat-card,
+  .message-page,
+  .chat-header,
+  .chat-messages,
+  .chat-input,
+  .dashboard-list li {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .filters,
+  .property-actions,
+  .action-buttons,
+  .modal-buttons {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .bookings-container,
+  .owner-payment-page,
+  .dashboard-container,
+  .listings-page,
+  .payment-page,
+  .favorites-page,
+  .settings-page {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .dashboard-container > h1,
+  .dashboard-container > h2,
+  .listings-page > h1,
+  .listings-page > h2,
+  .favorites-container > h1,
+  .favorites-container > h2,
+  .bookings-container > h1,
+  .bookings-container > h2,
+  .payment-page > h1,
+  .payment-page > h2,
+  .owner-payment-page > h1,
+  .owner-payment-page > h2,
+  .owner-complaints-container > h1,
+  .owner-complaints-container > h2,
+  .complaint-container > h1,
+  .complaint-container > h2,
+  .my-properties-container > h1,
+  .my-properties-container > h2 {
+    font-size: clamp(1.5rem, 5vw, 1.95rem) !important;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+
+  .dashboard-container p,
+  .listings-page p,
+  .favorites-container p,
+  .bookings-container p,
+  .payment-page p,
+  .owner-payment-page p,
+  .owner-complaints-container p,
+  .complaint-container p,
+  .my-properties-container p,
+  .settings-page p,
+  .profile-page p {
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-cards,
+  .owner-payment-cards,
+  .chart-section,
+  .dashboard-grid-two {
+    grid-template-columns: 1fr !important;
+  }
+
+  .modal-overlay,
+  .agreements-modal {
+    align-items: flex-end !important;
+    justify-content: center !important;
+    z-index: 1300 !important;
+    padding:
+      calc(10px + var(--safe-top))
+      10px
+      calc(10px + var(--safe-bottom) + var(--keyboard-offset)) !important;
+    overflow: hidden;
+  }
+
+  .modal-content,
+  .agreements-modal-card,
+  .property-details-popup {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    max-height: min(88vh, calc(var(--app-height) - 20px - var(--safe-top))) !important;
+    border-radius: 22px 22px 0 0 !important;
+    padding: 1rem 0.95rem 1rem !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    box-sizing: border-box;
+  }
+
+  .booking-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .modal-close,
+  .details-close-btn,
+  .agreements-close {
+    top: 0.85rem !important;
+    right: 0.85rem !important;
+    width: 2.2rem !important;
+    height: 2.2rem !important;
+    min-width: 2.2rem !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    font-size: 0.95rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .booking-grid,
+  .modal-buttons,
+  .agreements-sign-box {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+  }
+
+  .modal-buttons button,
+  .agreements-sign-box input,
+  .agreements-sign-box button,
+  .booking-grid input,
+  .booking-grid textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .property-details-popup img,
+  .modal-image {
+    height: 200px !important;
+    border-radius: 14px !important;
+  }
+
+  .property-details-popup h2,
+  .modal-content h2,
+  .agreements-modal-card h3 {
+    font-size: 1.3rem !important;
+    line-height: 1.2 !important;
+    padding-right: 2.4rem;
+  }
+
+  .property-details-popup p,
+  .modal-content p,
+  .agreements-content,
+  .booking-subtitle {
+    font-size: 0.9rem !important;
+    line-height: 1.45 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body:has(.modal-overlay) .mobile-bottom-nav,
+  body:has(.agreements-modal) .mobile-bottom-nav {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(18px) !important;
+  }
+
+  body:has(.modal-overlay) .mobile-nav-sheet,
+  body:has(.agreements-modal) .mobile-nav-sheet,
+  body:has(.modal-overlay) .mobile-nav-backdrop,
+  body:has(.agreements-modal) .mobile-nav-backdrop {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}

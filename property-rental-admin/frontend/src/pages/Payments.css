@@ -1,0 +1,83 @@
+.payments-page .payments-toolbar {
+  background: #ffffff;
+  border: 1px solid #dbe2eb;
+  border-radius: 12px;
+  padding: 0.65rem;
+}
+
+.payments-page .payments-toolbar select {
+  min-width: 170px;
+}
+
+.payments-page .payments-apply-btn {
+  font-weight: 600;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.payments-table-wrap {
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.payments-page .table td {
+  white-space: nowrap;
+}
+
+.payments-page .commission-input,
+.payments-page .remark-input {
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  padding: 0.45rem 0.55rem;
+  font: inherit;
+}
+
+.payments-page .commission-input {
+  width: 90px;
+}
+
+.payments-page .remark-input {
+  min-width: 160px;
+}
+
+.payment-actions-cell {
+  min-width: 390px;
+}
+
+.payment-action-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.payment-action-row + .payment-action-row {
+  margin-top: 0.45rem;
+}
+
+.payments-page .action-btn {
+  border-radius: 999px;
+  font-size: 0.78rem;
+  padding: 0.42rem 0.68rem;
+}
+
+.payments-page .action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.payments-page .paid-btn {
+  background: #16a34a;
+}
+
+.payments-page .allocate-btn {
+  background: #0f766e;
+}
+
+@media (max-width: 900px) {
+  .payment-actions-cell {
+    min-width: 300px;
+  }
+
+  .payments-page .remark-input {
+    min-width: 130px;
+  }
+}

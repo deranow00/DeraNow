@@ -1,0 +1,123 @@
+.owner-complaints-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  font-family: var(--font-body);
+  min-height: 100vh;
+  animation: pageFade 0.4s ease;
+}
+
+.owner-complaints-container h1 {
+  text-align: center;
+  font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2rem;
+}
+
+.loading,
+.error,
+.empty {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 999px;
+  max-width: 520px;
+  margin: 0 auto 1.5rem;
+}
+
+.loading {
+  background: #f3ede4;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.error {
+  background: #fdecea;
+  color: #b42318;
+  border: 1px solid #f2c4c2;
+}
+
+.empty {
+  background: #fff4d6;
+  color: #9a5b00;
+  border: 1px solid #f2c97b;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.complaints-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  font-size: 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+
+.complaints-table thead {
+  background: #1f1b17;
+  color: #f8f5ef;
+}
+
+.complaints-table th,
+.complaints-table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid #efe9de;
+  vertical-align: top;
+}
+
+.complaints-table tbody tr {
+  transition: background var(--transition);
+}
+
+.complaints-table tbody tr:hover {
+  background: #f7f4ef;
+}
+
+@media (max-width: 900px) {
+  .owner-complaints-container {
+    padding: 2rem 1.25rem;
+  }
+
+  .complaints-table {
+    min-width: 720px;
+  }
+}
+
+@media (max-width: 600px) {
+  .owner-complaints-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .complaints-table th,
+  .complaints-table td {
+    padding: 0.75rem 0.9rem;
+    font-size: 0.8rem;
+  }
+}
+
+@keyframes pageFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .owner-complaints-container,
+  .complaints-table tbody tr {
+    animation: none;
+    transition: none;
+  }
+}

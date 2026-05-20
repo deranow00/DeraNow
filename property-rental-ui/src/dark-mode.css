@@ -1,0 +1,587 @@
+:root[data-theme='dark'] .landing-page,
+:root[data-theme='dark'] .forgot-container,
+:root[data-theme='dark'] .login-container,
+:root[data-theme='dark'] .register-container,
+:root[data-theme='dark'] .favorites-container,
+:root[data-theme='dark'] .my-properties-container,
+:root[data-theme='dark'] .add-property-container,
+:root[data-theme='dark'] .complaint-container,
+:root[data-theme='dark'] .owner-complaints-container,
+:root[data-theme='dark'] .payment-page,
+:root[data-theme='dark'] .dashboard-container,
+:root[data-theme='dark'] .listings-page,
+:root[data-theme='dark'] .bookings-container,
+:root[data-theme='dark'] .message-page {
+  background: var(--bg);
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .landing-nav.scrolled {
+  background: rgba(17, 24, 39, 0.88);
+}
+
+:root[data-theme='dark'] a:hover {
+  color: #7ee9dc;
+}
+
+:root[data-theme='dark'] .renter-layout .topbar,
+:root[data-theme='dark'] .owner-layout .topbar,
+:root[data-theme='dark'] .admin-layout .topbar {
+  background: rgba(17, 24, 39, 0.94);
+  border-bottom-color: var(--border);
+}
+
+:root[data-theme='dark'] .mobile-bottom-nav,
+:root[data-theme='dark'] .mobile-nav-sheet {
+  background: rgba(17, 24, 39, 0.88) !important;
+  border-color: rgba(55, 65, 81, 0.9) !important;
+}
+
+:root[data-theme='dark'] .mobile-bottom-nav-link {
+  color: #9ca3af !important;
+}
+
+:root[data-theme='dark'] .mobile-bottom-nav-link.active,
+:root[data-theme='dark'] .mobile-bottom-nav-link[aria-expanded='true'] {
+  background: linear-gradient(180deg, rgba(20, 184, 166, 0.22), rgba(20, 184, 166, 0.1)) !important;
+  color: #ccfbf1 !important;
+}
+
+:root[data-theme='dark'] .mobile-nav-sheet-link {
+  background: rgba(31, 41, 55, 0.9) !important;
+  border-color: rgba(55, 65, 81, 0.9) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .mobile-nav-sheet-icon {
+  background: rgba(20, 184, 166, 0.14) !important;
+  color: #99f6e4 !important;
+}
+
+:root[data-theme='dark'] .renter-layout .topbar h3,
+:root[data-theme='dark'] .owner-layout .topbar h3,
+:root[data-theme='dark'] .admin-layout .topbar h3,
+:root[data-theme='dark'] .renter-layout .user-menu,
+:root[data-theme='dark'] .owner-layout .user-menu,
+:root[data-theme='dark'] .admin-layout .user-menu {
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .hero-copy,
+:root[data-theme='dark'] .hero-panel,
+:root[data-theme='dark'] .hero-stats div,
+:root[data-theme='dark'] .featured-card,
+:root[data-theme='dark'] .status-box,
+:root[data-theme='dark'] .forgot-card,
+:root[data-theme='dark'] .login-box,
+:root[data-theme='dark'] .register-right,
+:root[data-theme='dark'] .payment-card,
+:root[data-theme='dark'] .summary-card,
+:root[data-theme='dark'] .history-card,
+:root[data-theme='dark'] .qr-box,
+:root[data-theme='dark'] .favorites-grid .favorite-card,
+:root[data-theme='dark'] .property-card,
+:root[data-theme='dark'] .complaint-item,
+:root[data-theme='dark'] .owner-payment-card,
+:root[data-theme='dark'] .settings-card,
+:root[data-theme='dark'] .profile-card,
+:root[data-theme='dark'] .agreements-modal-card,
+:root[data-theme='dark'] .agreements-generator,
+:root[data-theme='dark'] .agreements-list,
+:root[data-theme='dark'] .agreements-versions,
+:root[data-theme='dark'] .table-wrapper,
+:root[data-theme='dark'] .complaints-table,
+:root[data-theme='dark'] .bookings-table,
+:root[data-theme='dark'] .owner-payment-table,
+:root[data-theme='dark'] .payment-status-table,
+:root[data-theme='dark'] .notification-dropdown,
+:root[data-theme='dark'] .chat-window,
+:root[data-theme='dark'] .chat-sidebar,
+:root[data-theme='dark'] .messages-thread-list,
+:root[data-theme='dark'] .messages-thread-panel,
+:root[data-theme='dark'] .messages-toolbar,
+:root[data-theme='dark'] .table-wrap,
+:root[data-theme='dark'] .card,
+:root[data-theme='dark'] .kpi,
+:root[data-theme='dark'] .modal-content,
+:root[data-theme='dark'] .modal-overlay .modal-content,
+:root[data-theme='dark'] .property-details-popup {
+  background: var(--surface) !important;
+  color: var(--text);
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow-soft);
+}
+
+:root[data-theme='dark'] .login-right,
+:root[data-theme='dark'] .register-right,
+:root[data-theme='dark'] .featured-section,
+:root[data-theme='dark'] .how-section,
+:root[data-theme='dark'] .faq-section {
+  background: var(--bg) !important;
+}
+
+:root[data-theme='dark'] .hero-panel-btn,
+:root[data-theme='dark'] .btn-secondary,
+:root[data-theme='dark'] .btn-history,
+:root[data-theme='dark'] .clear-btn,
+:root[data-theme='dark'] .clear-all-btn {
+  background: var(--surface-muted);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+:root[data-theme='dark'] .hero-panel-btn:hover,
+:root[data-theme='dark'] .btn-secondary:hover,
+:root[data-theme='dark'] .btn-history:hover,
+:root[data-theme='dark'] .clear-btn:hover,
+:root[data-theme='dark'] .clear-all-btn:hover {
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface));
+}
+
+:root[data-theme='dark'] .status-box.error,
+:root[data-theme='dark'] .forgot-error,
+:root[data-theme='dark'] .register-right .error,
+:root[data-theme='dark'] .login-box .error,
+:root[data-theme='dark'] .error-msg,
+:root[data-theme='dark'] .form-error {
+  background: var(--danger-bg) !important;
+  border-color: var(--danger-border) !important;
+  color: var(--danger-text) !important;
+}
+
+:root[data-theme='dark'] .forgot-success,
+:root[data-theme='dark'] .register-right .success,
+:root[data-theme='dark'] .success-msg,
+:root[data-theme='dark'] .alert.success {
+  background: var(--success-bg) !important;
+  border-color: var(--success-border) !important;
+  color: var(--success-text) !important;
+}
+
+:root[data-theme='dark'] .forgot-dev-link,
+:root[data-theme='dark'] .alert.info,
+:root[data-theme='dark'] .notification-type {
+  background: var(--info-bg) !important;
+  border-color: var(--info-border) !important;
+  color: var(--info-text) !important;
+}
+
+:root[data-theme='dark'] .alert.warning,
+:root[data-theme='dark'] .owner-chip.pending,
+:root[data-theme='dark'] .payment-chip.pending,
+:root[data-theme='dark'] .status-chip.pending {
+  background: var(--warning-bg) !important;
+  border-color: var(--warning-border) !important;
+  color: var(--warning-text) !important;
+}
+
+:root[data-theme='dark'] .owner-chip.paid,
+:root[data-theme='dark'] .payment-chip.paid,
+:root[data-theme='dark'] .status-chip.paid,
+:root[data-theme='dark'] .status-chip.verified,
+:root[data-theme='dark'] .status-chip.resolved {
+  background: var(--success-bg) !important;
+  border-color: var(--success-border) !important;
+  color: var(--success-text) !important;
+}
+
+:root[data-theme='dark'] .owner-chip.failed,
+:root[data-theme='dark'] .payment-chip.failed,
+:root[data-theme='dark'] .status-chip.failed,
+:root[data-theme='dark'] .status-chip.rejected {
+  background: var(--danger-bg) !important;
+  border-color: var(--danger-border) !important;
+  color: var(--danger-text) !important;
+}
+
+:root[data-theme='dark'] .notification-row,
+:root[data-theme='dark'] .thread-item,
+:root[data-theme='dark'] .thread-message,
+:root[data-theme='dark'] .payment-row,
+:root[data-theme='dark'] .agreement-row,
+:root[data-theme='dark'] .property-actions,
+:root[data-theme='dark'] .filters,
+:root[data-theme='dark'] .tabs {
+  background: var(--surface-muted) !important;
+  border-color: var(--border) !important;
+}
+
+:root[data-theme='dark'] .chat-thread-item {
+  background: var(--surface-muted) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .chat-thread-item:hover {
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface)) !important;
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--border)) !important;
+}
+
+:root[data-theme='dark'] .chat-thread-item.active {
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface)) !important;
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border)) !important;
+  color: #ccfbf1 !important;
+}
+
+:root[data-theme='dark'] .chat-sidebar {
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(15, 23, 42, 0.96)) !important;
+  border-color: var(--border) !important;
+}
+
+:root[data-theme='dark'] .profile-status-card {
+  background: linear-gradient(180deg, rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.92));
+  border-color: var(--border);
+}
+
+:root[data-theme='dark'] .profile-upload-hint {
+  background: color-mix(in srgb, var(--info-bg) 48%, var(--surface));
+  border-color: var(--info-border);
+  color: var(--info-text);
+}
+
+:root[data-theme='dark'] .profile-avatar {
+  color: #ccfbf1;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.22), rgba(245, 158, 11, 0.14));
+}
+
+:root[data-theme='dark'] .chat-header,
+:root[data-theme='dark'] .chat-input {
+  background: var(--surface-muted) !important;
+  border-color: var(--border) !important;
+}
+
+:root[data-theme='dark'] .chat-messages {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 24, 39, 0.96)) !important;
+}
+
+:root[data-theme='dark'] .chat-search-box input,
+:root[data-theme='dark'] .chat-input input {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+:root[data-theme='dark'] .chat-input-shell,
+:root[data-theme='dark'] .chat-filter-pill,
+:root[data-theme='dark'] .chat-header-action,
+:root[data-theme='dark'] .chat-sidebar-action,
+:root[data-theme='dark'] .chat-back-btn,
+:root[data-theme='dark'] .chat-thread-pin,
+:root[data-theme='dark'] .chat-selected-file-chip {
+  background: color-mix(in srgb, var(--surface-muted) 88%, var(--surface)) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .chat-filter-pill.active,
+:root[data-theme='dark'] .chat-thread-pin.pinned {
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface)) !important;
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--border)) !important;
+  color: #ccfbf1 !important;
+}
+
+:root[data-theme='dark'] .chat-filter-pill span,
+:root[data-theme='dark'] .chat-thread-pin-badge {
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface)) !important;
+  color: #ccfbf1 !important;
+}
+
+:root[data-theme='dark'] .chat-sidebar-avatar,
+:root[data-theme='dark'] .chat-thread-avatar,
+:root[data-theme='dark'] .chat-header-avatar,
+:root[data-theme='dark'] .chat-send-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong)) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme='dark'] .chat-input input::placeholder {
+  color: var(--text-subtle) !important;
+}
+
+:root[data-theme='dark'] .chat-message.sent {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong)) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+:root[data-theme='dark'] .chat-message.received {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+:root[data-theme='dark'] .chat-attachment-link {
+  border-color: color-mix(in srgb, var(--border) 80%, transparent) !important;
+  background: color-mix(in srgb, var(--surface-muted) 88%, transparent) !important;
+}
+
+:root[data-theme='dark'] .chat-reaction-pill,
+:root[data-theme='dark'] .chat-reaction-btn {
+  border-color: color-mix(in srgb, var(--border) 82%, transparent) !important;
+  background: color-mix(in srgb, var(--surface-muted) 88%, transparent) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .chat-tick.read {
+  color: #7dd3fc !important;
+}
+
+:root[data-theme='dark'] .chat-attach-btn {
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface)) !important;
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--border)) !important;
+  color: #ccfbf1 !important;
+}
+
+:root[data-theme='dark'] .chat-selected-files {
+  background: var(--surface-muted) !important;
+  border-top-color: var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+:root[data-theme='dark'] .chat-thread-presence {
+  border-color: var(--surface-muted) !important;
+}
+
+:root[data-theme='dark'] .thread-item.active,
+:root[data-theme='dark'] .notification-row.unread,
+:root[data-theme='dark'] .chat-sidebar li.active,
+:root[data-theme='dark'] .notification-link:hover,
+:root[data-theme='dark'] .nav-links a:hover {
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface)) !important;
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--border)) !important;
+}
+
+:root[data-theme='dark'] .renter-layout .sidebar nav a:hover,
+:root[data-theme='dark'] .owner-layout .sidebar nav a:hover,
+:root[data-theme='dark'] .admin-layout .sidebar nav a:hover {
+  color: #ffffff !important;
+}
+
+:root[data-theme='dark'] .notification-time,
+:root[data-theme='dark'] .thread-item small,
+:root[data-theme='dark'] .messages-empty,
+:root[data-theme='dark'] .no-results,
+:root[data-theme='dark'] .empty,
+:root[data-theme='dark'] .forgot-subtitle,
+:root[data-theme='dark'] .register-footer p,
+:root[data-theme='dark'] .login-footer p,
+:root[data-theme='dark'] .footer-inner p,
+:root[data-theme='dark'] .footer-links a,
+:root[data-theme='dark'] .section-head p,
+:root[data-theme='dark'] .property-info p,
+:root[data-theme='dark'] .meta-row span,
+:root[data-theme='dark'] .complaint-item small,
+:root[data-theme='dark'] .details-label {
+  color: var(--text-muted) !important;
+}
+
+:root[data-theme='dark'] .notification-header h4,
+:root[data-theme='dark'] .thread-item p,
+:root[data-theme='dark'] .thread-message p,
+:root[data-theme='dark'] .chat-header h4,
+:root[data-theme='dark'] .chat-seen-indicator,
+:root[data-theme='dark'] .chat-typing-indicator,
+:root[data-theme='dark'] .property-info h3,
+:root[data-theme='dark'] .featured-body h3,
+:root[data-theme='dark'] .card h3,
+:root[data-theme='dark'] .card h4,
+:root[data-theme='dark'] .detail-title,
+:root[data-theme='dark'] .modal-content h3,
+:root[data-theme='dark'] .modal-content p,
+:root[data-theme='dark'] .summary-value,
+:root[data-theme='dark'] .price-chip,
+:root[data-theme='dark'] .brand {
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .nav-links .nav-cta,
+:root[data-theme='dark'] .btn-primary,
+:root[data-theme='dark'] .booking-submit-btn,
+:root[data-theme='dark'] .payment-submit-btn,
+:root[data-theme='dark'] .btn-submit {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #fff;
+}
+
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] textarea,
+:root[data-theme='dark'] .commission-input,
+:root[data-theme='dark'] .remark-input,
+:root[data-theme='dark'] .kyc-reason-input,
+:root[data-theme='dark'] .owner-verify-input {
+  background: var(--surface-muted) !important;
+  color: var(--text);
+  border-color: var(--border) !important;
+}
+
+:root[data-theme='dark'] .hero-bg-shape-a {
+  background: rgba(20, 184, 166, 0.14);
+}
+
+:root[data-theme='dark'] .hero-bg-shape-b {
+  background: rgba(245, 158, 11, 0.18);
+}
+
+:root[data-theme='dark'] .modal-overlay,
+:root[data-theme='dark'] .booking-modal,
+:root[data-theme='dark'] .agreements-modal,
+:root[data-theme='dark'] .property-details-popup::before {
+  background-color: rgba(0, 0, 0, 0.62);
+}
+
+:root[data-theme='dark'] .footer-inner {
+  border-top-color: var(--border);
+}
+
+:root[data-theme='dark'] .recharts-cartesian-grid-horizontal line,
+:root[data-theme='dark'] .recharts-cartesian-grid-vertical line {
+  stroke: color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+:root[data-theme='dark'] .recharts-text,
+:root[data-theme='dark'] .recharts-legend-item-text {
+  fill: var(--text-muted) !important;
+}
+
+/* Owner: Add Property */
+:root[data-theme='dark'] .add-property-container h2 {
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .add-property-form,
+:root[data-theme='dark'] .add-property-form input[type='text'],
+:root[data-theme='dark'] .add-property-form input[type='number'],
+:root[data-theme='dark'] .add-property-form input[type='file'],
+:root[data-theme='dark'] .add-property-form select,
+:root[data-theme='dark'] .add-property-form textarea {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+:root[data-theme='dark'] .add-property-form label {
+  color: var(--text-muted) !important;
+}
+
+:root[data-theme='dark'] .add-property-form input::placeholder,
+:root[data-theme='dark'] .add-property-form textarea::placeholder {
+  color: var(--text-subtle) !important;
+}
+
+:root[data-theme='dark'] .add-property-form select {
+  background-image: none !important;
+}
+
+/* Owner: My Properties */
+:root[data-theme='dark'] .my-properties-container h1,
+:root[data-theme='dark'] .property-details h3,
+:root[data-theme='dark'] .modal-content h2,
+:root[data-theme='dark'] .modal-content p strong {
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .property-details p,
+:root[data-theme='dark'] .modal-content p,
+:root[data-theme='dark'] .form-group label {
+  color: var(--text-muted) !important;
+}
+
+:root[data-theme='dark'] .property-card,
+:root[data-theme='dark'] .modal-content,
+:root[data-theme='dark'] .modal-image,
+:root[data-theme='dark'] .form-group input,
+:root[data-theme='dark'] .form-group textarea,
+:root[data-theme='dark'] .form-group select {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .my-properties-container > p,
+:root[data-theme='dark'] .my-properties-container > p:last-child {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+:root[data-theme='dark'] .rent-amount {
+  color: var(--success-text) !important;
+}
+
+:root[data-theme='dark'] .status.approved {
+  background: var(--danger-bg) !important;
+  color: var(--danger-text) !important;
+  border-color: var(--danger-border) !important;
+}
+
+:root[data-theme='dark'] .status.available {
+  background: var(--info-bg) !important;
+  color: var(--info-text) !important;
+  border-color: var(--info-border) !important;
+}
+
+:root[data-theme='dark'] .btn-edit,
+:root[data-theme='dark'] .btn-delete,
+:root[data-theme='dark'] .btn-view,
+:root[data-theme='dark'] .btn-save,
+:root[data-theme='dark'] .btn-cancel {
+  border-color: transparent !important;
+}
+
+/* Owner: Complaints */
+:root[data-theme='dark'] .owner-complaints-container .loading {
+  background: var(--surface-muted) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border) !important;
+}
+
+:root[data-theme='dark'] .owner-complaints-container .error {
+  background: var(--danger-bg) !important;
+  color: var(--danger-text) !important;
+  border-color: var(--danger-border) !important;
+}
+
+:root[data-theme='dark'] .owner-complaints-container .empty {
+  background: var(--warning-bg) !important;
+  color: var(--warning-text) !important;
+  border-color: var(--warning-border) !important;
+}
+
+:root[data-theme='dark'] .complaints-table thead {
+  background: var(--surface-muted) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .complaints-table th,
+:root[data-theme='dark'] .complaints-table td {
+  border-bottom-color: var(--border) !important;
+}
+
+:root[data-theme='dark'] .complaints-table tbody tr:hover {
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface)) !important;
+}
+
+/* Lease Agreements Popup */
+:root[data-theme='dark'] .agreements-content {
+  background: var(--surface-muted) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .agreements-close {
+  background: var(--surface-muted) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .agreements-signatures p,
+:root[data-theme='dark'] .agreements-versions li {
+  color: var(--text-muted) !important;
+}
+
+:root[data-theme='dark'] .agreements-sign-box button {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong)) !important;
+  color: #fff !important;
+  border: none !important;
+}

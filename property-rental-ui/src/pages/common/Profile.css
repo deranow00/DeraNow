@@ -1,0 +1,386 @@
+.profile-page {
+  max-width: 1050px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+  padding-bottom: 0.25rem;
+  animation: profileFadeIn 220ms ease;
+  min-width: 0;
+}
+
+.profile-loading {
+  color: var(--text-muted);
+}
+
+.profile-header-card,
+.profile-card {
+  padding: 1.15rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.profile-header-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.profile-hero {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.18), rgba(217, 119, 6, 0.18));
+  border: 1px solid color-mix(in srgb, var(--accent) 16%, var(--border));
+  color: var(--accent-strong);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.profile-hero-copy {
+  min-width: 0;
+}
+
+.profile-eyebrow,
+.profile-section-eyebrow {
+  display: inline-flex;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent-strong);
+}
+
+.profile-header-card p {
+  margin-top: 0.35rem;
+}
+
+.profile-status-card {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: end;
+  padding: 0.8rem 0.9rem;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(241, 245, 249, 0.86));
+  border: 1px solid var(--border);
+}
+
+.profile-status-card.pending,
+.profile-status-card.unsubmitted {
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.96), rgba(254, 243, 199, 0.78));
+}
+
+.profile-status-card.verified {
+  background: linear-gradient(180deg, rgba(236, 253, 245, 0.98), rgba(209, 250, 229, 0.82));
+}
+
+.profile-status-card.rejected {
+  background: linear-gradient(180deg, rgba(254, 242, 242, 0.98), rgba(254, 226, 226, 0.82));
+}
+
+.profile-status-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.profile-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.8rem;
+}
+
+.profile-meta-grid div {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.profile-label {
+  color: var(--text-subtle);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.profile-section-copy {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.profile-section-copy p {
+  font-size: 0.92rem;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.profile-meta-grid strong,
+.profile-section-copy h3,
+.kyc-doc-title,
+.profile-error,
+.profile-verified-note,
+.profile-message {
+  overflow-wrap: anywhere;
+}
+
+.kyc-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.kyc-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.kyc-field {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.kyc-field span {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.profile-upload-hint {
+  margin-bottom: 0.85rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 16px;
+  border: 1px solid var(--info-border);
+  background: color-mix(in srgb, var(--info-bg) 82%, var(--surface));
+  color: var(--info-text);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.kyc-file-preview-row {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.kyc-submit-btn {
+  margin-top: 0.8rem;
+}
+
+.kyc-doc-grid {
+  margin-top: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 0.75rem;
+}
+
+.kyc-doc-item {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 0.65rem;
+  display: grid;
+  gap: 0.45rem;
+  background: var(--surface-muted);
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  min-width: 0;
+}
+
+.kyc-doc-item:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--border));
+  box-shadow: var(--shadow-soft);
+}
+
+.kyc-doc-link {
+  display: block;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.kyc-doc-item img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  transition: transform 220ms ease;
+}
+
+.kyc-doc-item:hover img {
+  transform: scale(1.03);
+}
+
+.kyc-doc-title {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.kyc-chip {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+
+.kyc-chip.pending {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-color: var(--warning-border);
+}
+
+.kyc-chip.verified {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-color: var(--success-border);
+}
+
+.kyc-chip.rejected {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+
+.kyc-chip.unsubmitted {
+  background: color-mix(in srgb, var(--surface) 60%, var(--border));
+  color: var(--text-subtle);
+  border-color: var(--border);
+}
+
+.profile-error {
+  color: var(--danger-text);
+}
+
+.profile-message {
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--info-border);
+  background: var(--info-bg);
+  color: var(--info-text);
+  font-weight: 600;
+}
+
+.profile-empty {
+  color: var(--text-muted);
+}
+
+.profile-verified-note {
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-text);
+  font-weight: 600;
+}
+
+@keyframes profileFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 980px) {
+  .profile-hero {
+    grid-template-columns: auto 1fr;
+  }
+
+  .profile-status-card {
+    grid-column: 1 / -1;
+    justify-items: start;
+  }
+
+  .profile-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kyc-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-page {
+    gap: 0.85rem;
+  }
+
+  .profile-hero {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 0.85rem;
+  }
+
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    font-size: 1.2rem;
+  }
+
+  .profile-header-card,
+  .profile-card {
+    padding: 0.9rem;
+    border-radius: 20px;
+  }
+
+  .profile-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+    padding: 0.75rem;
+  }
+
+  .kyc-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .kyc-file-preview-row {
+    font-size: 0.86rem;
+  }
+
+  .kyc-submit-btn {
+    width: 100%;
+  }
+
+  .kyc-doc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kyc-doc-item {
+    border-radius: 20px;
+  }
+
+  .kyc-doc-item img {
+    height: 180px;
+  }
+}

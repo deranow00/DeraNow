@@ -1,0 +1,110 @@
+.owner-payment-page {
+  padding: 0.5rem;
+}
+
+.owner-payment-header h2 {
+  margin: 0;
+}
+
+.owner-payment-header p {
+  margin: 0.35rem 0 1rem;
+  color: var(--text-muted);
+}
+
+.owner-payment-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.owner-payment-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.owner-payment-card h3 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 1.8rem;
+}
+
+.owner-payment-card p {
+  margin: 0.3rem 0 0;
+  color: var(--text-muted);
+}
+
+.owner-payment-table-wrap {
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.owner-payment-trend {
+  margin-bottom: 1rem;
+}
+
+.owner-payment-trend h3 {
+  margin: 0 0 0.6rem;
+}
+
+.owner-payment-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 920px;
+}
+
+.owner-payment-table th,
+.owner-payment-table td {
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  padding: 0.7rem;
+}
+
+.owner-payment-table th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.owner-chip {
+  display: inline-flex;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.owner-chip.paid,
+.owner-chip.transferred {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.owner-chip.pending-verification,
+.owner-chip.allocated,
+.owner-chip.unallocated {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.owner-chip.unpaid,
+.owner-chip.not-eligible {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+@media (max-width: 1000px) {
+  .owner-payment-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .owner-payment-cards {
+    grid-template-columns: 1fr;
+  }
+}

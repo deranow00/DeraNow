@@ -1,0 +1,242 @@
+.complaint-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  font-family: var(--font-body);
+  min-height: 100vh;
+  position: relative;
+  animation: pageFade 0.4s ease;
+}
+
+.complaint-container h1 {
+  text-align: center;
+  font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+  color: var(--text);
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+.complaint-form,
+.complaint-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 2rem;
+}
+
+.success-msg,
+.error-msg {
+  text-align: center;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  max-width: 520px;
+  margin: 0 auto 1.2rem;
+}
+
+.success-msg {
+  color: #0f766e;
+  background: #e0f2f0;
+  border: 1px solid #9ed7d1;
+}
+
+.error-msg {
+  color: #b42318;
+  background: #fdecea;
+  border: 1px solid #f2c4c2;
+}
+
+.complaint-form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.complaint-form label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+  color: var(--text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.complaint-form input,
+.complaint-form textarea,
+.complaint-form select {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: #f9f6f1;
+  transition: border var(--transition), box-shadow var(--transition);
+}
+
+.complaint-form input:focus,
+.complaint-form textarea:focus,
+.complaint-form select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
+  background-color: #ffffff;
+}
+
+.complaint-form textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.form-buttons button {
+  flex: 1;
+  min-width: 160px;
+  padding: 0.85rem 1.2rem;
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: white;
+  box-shadow: 0 12px 22px rgba(15, 118, 110, 0.25);
+}
+
+.btn-reset {
+  background: #f87171;
+  color: white;
+  box-shadow: 0 12px 22px rgba(220, 38, 38, 0.2);
+}
+
+.form-buttons button:hover {
+  transform: translateY(-2px);
+}
+
+.complaint-list {
+  list-style: none;
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+}
+
+.complaint-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  background: #ffffff;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.complaint-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.complaint-item.pending {
+  border-left: 4px solid #f59e0b;
+}
+
+.complaint-item.resolved {
+  border-left: 4px solid #10b981;
+  opacity: 0.85;
+}
+
+.btn-resolve {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--transition);
+}
+
+.btn-resolve:hover {
+  transform: translateY(-1px);
+}
+
+.history-btn-container {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+}
+
+.btn-history {
+  background: #1f1b17;
+  color: #f8f5ef;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: transform var(--transition), background var(--transition);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-history:hover {
+  transform: translateY(-2px);
+  background: #2a2521;
+}
+
+@media (max-width: 900px) {
+  .complaint-container {
+    padding: 2rem 1.25rem;
+  }
+
+  .history-btn-container {
+    position: static;
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .complaint-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+  }
+
+  .form-buttons button {
+    width: 100%;
+  }
+}
+
+@keyframes pageFade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .complaint-container,
+  .complaint-item,
+  .btn-submit,
+  .btn-reset,
+  .btn-resolve,
+  .btn-history {
+    animation: none;
+    transition: none;
+  }
+}

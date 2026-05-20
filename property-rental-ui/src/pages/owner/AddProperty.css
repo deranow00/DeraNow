@@ -1,0 +1,402 @@
+/* Reset and base styles for the add property component */
+.add-property-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0.35rem 0 0.25rem;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100%;
+}
+
+.add-property-container h2 {
+  font-size: clamp(1.65rem, 2.6vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text);
+  text-align: left;
+  margin: 0 0 1.1rem 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+/* Form container */
+.add-property-form {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+  padding: 1.4rem;
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  max-width: 100%;
+}
+
+/* Form labels */
+.add-property-form label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.45rem;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.add-property-form label:first-child {
+  margin-top: 0;
+}
+
+/* Required field indicator */
+.add-property-form label::after {
+  content: "";
+}
+
+.add-property-form label.required::after {
+  content: " *";
+  color: #ef4444;
+  font-weight: 700;
+}
+
+/* Input fields */
+.add-property-form input[type="text"],
+.add-property-form input[type="number"],
+.add-property-form input[type="file"],
+.add-property-form select,
+.add-property-form textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-size: 1rem;
+  color: var(--text);
+  background-color: var(--surface);
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.add-property-form input[type="file"] {
+  padding: 0.7rem 0.85rem;
+}
+
+.add-property-form input[type="text"]:focus,
+.add-property-form input[type="number"]:focus,
+.add-property-form input[type="file"]:focus,
+.add-property-form select:focus,
+.add-property-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+}
+
+.add-property-form input[type="text"]:hover,
+.add-property-form input[type="number"]:hover,
+.add-property-form input[type="file"]:hover,
+.add-property-form select:hover,
+.add-property-form textarea:hover {
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+}
+
+/* Placeholder styling */
+.add-property-form input::placeholder,
+.add-property-form textarea::placeholder {
+  color: var(--text-subtle);
+}
+
+/* Select dropdown */
+.add-property-form select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
+.add-property-form select:focus {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230f766e' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* Textarea */
+.add-property-form textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+/* Error message */
+.add-property-form .error {
+  background-color: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+}
+
+/* Success message */
+.add-property-form .success {
+  background-color: var(--success-bg);
+  border: 1px solid var(--success-border);
+  color: var(--success-text);
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+}
+
+/* Submit button */
+.add-property-form button[type="submit"] {
+  width: 100%;
+  min-height: 54px;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #ffffff;
+  border: none;
+  border-radius: 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1.25rem;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
+}
+
+.add-property-form button[type="submit"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(15, 118, 110, 0.18);
+}
+
+.add-property-form button[type="submit"]:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.add-property-form button[type="submit"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
+}
+
+.add-property-form button[type="submit"]:disabled {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* Loading state for button */
+.add-property-form button[type="submit"]:disabled::after {
+  content: "";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+/* Form validation styles */
+.add-property-form input:invalid:not(:placeholder-shown),
+.add-property-form textarea:invalid:not(:placeholder-shown) {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.add-property-form input:valid:not(:placeholder-shown),
+.add-property-form textarea:valid:not(:placeholder-shown) {
+  border-color: #10b981;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .add-property-container {
+    padding-top: 0;
+  }
+
+  .add-property-container h2 {
+    font-size: 1.6rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .add-property-form {
+    padding: 1rem;
+    border-radius: 20px;
+  }
+
+  .add-property-form label {
+    font-size: 0.8rem;
+    margin-top: 1.25rem;
+  }
+
+  .add-property-form input[type="text"],
+  .add-property-form input[type="number"],
+  .add-property-form input[type="file"],
+  .add-property-form select,
+  .add-property-form textarea {
+    min-height: 50px;
+    padding: 0.8rem 0.9rem;
+    font-size: 1rem;
+  }
+
+  .add-property-form button[type="submit"] {
+    margin-top: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .add-property-container h2 {
+    font-size: 1.45rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .add-property-form {
+    padding: 0.95rem;
+    border-radius: 18px;
+  }
+
+  .add-property-form label {
+    font-size: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .add-property-form input[type="text"],
+  .add-property-form input[type="number"],
+  .add-property-form input[type="file"],
+  .add-property-form select,
+  .add-property-form textarea {
+    min-height: 48px;
+    padding: 0.78rem 0.85rem;
+    font-size: 1rem;
+  }
+
+  .add-property-form button[type="submit"] {
+    min-height: 52px;
+    font-size: 0.92rem;
+    margin-top: 0.95rem;
+  }
+}
+
+/* Form grid layout for larger screens */
+@media (min-width: 768px) {
+  .add-property-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 2rem;
+    align-items: start;
+  }
+
+  .add-property-form label:nth-of-type(1),
+  .add-property-form input:nth-of-type(1) {
+    grid-column: 1 / -1;
+  }
+
+  .add-property-form label:nth-of-type(2),
+  .add-property-form input:nth-of-type(2) {
+    grid-column: 1 / -1;
+  }
+
+  .add-property-form label:nth-of-type(7),
+  .add-property-form select {
+    grid-column: 1 / -1;
+  }
+
+  .add-property-form label:nth-of-type(8),
+  .add-property-form textarea {
+    grid-column: 1 / -1;
+  }
+
+  .add-property-form label:nth-of-type(9),
+  .add-property-form input:nth-of-type(6) {
+    grid-column: 1 / -1;
+  }
+
+  .add-property-form .error,
+  .add-property-form .success,
+  .add-property-form button[type="submit"] {
+    grid-column: 1 / -1;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .add-property-form {
+    border: 2px solid #000000;
+  }
+
+  .add-property-form input[type="text"],
+  .add-property-form input[type="number"],
+  .add-property-form select,
+  .add-property-form textarea {
+    border: 2px solid #000000;
+  }
+
+  .add-property-form input[type="text"]:focus,
+  .add-property-form input[type="number"]:focus,
+  .add-property-form select:focus,
+  .add-property-form textarea:focus {
+    border-color: #0000ff;
+    box-shadow: 0 0 0 3px rgba(0, 0, 255, 0.3);
+  }
+
+  .add-property-form button[type="submit"] {
+    border: 2px solid #000000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .add-property-form input[type="text"],
+  .add-property-form input[type="number"],
+  .add-property-form select,
+  .add-property-form textarea,
+  .add-property-form button[type="submit"] {
+    transition: none;
+  }
+
+  .add-property-form button[type="submit"]:disabled::after {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .add-property-container {
+    background-color: white;
+    box-shadow: none;
+    padding: 1rem;
+  }
+
+  .add-property-form {
+    box-shadow: none;
+    border: 1px solid #000000;
+  }
+
+  .add-property-form button[type="submit"] {
+    display: none;
+  }
+}

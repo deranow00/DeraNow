@@ -1,0 +1,533 @@
+/* Reset and base styles for the register component */
+.register-container {
+  display: flex;
+  min-height: var(--app-height);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg);
+  margin: 0;
+  padding: 0;
+  padding-top: var(--safe-top);
+}
+
+/* Left side - Join section */
+.register-left {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.95) 0%, rgba(246, 243, 238, 0.95) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.register-left::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.register-left > * {
+  position: relative;
+  z-index: 2;
+}
+
+.register-left h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0 0 2rem 0;
+  padding: 0;
+  text-align: center;
+  line-height: 1.1;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.02em;
+}
+
+.green {
+  color: #34d399;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.register-left img {
+  max-width: 400px;
+  width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.register-left img:hover {
+  transform: scale(1.02);
+}
+
+/* Right side - Register form */
+.register-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #ffffff;
+  overflow-y: auto;
+  transition: padding-bottom 180ms ease;
+}
+
+.register-right h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  padding: 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.logo {
+  color: #10b981;
+  background: linear-gradient(135deg, #10b981, #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.register-right h3 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #64748b;
+  margin: 0 0 2rem 0;
+  padding: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Form styling */
+.register-right form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.register-right label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.register-right input[type="text"],
+.register-right input[type="email"],
+.register-right input[type="password"],
+.register-right select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: #374151;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.register-right input[type="text"]:focus,
+.register-right input[type="email"]:focus,
+.register-right input[type="password"]:focus,
+.register-right select:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  background-color: #fefefe;
+}
+
+.register-right input[type="text"]:hover,
+.register-right input[type="email"]:hover,
+.register-right input[type="password"]:hover,
+.register-right select:hover {
+  border-color: #cbd5e1;
+}
+
+/* Placeholder styling */
+.register-right input::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Select dropdown */
+.register-right select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
+.register-right select:focus {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230f766e' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* Error message */
+.register-right .error {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Success message */
+.register-right .success {
+  background-color: #d1fae5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  padding: 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Submit button */
+.register-right button[type="submit"] {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.register-right button[type="submit"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.register-right button[type="submit"]:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.register-right button[type="submit"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+.register-right button[type="submit"]:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* Loading state for button */
+.register-right button[type="submit"]:disabled::after {
+  content: "";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+/* Register footer */
+.register-footer {
+  margin-top: 2rem;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.register-footer p {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+.register-footer p a {
+  color: #10b981;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.register-footer p a:hover {
+  color: #059669;
+  text-decoration: underline;
+}
+
+.register-footer p a:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+  border-radius: 0.25rem;
+}
+
+/* Form validation styles */
+.register-right input:invalid:not(:placeholder-shown) {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.register-right input:valid:not(:placeholder-shown) {
+  border-color: #10b981;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .register-left h1 {
+    font-size: 3rem;
+  }
+
+  .register-left img {
+    max-width: 350px;
+  }
+
+  .register-right {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .register-container {
+    flex-direction: column;
+    padding-top: 0;
+  }
+
+  .register-left {
+    flex: none;
+    min-height: 35vh;
+    padding: 2rem 1rem;
+  }
+
+  .register-left h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .register-left img {
+    max-width: 280px;
+  }
+
+  .register-right {
+    flex: none;
+    padding: 1.5rem 1rem calc(1.5rem + var(--keyboard-offset));
+    min-height: 65vh;
+    justify-content: flex-start;
+  }
+
+  .register-right form {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-left {
+    min-height: 30vh;
+    padding: calc(1.5rem + var(--safe-top)) 1rem 1.5rem;
+  }
+
+  .register-left h1 {
+    font-size: 2rem;
+  }
+
+  .register-left img {
+    max-width: 240px;
+  }
+
+  .register-right {
+    padding: 1rem 0.75rem calc(1rem + var(--keyboard-offset));
+    min-height: 70vh;
+  }
+
+  .register-right h2 {
+    font-size: 1.5rem;
+  }
+
+  .register-right form {
+    gap: 0.875rem;
+  }
+
+  .register-right input[type="text"],
+  .register-right input[type="email"],
+  .register-right input[type="password"],
+  .register-right select {
+    padding: 0.75rem;
+    font-size: 16px;
+  }
+
+  .register-right button[type="submit"] {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .register-right {
+    padding: 0.75rem 0.5rem calc(0.9rem + var(--keyboard-offset));
+  }
+
+  .register-right form {
+    gap: 0.75rem;
+  }
+
+  .register-right label {
+    font-size: 0.8rem;
+  }
+
+  .register-right input[type="text"],
+  .register-right input[type="email"],
+  .register-right input[type="password"],
+  .register-right select {
+    padding: 0.625rem 0.75rem;
+    font-size: 16px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .register-right input[type="text"],
+  .register-right input[type="email"],
+  .register-right input[type="password"],
+  .register-right select {
+    border: 2px solid #000000;
+  }
+
+  .register-right input[type="text"]:focus,
+  .register-right input[type="email"]:focus,
+  .register-right input[type="password"]:focus,
+  .register-right select:focus {
+    border-color: #00ff00;
+    box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.3);
+  }
+
+  .register-right button[type="submit"] {
+    border: 2px solid #000000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .register-left img,
+  .register-right input[type="text"],
+  .register-right input[type="email"],
+  .register-right input[type="password"],
+  .register-right select,
+  .register-right button[type="submit"],
+  .register-footer a {
+    transition: none;
+  }
+
+  .register-right button[type="submit"]:disabled::after {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .register-container {
+    background-color: white;
+  }
+
+  .register-left {
+    background: white;
+    color: black;
+  }
+
+  .register-left img {
+    display: none;
+  }
+
+  .register-right form {
+    border: 1px solid #000000;
+    padding: 1rem;
+  }
+}
+
+/* Focus visible for better accessibility */
+.register-right input[type="text"]:focus-visible,
+.register-right input[type="email"]:focus-visible,
+.register-right input[type="password"]:focus-visible,
+.register-right select:focus-visible,
+.register-right button[type="submit"]:focus-visible,
+.register-footer a:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling for form */
+.register-right {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for register right section */
+.register-right::-webkit-scrollbar {
+  width: 6px;
+}
+
+.register-right::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.register-right::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.register-right::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

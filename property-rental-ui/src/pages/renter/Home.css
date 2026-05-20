@@ -1,0 +1,253 @@
+.renter-dashboard.dashboard-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: clamp(1rem, 2.4vw, 2rem);
+  min-height: calc(100vh - 90px);
+}
+
+.renter-dashboard .dashboard-hero {
+  background: linear-gradient(
+    130deg,
+    color-mix(in srgb, var(--surface) 82%, var(--accent) 18%),
+    var(--surface)
+  );
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--accent) 20%);
+  border-radius: var(--radius-lg);
+  padding: clamp(1rem, 2.2vw, 1.8rem);
+  margin-bottom: 1.25rem;
+}
+
+.renter-dashboard .dashboard-eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  font-weight: 700;
+}
+
+.renter-dashboard h2 {
+  margin: 0.35rem 0;
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  color: var(--text);
+}
+
+.renter-dashboard .dashboard-subtitle {
+  color: var(--text-muted);
+  max-width: 68ch;
+  line-height: 1.5;
+}
+
+.renter-dashboard .dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.renter-dashboard .dashboard-grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.renter-dashboard .dashboard-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.2rem 1.35rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.renter-dashboard .stat-label {
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-subtle);
+}
+
+.renter-dashboard .dashboard-stat-card h3 {
+  margin-top: 0.45rem;
+  font-size: clamp(1.65rem, 3vw, 2.2rem);
+  color: var(--text);
+}
+
+.renter-dashboard .chart-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.renter-dashboard .chart-card,
+.renter-dashboard .recent-properties,
+.renter-dashboard .action-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: clamp(0.9rem, 2vw, 1.25rem);
+}
+
+.renter-dashboard .action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.renter-dashboard .action-link {
+  display: block;
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg) 12%);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.72rem 0.82rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.renter-dashboard .action-link:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  transform: translateY(-1px);
+}
+
+.renter-dashboard .insight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.renter-dashboard .insight-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.7rem 0.78rem;
+  background: color-mix(in srgb, var(--surface) 90%, var(--bg) 10%);
+}
+
+.renter-dashboard .insight-label {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-subtle);
+  font-weight: 700;
+}
+
+.renter-dashboard .insight-value {
+  margin-top: 0.32rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.renter-dashboard .section-head {
+  margin-bottom: 0.75rem;
+}
+
+.renter-dashboard .section-head h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.04rem;
+  font-weight: 700;
+}
+
+.renter-dashboard .section-head p {
+  margin-top: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.renter-dashboard .dashboard-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.renter-dashboard .dashboard-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 92%, var(--bg) 8%);
+}
+
+.renter-dashboard .item-title {
+  margin: 0;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.renter-dashboard .item-subtitle {
+  margin-top: 0.22rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.renter-dashboard .status-pill {
+  border-radius: 999px;
+  padding: 0.3rem 0.66rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.renter-dashboard .status-pill.approved {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-color: var(--success-border);
+}
+
+.renter-dashboard .status-pill.pending {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-color: var(--warning-border);
+}
+
+.renter-dashboard .status-pill.rejected {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+
+.renter-dashboard .empty-state {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--surface) 85%, var(--bg) 15%);
+}
+
+.renter-dashboard .recharts-tooltip-wrapper {
+  outline: none;
+}
+
+@media (max-width: 980px) {
+  .renter-dashboard .dashboard-cards,
+  .renter-dashboard .dashboard-grid-two,
+  .renter-dashboard .chart-section {
+    grid-template-columns: 1fr;
+  }
+
+  .renter-dashboard .insight-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .renter-dashboard .action-grid,
+  .renter-dashboard .insight-grid {
+    grid-template-columns: 1fr;
+  }
+}

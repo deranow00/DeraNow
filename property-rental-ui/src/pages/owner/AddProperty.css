@@ -59,7 +59,6 @@
 /* Input fields */
 .add-property-form input[type="text"],
 .add-property-form input[type="number"],
-.add-property-form input[type="file"],
 .add-property-form select,
 .add-property-form textarea {
   width: 100%;
@@ -75,13 +74,8 @@
   box-sizing: border-box;
 }
 
-.add-property-form input[type="file"] {
-  padding: 0.7rem 0.85rem;
-}
-
 .add-property-form input[type="text"]:focus,
 .add-property-form input[type="number"]:focus,
-.add-property-form input[type="file"]:focus,
 .add-property-form select:focus,
 .add-property-form textarea:focus {
   outline: none;
@@ -91,7 +85,6 @@
 
 .add-property-form input[type="text"]:hover,
 .add-property-form input[type="number"]:hover,
-.add-property-form input[type="file"]:hover,
 .add-property-form select:hover,
 .add-property-form textarea:hover {
   border-color: color-mix(in srgb, var(--accent) 22%, var(--border));
@@ -255,7 +248,6 @@
 
   .add-property-form input[type="text"],
   .add-property-form input[type="number"],
-  .add-property-form input[type="file"],
   .add-property-form select,
   .add-property-form textarea {
     min-height: 50px;
@@ -286,7 +278,6 @@
 
   .add-property-form input[type="text"],
   .add-property-form input[type="number"],
-  .add-property-form input[type="file"],
   .add-property-form select,
   .add-property-form textarea {
     min-height: 48px;
@@ -331,7 +322,7 @@
   }
 
   .add-property-form label:nth-of-type(9),
-  .add-property-form input:nth-of-type(6) {
+  .add-property-form .photo-upload-field {
     grid-column: 1 / -1;
   }
 

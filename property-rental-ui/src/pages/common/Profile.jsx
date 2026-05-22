@@ -158,24 +158,60 @@ export default function Profile() {
                 </select>
               </label>
 
-              <label className="kyc-field">
+              <div className="kyc-field">
                 <span>Upload ID Document(s)</span>
+                <div className="photo-upload-actions">
+                  <label className="photo-upload-button" htmlFor="kyc-doc-gallery">
+                    Choose from Photos
+                  </label>
+                  <label className="photo-upload-button" htmlFor="kyc-doc-camera">
+                    Take Live Photo
+                  </label>
+                </div>
                 <input
+                  id="kyc-doc-gallery"
+                  className="photo-upload-input"
                   type="file"
                   accept="image/*"
                   multiple
                   onChange={(e) => setFiles(Array.from(e.target.files || []))}
                 />
-              </label>
-
-              <label className="kyc-field">
-                <span>Passport Size Photo (Optional)</span>
                 <input
+                  id="kyc-doc-camera"
+                  className="photo-upload-input"
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={(e) => setFiles(Array.from(e.target.files || []))}
+                />
+              </div>
+
+              <div className="kyc-field">
+                <span>Passport Size Photo (Optional)</span>
+                <div className="photo-upload-actions">
+                  <label className="photo-upload-button" htmlFor="passport-photo-gallery">
+                    Choose from Photos
+                  </label>
+                  <label className="photo-upload-button" htmlFor="passport-photo-camera">
+                    Take Live Photo
+                  </label>
+                </div>
+                <input
+                  id="passport-photo-gallery"
+                  className="photo-upload-input"
                   type="file"
                   accept="image/*"
                   onChange={(e) => setPassportPhotoFile(e.target.files?.[0] || null)}
                 />
-              </label>
+                <input
+                  id="passport-photo-camera"
+                  className="photo-upload-input"
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  onChange={(e) => setPassportPhotoFile(e.target.files?.[0] || null)}
+                />
+              </div>
             </div>
 
             <div className="kyc-file-preview-row">

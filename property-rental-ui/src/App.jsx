@@ -7,6 +7,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { SocketProvider } from './context/SocketContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { API_BASE_URL } from './config/api';
+import AppLaunchSplash from './components/common/AppLaunchSplash';
 
 const isEditableElement = (element) => {
   if (!element) return false;
@@ -141,6 +142,7 @@ function AppShell() {
         <LanguageProvider>
           <AppPreferenceSync />
           <AppViewportSync />
+          <AppLaunchSplash />
           <BrowserRouter>
             <AppRoutes />
           </BrowserRouter>

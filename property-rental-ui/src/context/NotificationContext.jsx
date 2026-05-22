@@ -5,10 +5,31 @@ import { API_BASE_URL } from '../config/api';
 
 export const NotificationContext = createContext();
 
+const canUseBrowserNotifications = () =>
+  typeof window !== 'undefined' && 'Notification' in window;
+
 export const NotificationProvider = ({ children }) => {
   const { user, token } = useContext(AuthContext);
   const socket = useSocket();
   const [notifications, setNotifications] = useState([]);
+  const [phoneNotificationPermission, setPhoneNotificationPermission] = useState(() =>
+    canUseBrowserNotifications() ? Notification.permission : 'unsupported'
+  );
+
+  const requestPhoneNotifications = async () => {
+    if (!canUseBrowserNotifications()) {
+      setPhoneNotificationPermission('unsupported');
+      return 'unsupported';
+    }
+    const permission = await Notification.requestPermission();
+    setPhoneNotificationPermission(permission);
+    return permission;
+  };
+
+  useEffect(() => {
+    if (!user || !canUseBrowserNotifications()) return;
+    setPhoneNotificationPermission(Notification.permission);
+  }, [user?._id]);
 
   useEffect(() => {
     if (!user || !token) {
@@ -45,6 +66,21 @@ export const NotificationProvider = ({ children }) => {
         if (prev.some((n) => n._id === notification._id)) return prev;
         return [notification, ...prev];
       });
+
+      if (
+        canUseBrowserNotifications() &&
+        Notification.permission === 'granted' &&
+        document.visibilityState !== 'visible'
+      ) {
+        const systemNotification = new Notification('DeraNow', {
+          body: notification.message || 'You have a new notification.',
+          icon: '/dera.png',
+          tag: notification._id || notification.type || 'deranow-notification',
+        });
+        systemNotification.onclick = () => {
+          window.focus();
+        };
+      }
     };
 
     currentSocket.on('newNotification', handleNewNotification);
@@ -79,7 +115,14 @@ export const NotificationProvider = ({ children }) => {
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, setNotifications, unreadCount, markAsRead }}
+      value={{
+        notifications,
+        setNotifications,
+        unreadCount,
+        markAsRead,
+        phoneNotificationPermission,
+        requestPhoneNotifications,
+      }}
     >
       {children}
     </NotificationContext.Provider>

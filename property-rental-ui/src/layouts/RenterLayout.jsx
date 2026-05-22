@@ -81,7 +81,7 @@ export default function RenterLayout() {
     <div className={`renter-layout ios-app-shell ${collapsed ? 'sidebar-collapsed' : ''}`}>
       <aside className="sidebar">
         <div className="sidebar-head">
-          <h2 className="logo">Dera</h2>
+          <h2 className="logo">{t('common.appName')}</h2>
           <button
             type="button"
             className="sidebar-toggle"

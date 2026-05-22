@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   HiOutlineChevronLeft,
   HiOutlineInformationCircle,
+  HiOutlineCamera,
   HiOutlinePaperAirplane,
   HiOutlinePhone,
   HiOutlinePhoto,
@@ -355,14 +356,25 @@ export default function ChatWindow({ selectedUser, onBack }) {
         </div>
       ) : null}
       <div className="chat-input">
-        <label className="chat-attach-btn" htmlFor="chat-attachment-input" title="Add photo">
+        <label className="chat-attach-btn" htmlFor="chat-attachment-gallery" title="Choose from photos">
           <HiOutlinePhoto />
         </label>
+        <label className="chat-attach-btn" htmlFor="chat-attachment-camera" title="Take live photo">
+          <HiOutlineCamera />
+        </label>
         <input
-          id="chat-attachment-input"
+          id="chat-attachment-gallery"
           type="file"
           accept="image/*"
           multiple
+          onChange={handleFileChange}
+          className="chat-attachment-input"
+        />
+        <input
+          id="chat-attachment-camera"
+          type="file"
+          accept="image/*"
+          capture="environment"
           onChange={handleFileChange}
           className="chat-attachment-input"
         />

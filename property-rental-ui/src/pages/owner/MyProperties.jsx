@@ -4,6 +4,8 @@ import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
 
 const PROPERTY_TYPES = ['Apartment', 'House', 'Condo'];
+const displayPropertyType = (type) => (type === 'Condo' ? 'Room' : type);
+const toBackendPropertyType = (type) => (type === 'Room' ? 'Condo' : type);
 
 export default function MyProperties() {
   const [viewProperty, setViewProperty] = useState(null);
@@ -63,7 +65,7 @@ export default function MyProperties() {
       bedrooms: property.bedrooms || '',
       bathrooms: property.bathrooms || '',
       description: property.description || '',
-      type: property.type || PROPERTY_TYPES[0],
+      type: toBackendPropertyType(property.type || PROPERTY_TYPES[0]),
       image: property.image || '',
     });
     setFormError('');
@@ -122,6 +124,7 @@ export default function MyProperties() {
         },
         body: JSON.stringify({
           ...formData,
+          type: toBackendPropertyType(formData.type),
           image: imageUrl,
           price: Number(formData.price),
           bedrooms: Number(formData.bedrooms),
@@ -283,18 +286,39 @@ export default function MyProperties() {
               <select name="type" value={formData.type} onChange={handleInputChange}>
                 {PROPERTY_TYPES.map((t) => (
                   <option key={t} value={t}>
-                    {t}
+                    {displayPropertyType(t)}
                   </option>
                 ))}
               </select>
             </div>
             <div className="form-group">
-              <label>Upload New Image</label>
+              <span className="photo-upload-label">Upload New Image</span>
+              <div className="photo-upload-actions">
+                <label className="photo-upload-button" htmlFor="edit-property-image-gallery">
+                  Choose from Photos
+                </label>
+                <label className="photo-upload-button" htmlFor="edit-property-image-camera">
+                  Take Live Photo
+                </label>
+              </div>
               <input
+                id="edit-property-image-gallery"
+                className="photo-upload-input"
                 type="file"
                 accept="image/*"
                 onChange={(e) => setEditImageFile(e.target.files?.[0] || null)}
               />
+              <input
+                id="edit-property-image-camera"
+                className="photo-upload-input"
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={(e) => setEditImageFile(e.target.files?.[0] || null)}
+              />
+              <small className="photo-upload-selected">
+                {editImageFile ? editImageFile.name : 'No image selected'}
+              </small>
             </div>
             <div className="form-group">
               <label>Image URL (Optional)</label>
@@ -348,7 +372,7 @@ export default function MyProperties() {
               <strong>Description:</strong> {viewProperty.description || 'N/A'}
             </p>
             <p>
-              <strong>Type:</strong> {viewProperty.type}
+              <strong>Type:</strong> {displayPropertyType(viewProperty.type)}
             </p>
             <div className="modal-buttons">
               <button className="btn-cancel" onClick={() => setViewProperty(null)}>

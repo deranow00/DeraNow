@@ -27,9 +27,17 @@ connectDB();
 
 const app = express();
 const DEFAULT_FRONTEND_ORIGIN = 'http://localhost:5173';
+const NATIVE_APP_ORIGINS = [
+  'capacitor://localhost',
+  'ionic://localhost',
+  'http://localhost',
+  'https://localhost',
+];
 const configuredOrigins = process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '';
-const allowedOrigins = (configuredOrigins || DEFAULT_FRONTEND_ORIGIN)
-  .split(',')
+const allowedOrigins = [
+  ...(configuredOrigins || DEFAULT_FRONTEND_ORIGIN).split(','),
+  ...NATIVE_APP_ORIGINS,
+]
   .map((origin) => origin.trim())
   .filter(Boolean)
   .map((origin) => origin.replace(/\/+$/, ''));

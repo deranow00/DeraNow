@@ -226,12 +226,29 @@ export default function Dashboard() {
           user?.ownerVerificationStatus === 'rejected') && (
           <div className="verification-form">
             <div className="verification-input-group">
-              <label htmlFor="owner-id-image">Upload Valid ID Photo(s)</label>
+              <span className="photo-upload-label">Upload Valid ID Photo(s)</span>
+              <div className="photo-upload-actions">
+                <label className="photo-upload-button" htmlFor="owner-id-gallery">
+                  Choose from Photos
+                </label>
+                <label className="photo-upload-button" htmlFor="owner-id-camera">
+                  Take Live Photo
+                </label>
+              </div>
               <input
-                id="owner-id-image"
+                id="owner-id-gallery"
+                className="photo-upload-input"
                 type="file"
                 accept="image/*"
                 multiple
+                onChange={(e) => setVerificationIdFiles(Array.from(e.target.files || []))}
+              />
+              <input
+                id="owner-id-camera"
+                className="photo-upload-input"
+                type="file"
+                accept="image/*"
+                capture="environment"
                 onChange={(e) => setVerificationIdFiles(Array.from(e.target.files || []))}
               />
               {verificationIdFiles.length > 0 && (

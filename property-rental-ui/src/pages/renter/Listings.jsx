@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PropertyCard from '../../components/common/PropertyCard';
 import './Listings.css';
@@ -49,76 +49,57 @@ const sortListings = (items, sortBy) => {
 };
 
 export default function Listings() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const searchParamsString = searchParams.toString();
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [showDetailsId, setShowDetailsId] = useState(null);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [searchTerm, setSearchTerm] = useState(() => getStateFromParams(searchParams).searchTerm);
   const [filters, setFilters] = useState(() => getStateFromParams(searchParams).filters);
-  const prevSearchParamStringRef = useRef(searchParamsString);
 
   const fetchProperties = async (params, signal) => {
-    setLoading(true);
+    if (filteredProperties.length === 0) setLoading(true);
+    else setRefreshing(true);
     setError('');
     try {
-      // Fetch both listed states directly so UI works even if backend status aliases aren't deployed.
-      const pendingParams = new URLSearchParams(params);
-      pendingParams.set('status', 'Pending');
-      pendingParams.set('availableOnly', 'true');
       const approvedParams = new URLSearchParams(params);
       approvedParams.set('status', 'Approved');
       approvedParams.set('availableOnly', 'true');
 
-      const [pendingRes, approvedRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/properties?${pendingParams.toString()}`, { signal }),
-        fetch(`${API_BASE_URL}/api/properties?${approvedParams.toString()}`, { signal }),
-      ]);
-
-      const [pendingData, approvedData] = await Promise.all([pendingRes.json(), approvedRes.json()]);
-      if (!pendingRes.ok) throw new Error(pendingData.error || 'Failed to fetch listed properties');
+      const approvedRes = await fetch(`${API_BASE_URL}/api/properties?${approvedParams.toString()}`, { signal });
+      const approvedData = await approvedRes.json();
       if (!approvedRes.ok) throw new Error(approvedData.error || 'Failed to fetch listed properties');
 
-      const merged = [...(Array.isArray(pendingData) ? pendingData : []), ...(Array.isArray(approvedData) ? approvedData : [])];
-      const dedupedById = Object.values(
-        merged.reduce((acc, item) => {
-          if (item?._id) acc[item._id] = item;
-          return acc;
-        }, {})
-      );
-      setFilteredProperties(sortListings(dedupedById, filters.sort));
+      const approvedListings = Array.isArray(approvedData) ? approvedData : [];
+      setFilteredProperties(sortListings(approvedListings, params.get('sort') || filters.sort));
     } catch (err) {
       if (err.name === 'AbortError') return;
       setError(err.message);
       setFilteredProperties([]);
     } finally {
-      if (!signal?.aborted) setLoading(false);
+      if (!signal?.aborted) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   };
 
   useEffect(() => {
-    const nextParamsString = searchParamsString;
-    if (nextParamsString === prevSearchParamStringRef.current) return;
-
-    prevSearchParamStringRef.current = nextParamsString;
     const nextState = getStateFromParams(searchParams);
     setSearchTerm(nextState.searchTerm);
     setFilters(nextState.filters);
-  }, [searchParams, searchParamsString]);
+    // Only hydrate from URL when the route's query changes externally.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParamsString]);
 
   useEffect(() => {
     const requestParams = buildListingParams(searchTerm, filters);
-    const requestParamsString = requestParams.toString();
-    const currentParamsString = searchParamsString;
     const controller = new AbortController();
 
     const timeout = setTimeout(() => {
-      if (requestParamsString !== currentParamsString) {
-        prevSearchParamStringRef.current = requestParamsString;
-        setSearchParams(requestParams, { replace: true });
-      }
       fetchProperties(requestParams, controller.signal);
     }, 300);
 
@@ -126,7 +107,7 @@ export default function Listings() {
       clearTimeout(timeout);
       controller.abort();
     };
-  }, [searchTerm, filters, searchParamsString, setSearchParams]);
+  }, [searchTerm, filters]);
 
   const closeDetailsModal = () => setShowDetailsId(null);
   const openBookingPopup = (property) => setSelectedProperty(property);
@@ -138,14 +119,11 @@ export default function Listings() {
     setFilters(DEFAULT_FILTERS);
   };
 
-  if (loading) return <p>Loading properties...</p>;
-  if (error) return <p className="error">{error}</p>;
-
   return (
     <div className="listings-page">
       <div className="listings-header">
-        <h2>Available Listed Properties</h2>
-        <p>Showing listed properties that are not already booked.</p>
+        <h2>Available Properties</h2>
+        <p>Search approved DeraNow listings that are not already booked.</p>
       </div>
 
       <div className="filters">
@@ -199,7 +177,7 @@ export default function Listings() {
           <option value="">Type</option>
           <option value="Apartment">Apartment</option>
           <option value="House">House</option>
-          <option value="Condo">Condo</option>
+          <option value="Condo">Room</option>
         </select>
         <select
           value={filters.sort}
@@ -214,7 +192,16 @@ export default function Listings() {
         </button>
       </div>
 
-      {filteredProperties.length === 0 && !loading && !error ? (
+      {refreshing && <p className="listings-refreshing">Updating results...</p>}
+      {loading ? (
+        <div className="listings-grid">
+          {[1, 2, 3, 4, 5, 6].map((item) => (
+            <div className="listings-skeleton-card" key={item} />
+          ))}
+        </div>
+      ) : error ? (
+        <p className="error">{error}</p>
+      ) : filteredProperties.length === 0 ? (
         <p className="listings-empty-state">
           No properties found matching your search.
         </p>

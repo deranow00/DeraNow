@@ -152,7 +152,7 @@ export default function AddProperty() {
         <select value={type} onChange={(e) => setType(e.target.value)}>
           <option value="Apartment">Apartment</option>
           <option value="House">House</option>
-          <option value="Condo">Condo</option>
+          <option value="Condo">Room</option>
         </select>
 
         <label>Description</label>
@@ -163,12 +163,35 @@ export default function AddProperty() {
           rows={4}
         ></textarea>
 
-        <label>Property Image</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-        />
+        <div className="photo-upload-field">
+          <span className="photo-upload-label">Property Image</span>
+          <div className="photo-upload-actions">
+            <label className="photo-upload-button" htmlFor="property-image-gallery">
+              Choose from Photos
+            </label>
+            <label className="photo-upload-button" htmlFor="property-image-camera">
+              Take Live Photo
+            </label>
+          </div>
+          <input
+            id="property-image-gallery"
+            className="photo-upload-input"
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+          />
+          <input
+            id="property-image-camera"
+            className="photo-upload-input"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+          />
+          <small className="photo-upload-selected">
+            {imageFile ? imageFile.name : 'No image selected'}
+          </small>
+        </div>
 
         <label>Or Image URL</label>
         <input

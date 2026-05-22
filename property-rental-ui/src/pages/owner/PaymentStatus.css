@@ -1,9 +1,22 @@
 .owner-payment-page {
-  padding: 0.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  min-height: 100vh;
+  overflow-x: hidden;
+  animation: pageFade 0.4s ease;
+}
+
+.owner-payment-header {
+  margin-bottom: 1.4rem;
+  text-align: center;
 }
 
 .owner-payment-header h2 {
   margin: 0;
+  font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+  font-weight: 700;
+  color: var(--text);
 }
 
 .owner-payment-header p {
@@ -13,42 +26,48 @@
 
 .owner-payment-cards {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
 }
 
 .owner-payment-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1rem;
+  border-radius: var(--radius-lg);
+  padding: 0.95rem;
+  min-width: 0;
+  box-shadow: var(--shadow-soft);
 }
 
 .owner-payment-card h3 {
   margin: 0;
   color: var(--accent);
-  font-size: 1.8rem;
+  font-size: clamp(1.2rem, 3vw, 1.65rem);
+  overflow-wrap: anywhere;
 }
 
 .owner-payment-card p {
   margin: 0.3rem 0 0;
   color: var(--text-muted);
+  font-size: 0.86rem;
 }
 
 .owner-payment-table-wrap {
   overflow: auto;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
 }
 
 .owner-payment-trend {
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
 }
 
 .owner-payment-trend h3 {
-  margin: 0 0 0.6rem;
+  margin: 0 0 0.65rem;
+  font-size: 1.05rem;
 }
 
 .owner-payment-table {
@@ -72,10 +91,14 @@
 
 .owner-chip {
   display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
+  text-transform: capitalize;
 }
 
 .owner-chip.paid,
@@ -97,14 +120,154 @@
   color: #991b1b;
 }
 
+.owner-payment-mobile-list {
+  display: none;
+}
+
+.owner-payment-empty {
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  margin: 0;
+  padding: 1rem;
+  text-align: center;
+}
+
 @media (max-width: 1000px) {
   .owner-payment-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
+  .owner-payment-page {
+    padding: 0.82rem 0.52rem;
+  }
+
+  .owner-payment-header {
+    text-align: left;
+    margin-bottom: 0.8rem;
+  }
+
+  .owner-payment-header h2 {
+    font-size: 1.28rem;
+  }
+
+  .owner-payment-header p {
+    font-size: 0.82rem;
+    margin-bottom: 0;
+  }
+
   .owner-payment-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.55rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .owner-payment-card {
+    border-radius: 15px;
+    padding: 0.72rem;
+  }
+
+  .owner-payment-card h3 {
+    font-size: 1rem;
+  }
+
+  .owner-payment-card p {
+    font-size: 0.7rem;
+    line-height: 1.25;
+  }
+
+  .owner-payment-trend {
+    margin-bottom: 0.8rem;
+  }
+
+  .owner-payment-trend h3 {
+    font-size: 0.94rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .owner-payment-table-wrap {
+    display: none;
+  }
+
+  .owner-payment-mobile-list {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .owner-payment-mobile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+    padding: 0.7rem;
+    min-width: 0;
+  }
+
+  .owner-payment-mobile-grid,
+  .owner-payment-mobile-statuses {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+  }
+
+  .owner-payment-mobile-block {
+    display: grid;
+    gap: 0.16rem;
+    padding: 0.42rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+    min-width: 0;
+  }
+
+  .owner-payment-mobile-block:last-child {
+    border-bottom: none;
+  }
+
+  .owner-payment-mobile-head {
+    padding-top: 0;
+  }
+
+  .owner-payment-mobile-label {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
+  }
+
+  .owner-payment-mobile-value {
+    display: grid;
+    gap: 0.12rem;
+    font-size: 0.78rem;
+    color: var(--text);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .owner-payment-mobile-value small {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    overflow-wrap: anywhere;
+  }
+
+  .owner-payment-mobile-statuses {
+    margin-top: 0.25rem;
+  }
+
+  .owner-chip {
+    font-size: 0.68rem;
+    padding: 0.28rem 0.55rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .owner-payment-cards,
+  .owner-payment-mobile-grid,
+  .owner-payment-mobile-statuses {
+    grid-template-columns: 1fr !important;
   }
 }

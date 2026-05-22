@@ -7,6 +7,7 @@ import { API_BASE_URL } from '../../config/api';
 function PropertyCard({ property, onViewDetails, onApplyBooking }) {
   const { token } = useContext(AuthContext);
   const [isFavorited, setIsFavorited] = useState(false);
+  const displayType = property.type === 'Condo' ? 'Room' : property.type;
 
   const handleFavoriteClick = async () => {
     if (!token) return;
@@ -69,6 +70,7 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
       <div className="property-info">
         <h3>{property.title}</h3>
         <p>{property.location}</p>
+        {displayType && <p>{displayType}</p>}
         <p>Rs. {property.price}/month</p>
 
         {property.ownerId?.ownerVerificationStatus === 'verified' && (

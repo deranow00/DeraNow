@@ -1,7 +1,7 @@
 export const translations = {
   en: {
     common: {
-      appName: 'Dera',
+      appName: 'DeraNow',
       english: 'English',
       nepali: 'Nepali',
       save: 'Save',
@@ -67,7 +67,7 @@ export const translations = {
     auth: {
       welcome: 'WELCOME!',
       joinUs: 'JOIN US',
-      propertyRental: 'Property Rental',
+      propertyRental: 'DeraNow',
       login: 'Log In',
       loginTitle: 'LogIn',
       register: 'Register',
@@ -126,6 +126,7 @@ export const translations = {
       privacySecurity: 'Privacy & Security',
       appPreferences: 'App Preferences',
       inAppNotifications: 'In-app notifications',
+      phoneNotifications: 'Phone notifications',
       emailNotificationsSoon: 'Email notifications (coming soon)',
       showEmail: 'Show my email to renter/owner in booking workflow',
       showPhone: 'Show my phone number to renter/owner',
@@ -224,7 +225,7 @@ export const translations = {
   },
   ne: {
     common: {
-      appName: 'डेरा',
+      appName: 'DeraNow',
       english: 'अंग्रेजी',
       nepali: 'नेपाली',
       save: 'सेभ गर्नुहोस्',
@@ -290,7 +291,7 @@ export const translations = {
     auth: {
       welcome: 'स्वागत छ!',
       joinUs: 'हामीसँग जोडिनुहोस्',
-      propertyRental: 'प्रोपर्टी रेन्टल',
+      propertyRental: 'DeraNow',
       login: 'लग इन',
       loginTitle: 'लगइन',
       register: 'दर्ता गर्नुहोस्',
@@ -349,6 +350,7 @@ export const translations = {
       privacySecurity: 'गोपनीयता र सुरक्षा',
       appPreferences: 'एप प्राथमिकता',
       inAppNotifications: 'एपभित्रका सूचनाहरू',
+      phoneNotifications: 'फोन सूचना',
       emailNotificationsSoon: 'इमेल सूचना (चाँडै आउँदै)',
       showEmail: 'बुकिङ प्रक्रियामा मेरो इमेल घरधनी/भाडावालालाई देखाउनुहोस्',
       showPhone: 'मेरो फोन नम्बर घरधनी/भाडावालालाई देखाउनुहोस्',

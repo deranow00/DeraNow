@@ -1,4 +1,4 @@
-package com.derama.app;
+package com.deranow.app;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -128,9 +128,7 @@ export default function Register() {
         <img src={image.property} alt="Property" />
       </div>
       <div className="register-right">
-        <h2>
-          <span className="logo">Property</span> Rental
-        </h2>
+        <h2 className="auth-brand">{t('common.appName')}</h2>
         <h3>{verificationRequired ? t('auth.verifyEmail') : t('auth.registerTitle')}</h3>
         {!verificationRequired ? (
         <form onSubmit={handleSubmit}>

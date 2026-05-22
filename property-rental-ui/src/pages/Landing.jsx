@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
 import './Landing.css';
 
+const displayRentalType = (type) => (type === 'Condo' ? 'Room' : type);
+
 function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -16,7 +18,7 @@ function Navbar() {
   return (
     <header className={`landing-nav ${scrolled ? 'scrolled' : ''}`}>
       <div className="landing-wrap nav-inner">
-        <a className="brand" href="#home">Property Rental</a>
+        <a className="brand" href="#home">DeraNow</a>
         <button className="menu-btn" onClick={() => setOpen((p) => !p)} aria-label="Toggle menu">
           <span />
           <span />
@@ -24,13 +26,13 @@ function Navbar() {
         </button>
         <nav className={`nav-links ${open ? 'open' : ''}`}>
           <a href="#home" onClick={() => setOpen(false)}>Home</a>
-          <a href="#featured" onClick={() => setOpen(false)}>Featured</a>
-          <a href="#ops" onClick={() => setOpen(false)}>Operations</a>
+          <a href="#featured" onClick={() => setOpen(false)}>Listings</a>
+          <a href="#renters" onClick={() => setOpen(false)}>For Renters</a>
           <a href="#how" onClick={() => setOpen(false)}>How It Works</a>
-          <a href="#security" onClick={() => setOpen(false)}>Security</a>
+          <a href="#security" onClick={() => setOpen(false)}>Trust</a>
           <a href="#faq" onClick={() => setOpen(false)}>FAQ</a>
           <Link to="/login" onClick={() => setOpen(false)}>Login</Link>
-          <Link to="/register" className="nav-cta" onClick={() => setOpen(false)}>Get Started</Link>
+          <Link to="/register" className="nav-cta" onClick={() => setOpen(false)}>Create Account</Link>
         </nav>
       </div>
     </header>
@@ -53,22 +55,22 @@ function Hero({ totalProperties, featuredCount, onSearch }) {
       <div className="hero-bg-shape hero-bg-shape-b" />
       <div className="landing-wrap hero-grid">
         <div className="hero-copy">
-          <p className="eyebrow">Verified Rentals</p>
-          <h1>Find A Reliable Property In Minutes</h1>
+          <p className="eyebrow">DeraNow Verified Rentals</p>
+          <h1>Find verified rooms, flats, and houses</h1>
           <p>
-            Search approved listings, compare prices, and book with secure payment tracking.
-            Built for renters and owners with a clean workflow.
+            Search approved listings, compare prices, message owners, and manage every
+            step from booking request to payment record in one trusted place.
           </p>
           <form className="hero-search" onSubmit={submit}>
             <input
               type="text"
-              placeholder="Search title or keyword"
+              placeholder="Search room, flat, house..."
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
             <input
               type="text"
-              placeholder="Location"
+              placeholder="City or area"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
@@ -76,34 +78,34 @@ function Hero({ totalProperties, featuredCount, onSearch }) {
               <option value="">All types</option>
               <option value="Apartment">Apartment</option>
               <option value="House">House</option>
-              <option value="Condo">Condo</option>
+              <option value="Condo">Room</option>
             </select>
-            <button type="submit">Search Listings</button>
+            <button type="submit">Find Rentals</button>
           </form>
           <div className="hero-stats">
             <div>
               <strong>{totalProperties}</strong>
-              <span>Listed Properties</span>
+              <span>Approved Listings</span>
             </div>
             <div>
               <strong>{featuredCount}</strong>
-              <span>Featured Now</span>
+              <span>Featured Rentals</span>
             </div>
             <div>
               <strong>24/7</strong>
-              <span>Support Flow</span>
+              <span>Live Updates</span>
             </div>
           </div>
         </div>
         <div className="hero-panel">
-          <h3>Platform Highlights</h3>
+          <h3>Why renters and owners use DeraNow</h3>
           <ul>
-            <li>Advanced filters for price, bedrooms, bathrooms, and type</li>
-            <li>Review and rating support with owner verification badges</li>
-            <li>Real-time chat with typing indicators and read receipts</li>
-            <li>Invoice-ready payment history and status tracking</li>
+            <li>Approved listings with clear location, rent, and room details</li>
+            <li>Owner verification, renter profiles, ratings, and reviews</li>
+            <li>Real-time chat, notifications, and booking status updates</li>
+            <li>Payment records, invoices, agreements, and document storage</li>
           </ul>
-          <Link to="/register" className="hero-panel-btn">Create Account</Link>
+          <Link to="/register" className="hero-panel-btn">Start With DeraNow</Link>
         </div>
       </div>
     </section>
@@ -115,30 +117,30 @@ function Featured({ listings, loading, error }) {
     <section id="featured" className="featured-section">
       <div className="landing-wrap">
         <div className="section-head">
-          <h2>Featured Listings</h2>
-          <p>Live data from newly listed properties in the backend.</p>
+          <h2>Featured Rentals</h2>
+          <p>Approved rooms, flats, and houses currently available on DeraNow.</p>
         </div>
         {loading && <p className="status-box">Loading featured listings...</p>}
         {error && <p className="status-box error">{error}</p>}
         {!loading && !error && listings.length === 0 && (
-          <p className="status-box">No listed properties available yet.</p>
+          <p className="status-box">No approved listings are available yet.</p>
         )}
         {!loading && !error && listings.length > 0 && (
           <div className="featured-grid">
             {listings.map((item) => (
               <article className="featured-card" key={item._id}>
                 <div className="featured-image-wrap">
-                  <img src={item.image || '/default-property.jpg'} alt={item.title} />
+                  <img src={item.image || '/property.png'} alt={item.title} />
                   <span className="price-chip">Rs. {item.price}/month</span>
                 </div>
                 <div className="featured-body">
                   <h3>{item.title}</h3>
                   <p className="meta">{item.location}</p>
-                  <p className="meta">{item.type} · {item.bedrooms} bed · {item.bathrooms} bath</p>
+                  <p className="meta">{displayRentalType(item.type)} · {item.bedrooms} bed · {item.bathrooms} bath</p>
                   <p className="meta">Rating: {Number(item.rating || 0).toFixed(1)} ({item.numRatings || 0})</p>
                   <div className="card-actions">
                     <Link to={`/property/${item._id}`}>View Details</Link>
-                    <Link to="/login" className="secondary">Login To Rent</Link>
+                    <Link to="/login" className="secondary">Login To Book</Link>
                   </div>
                 </div>
               </article>
@@ -152,9 +154,9 @@ function Featured({ listings, loading, error }) {
 
 function TrustStrip() {
   const items = [
-    'KYC-backed profiles',
-    'Approval-first listings',
-    'Document-ready invoices',
+    'Verified renter and owner profiles',
+    'Approved public listings',
+    'Invoice-ready payment records',
     'Role-based dashboards',
     'Live chat and notifications',
   ];
@@ -173,20 +175,20 @@ function TrustStrip() {
 function ValuePillars() {
   const pillars = [
     {
-      title: 'Reliability',
-      text: 'Verification workflows and staged approvals reduce fraudulent listings and risky bookings.',
+      title: 'Verified Access',
+      text: 'Email verification, owner review, and KYC-aware profiles help keep rental activity accountable.',
     },
     {
-      title: 'Transparency',
-      text: 'Payment status, agreements, and booking events stay visible in one accountable trail.',
+      title: 'Clear Decisions',
+      text: 'Renters can compare price, location, property type, ratings, and owner details before booking.',
     },
     {
-      title: 'Operational Control',
-      text: 'Owners and renters get role-specific tools without complexity overload.',
+      title: 'Owner Control',
+      text: 'Owners manage listings, booking requests, agreements, messages, and payments from one dashboard.',
     },
     {
-      title: 'Scalable Workflow',
-      text: 'From first listing to move-in, each step is structured for consistent execution.',
+      title: 'Complete Records',
+      text: 'Bookings, payments, invoices, documents, and complaints remain traceable after move-in.',
     },
   ];
 
@@ -194,8 +196,8 @@ function ValuePillars() {
     <section className="pillars-section">
       <div className="landing-wrap">
         <div className="section-head">
-          <h2>Why Teams Trust This Platform</h2>
-          <p>Designed for practical rental operations, not demo-only features.</p>
+          <h2>Built for real rental decisions</h2>
+          <p>DeraNow keeps renters, owners, and rental records aligned from first search to move-in.</p>
         </div>
         <div className="pillars-grid">
           {pillars.map((pillar, index) => (
@@ -228,16 +230,16 @@ function OpsSnapshot({ pool }) {
     <section id="ops" className="ops-section">
       <div className="landing-wrap">
         <div className="section-head">
-          <h2>Operational Snapshot</h2>
-          <p>Real listing-derived signals to support faster rental decisions.</p>
+          <h2>Rental market snapshot</h2>
+          <p>Live signals from approved DeraNow listings.</p>
         </div>
         <div className="ops-grid">
           <article className="ops-card">
-            <span>Active Listing Pool</span>
+            <span>Approved Listings</span>
             <strong>{metrics.total}</strong>
           </article>
           <article className="ops-card">
-            <span>Average Monthly Price</span>
+            <span>Average Monthly Rent</span>
             <strong>Rs. {metrics.avgPrice || 0}</strong>
           </article>
           <article className="ops-card">
@@ -245,7 +247,7 @@ function OpsSnapshot({ pool }) {
             <strong>{metrics.avgRating}</strong>
           </article>
           <article className="ops-card">
-            <span>Verified Owner Listings</span>
+            <span>Verified Owners</span>
             <strong>{metrics.verifiedOwners}</strong>
           </article>
         </div>
@@ -262,25 +264,25 @@ function SearchResults({ listings, loading, error, searched }) {
       <div className="landing-wrap">
         <div className="section-head">
           <h2>Search Results</h2>
-          <p>Available properties matching your search.</p>
+          <p>Approved rentals matching your search.</p>
         </div>
-        {loading && <p className="status-box">Searching available properties...</p>}
+        {loading && <p className="status-box">Searching approved rentals...</p>}
         {error && <p className="status-box error">{error}</p>}
         {!loading && !error && listings.length === 0 && (
-          <p className="status-box">No available properties match your search.</p>
+          <p className="status-box">No approved rentals match your search.</p>
         )}
         {!loading && !error && listings.length > 0 && (
           <div className="featured-grid">
             {listings.map((item) => (
               <article className="featured-card" key={item._id}>
                 <div className="featured-image-wrap">
-                  <img src={item.image || '/default-property.jpg'} alt={item.title} />
+                  <img src={item.image || '/property.png'} alt={item.title} />
                   <span className="price-chip">Rs. {item.price}/month</span>
                 </div>
                 <div className="featured-body">
                   <h3>{item.title}</h3>
                   <p className="meta">{item.location}</p>
-                  <p className="meta">{item.type} · {item.bedrooms} bed · {item.bathrooms} bath</p>
+                  <p className="meta">{displayRentalType(item.type)} · {item.bedrooms} bed · {item.bathrooms} bath</p>
                   <p className="meta">Rating: {Number(item.rating || 0).toFixed(1)} ({item.numRatings || 0})</p>
                   <div className="card-actions">
                     <Link to={`/property/${item._id}`}>View Details</Link>
@@ -300,16 +302,16 @@ function HowItWorks() {
   const steps = useMemo(
     () => [
       {
-        title: 'Search Fast',
-        text: 'Use homepage search and filters to target relevant properties immediately.',
+        title: 'Search',
+        text: 'Filter by area, rent, and property type to find rooms, flats, and houses that match your needs.',
       },
       {
-        title: 'Review Trust Signals',
-        text: 'Check owner verification state, ratings, and review comments before booking.',
+        title: 'Compare',
+        text: 'Review listing details, owner status, ratings, and pricing before you send a booking request.',
       },
       {
-        title: 'Book And Track',
-        text: 'Submit booking requests, pay securely, and download invoice-ready payment records.',
+        title: 'Book And Manage',
+        text: 'Track requests, payments, agreements, and messages from your DeraNow dashboard.',
       },
     ],
     []
@@ -319,8 +321,8 @@ function HowItWorks() {
     <section id="how" className="how-section">
       <div className="landing-wrap">
         <div className="section-head">
-          <h2>How It Works</h2>
-          <p>Simple flow designed for production use.</p>
+          <h2>How DeraNow works</h2>
+          <p>A clear rental process for both renters and owners.</p>
         </div>
         <div className="steps-grid">
           {steps.map((step, i) => (
@@ -339,24 +341,24 @@ function HowItWorks() {
 function WorkflowDetail() {
   const phases = [
     {
-      title: 'Discovery',
-      text: 'Filtered search and shortlist generation using location, budget, and property type.',
+      title: 'Discover',
+      text: 'Search by location, budget, and rental type.',
     },
     {
-      title: 'Qualification',
-      text: 'Trust checks via profile verification, owner history, and listing-level context.',
+      title: 'Evaluate',
+      text: 'Check listing details, ratings, owner status, and photos.',
     },
     {
-      title: 'Commitment',
-      text: 'Booking request with structured state transitions and agreement tracking.',
+      title: 'Request',
+      text: 'Send a booking request and follow its status.',
     },
     {
-      title: 'Settlement',
-      text: 'Payment capture, invoice generation, and status-level transparency.',
+      title: 'Pay',
+      text: 'Track payment status and invoice records.',
     },
     {
-      title: 'Occupancy',
-      text: 'Move-in readiness with records and communication continuity.',
+      title: 'Move In',
+      text: 'Keep agreements, documents, and messages available after approval.',
     },
   ];
 
@@ -364,8 +366,8 @@ function WorkflowDetail() {
     <section className="workflow-section">
       <div className="landing-wrap">
         <div className="section-head">
-          <h2>End-To-End Workflow</h2>
-          <p>Every stage is explicit, traceable, and aligned with real rental operations.</p>
+          <h2>From search to move-in</h2>
+          <p>DeraNow keeps each rental step visible and easy to follow.</p>
         </div>
         <div className="workflow-grid">
           {phases.map((phase, index) => (
@@ -385,25 +387,25 @@ function WorkflowDetail() {
 
 function AudienceFlows() {
   return (
-    <section className="audience-section">
+    <section id="renters" className="audience-section">
       <div className="landing-wrap audience-grid">
         <article className="audience-card">
           <h3>For Renters</h3>
           <ul>
-            <li>Search by location, type, and budget in seconds.</li>
-            <li>Compare trust signals: ratings, owner status, and listing details.</li>
-            <li>Track payment and booking progression in one place.</li>
-            <li>Use chat to resolve pre-booking questions quickly.</li>
+            <li>Find rooms, flats, and houses by location, type, and budget.</li>
+            <li>Compare ratings, owner status, rent, and listing details.</li>
+            <li>Track booking requests, payments, agreements, and documents.</li>
+            <li>Message owners before and after booking.</li>
           </ul>
           <Link to="/register" className="audience-link">Start As Renter</Link>
         </article>
         <article className="audience-card">
           <h3>For Owners</h3>
           <ul>
-            <li>Publish and manage listings with approval-ready details.</li>
-            <li>Handle booking requests using structured workflow states.</li>
-            <li>Monitor payment status and agreement readiness.</li>
-            <li>Respond to renter messages and complaints with context.</li>
+            <li>Publish rooms, flats, and houses with complete listing details.</li>
+            <li>Review booking requests and communicate with renters.</li>
+            <li>Monitor payment status, invoices, agreements, and documents.</li>
+            <li>Keep complaints and renter communication organized.</li>
           </ul>
           <Link to="/register" className="audience-link">Start As Owner</Link>
         </article>
@@ -415,16 +417,16 @@ function AudienceFlows() {
 function SocialProof() {
   const quotes = [
     {
-      name: 'Rental Ops Team',
-      text: 'The booking-to-payment flow is now predictable and easy to audit.',
+      name: 'Renter',
+      text: 'DeraNow makes it easier to compare rentals and understand the next step before booking.',
     },
     {
-      name: 'Verified Owner',
-      text: 'Listing management feels cleaner, and communication with renters is faster.',
+      name: 'Owner',
+      text: 'Listings, requests, payments, and renter messages stay organized in one dashboard.',
     },
     {
-      name: 'Frequent Renter',
-      text: 'I can evaluate properties faster because trust and pricing details are clear.',
+      name: 'Admin',
+      text: 'Approved listings and verification flows help maintain trust across the platform.',
     },
   ];
 
@@ -432,8 +434,8 @@ function SocialProof() {
     <section className="social-proof-section">
       <div className="landing-wrap">
         <div className="section-head">
-          <h2>Proof Of Practical Value</h2>
-          <p>Built around repeatable rental operations with measurable clarity.</p>
+          <h2>Designed around daily rental work</h2>
+          <p>Practical tools for the people searching, listing, approving, and managing rentals.</p>
         </div>
         <div className="quote-grid">
           {quotes.map((quote) => (
@@ -450,19 +452,19 @@ function SocialProof() {
 
 function SecurityBlock() {
   const points = [
-    'Environment-based API and CORS control for deploy safety',
-    'Role-separated dashboards and route guards',
-    'OTP-backed email verification flow',
-    'Audit-ready booking/payment history trail',
+    'OTP-backed email verification for new accounts',
+    'Role-based renter, owner, and admin access',
+    'Owner verification and approval-first listing visibility',
+    'Traceable booking, payment, agreement, and complaint records',
   ];
   return (
     <section id="security" className="security-section">
       <div className="landing-wrap security-grid">
         <div>
-          <h2>Security and Compliance Foundations</h2>
+          <h2>Trust and safety built in</h2>
           <p>
-            Production-ready systems require controlled access, clear traces, and predictable data behavior.
-            This platform emphasizes practical safeguards that scale with operational growth.
+            DeraNow is built around verified accounts, controlled listing visibility, and clear
+            rental records so both renters and owners can move with confidence.
           </p>
         </div>
         <ul>
@@ -481,20 +483,20 @@ function Faq() {
       <div className="landing-wrap faq-grid">
         <div>
           <h2>Common Questions</h2>
-          <p>Quick answers about search, booking, and payment.</p>
+          <p>Quick answers about listings, booking, and payments.</p>
         </div>
         <div className="faq-list">
           <details>
-            <summary>Are listings verified before public visibility?</summary>
-            <p>Yes. Listings move through admin approval and are exposed as approved records.</p>
+            <summary>Are listings reviewed before renters see them?</summary>
+            <p>Yes. Public listing sections use approved listings so renters see reviewed rental options.</p>
           </details>
           <details>
-            <summary>Can I track payment and invoices?</summary>
-            <p>Yes. Payment history stores status and invoice data per booking transaction.</p>
+            <summary>Can I track payments and invoices?</summary>
+            <p>Yes. DeraNow keeps payment status and invoice data attached to each booking.</p>
           </details>
           <details>
-            <summary>Does messaging support real-time indicators?</summary>
-            <p>Yes. Typing indicators and read receipts are supported in chat.</p>
+            <summary>Can renters and owners message each other?</summary>
+            <p>Yes. Built-in chat supports quick communication around listings, booking, and move-in details.</p>
           </details>
         </div>
       </div>
@@ -507,15 +509,15 @@ function Footer() {
     <footer className="landing-footer">
       <div className="landing-wrap footer-inner">
         <div>
-          <h4>Property Rental</h4>
-          <p>Operational rental platform for owners and renters.</p>
+          <h4>DeraNow</h4>
+          <p>Verified rooms, flats, and houses with booking, payments, agreements, and messaging.</p>
         </div>
         <div className="footer-links">
           <Link to="/register">Create Account</Link>
           <Link to="/login">Login</Link>
-          <a href="#featured">Featured</a>
-          <a href="#ops">Operations</a>
-          <a href="#security">Security</a>
+          <a href="#featured">Listings</a>
+          <a href="#renters">For Renters</a>
+          <a href="#security">Trust</a>
         </div>
       </div>
     </footer>
@@ -527,8 +529,8 @@ function FinalCta() {
     <section className="final-cta">
       <div className="landing-wrap final-cta-inner">
         <div>
-          <h2>Launch Your Next Rental Decision With Confidence</h2>
-          <p>Join a workflow that stays clear from listing to move-in.</p>
+          <h2>Find or manage your next rental with DeraNow</h2>
+          <p>Create an account to search approved rentals, list your property, and manage bookings with clarity.</p>
         </div>
         <div className="final-cta-actions">
           <Link to="/register" className="final-cta-primary">Create Account</Link>
@@ -566,21 +568,13 @@ export default function Landing() {
     const loadFeatured = async () => {
       try {
         setLoading(true);
-        const [pendingRes, approvedRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/properties?status=Pending&sort=newest`),
-          fetch(`${API_BASE_URL}/api/properties?status=Approved&sort=newest`),
-        ]);
-        const pendingData = await pendingRes.json();
+        const approvedRes = await fetch(`${API_BASE_URL}/api/properties?status=Approved&sort=newest`);
         const approvedData = await approvedRes.json();
-        if (!pendingRes.ok) throw new Error(pendingData.error || 'Failed to load listings');
         if (!approvedRes.ok) throw new Error(approvedData.error || 'Failed to load listings');
         if (active) {
-          setFeatured(Array.isArray(pendingData) ? pendingData.slice(0, 6) : []);
-
-          const combined = [...(approvedData || []), ...(pendingData || [])];
-          const byId = new Map();
-          combined.forEach((item) => byId.set(item._id, item));
-          setSearchPool(Array.from(byId.values()));
+          const approvedListings = Array.isArray(approvedData) ? approvedData : [];
+          setFeatured(approvedListings.slice(0, 6));
+          setSearchPool(approvedListings);
         }
       } catch (err) {
         if (active) setError(err.message || 'Failed to load featured listings');
@@ -603,16 +597,10 @@ export default function Landing() {
     try {
       let pool = searchPool;
       if (!searchPool.length) {
-        const [pendingRes, approvedRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/properties?status=Pending&sort=newest`),
-          fetch(`${API_BASE_URL}/api/properties?status=Approved&sort=newest`),
-        ]);
-        const pendingData = await pendingRes.json();
+        const approvedRes = await fetch(`${API_BASE_URL}/api/properties?status=Approved&sort=newest`);
         const approvedData = await approvedRes.json();
-        const combined = [...(approvedData || []), ...(pendingData || [])];
-        const byId = new Map();
-        combined.forEach((item) => byId.set(item._id, item));
-        pool = Array.from(byId.values());
+        if (!approvedRes.ok) throw new Error(approvedData.error || 'Failed to search rentals');
+        pool = Array.isArray(approvedData) ? approvedData : [];
         setSearchPool(pool);
       }
 
@@ -626,8 +614,8 @@ export default function Landing() {
           item.description?.toLowerCase().includes(term);
         const matchesLocation = !loc || item.location?.toLowerCase().includes(loc);
         const matchesType = !type || item.type === type;
-        const notRejected = item.status !== 'Rejected';
-        return matchesTerm && matchesLocation && matchesType && notRejected;
+        const isApproved = item.status === 'Approved';
+        return matchesTerm && matchesLocation && matchesType && isApproved;
       });
       setSearchResults(results);
       window.requestAnimationFrame(() => {

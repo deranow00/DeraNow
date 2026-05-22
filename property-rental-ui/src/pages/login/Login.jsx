@@ -50,7 +50,7 @@ export default function Login() {
       <div className="login-right">
         <div className="login-box">
 
-          <h2><span className="logo">Property</span> Rental</h2>
+          <h2 className="auth-brand">{t('common.appName')}</h2>
           <h3>{t('auth.loginTitle')}</h3>
           <form onSubmit={handleSubmit}>
             <label>{t('auth.email')}</label>

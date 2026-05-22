@@ -1,206 +1,170 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Home.css';
+import PropertyCard from '../../components/common/PropertyCard';
+import PropertyDetails from '../../components/common/PropertyDetails';
+import BookingPopup from '../../components/common/BookingPopup';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Legend,
-} from 'recharts';
+import './Home.css';
 
-const COLORS = ['#2a9d8f', '#e9c46a', '#e76f51'];
+const getAreaKey = (location = '') =>
+  String(location)
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean)[0]
+    ?.toLowerCase() || '';
 
-export default function RenterDashboard() {
-  const { token } = useContext(AuthContext);
-  const [stats, setStats] = useState({
-    bookings: 0,
-    favorites: 0,
-    bookingStatusCount: { Approved: 0, Pending: 0, Rejected: 0 },
-    bookingStats: [],
-    recent: [],
-  });
+export default function RenterHome() {
+  const { user } = useContext(AuthContext);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [showDetailsId, setShowDetailsId] = useState(null);
+  const [selectedProperty, setSelectedProperty] = useState(null);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      if (!token) return;
+    let active = true;
+    const controller = new AbortController();
 
+    const loadProperties = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/dashboard/renter`, {
-          headers: { Authorization: `Bearer ${token}` },
+        setLoading(true);
+        setError('');
+        const params = new URLSearchParams({
+          status: 'Approved',
+          availableOnly: 'true',
+          sort: 'newest',
+        });
+        const res = await fetch(`${API_BASE_URL}/api/properties?${params.toString()}`, {
+          signal: controller.signal,
         });
         const data = await res.json();
-        setStats(data);
+        if (!res.ok) throw new Error(data.error || 'Failed to load properties');
+        if (active) setProperties(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error('Dashboard load error', err);
+        if (err.name === 'AbortError') return;
+        if (active) setError(err.message || 'Failed to load properties');
+      } finally {
+        if (active) setLoading(false);
       }
     };
-    fetchStats();
-  }, [token]);
 
-  const formatCurrency = (amount) => {
-    const numericAmount = Number(amount);
-    if (!Number.isFinite(numericAmount)) return 'N/A';
-    return new Intl.NumberFormat('en-NP', {
-      style: 'currency',
-      currency: 'NPR',
-      maximumFractionDigits: 0,
-    }).format(numericAmount);
+    loadProperties();
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, []);
+
+  const featuredProperties = useMemo(() => {
+    return [...properties]
+      .sort((a, b) => {
+        const ratingDelta = Number(b.rating || 0) - Number(a.rating || 0);
+        if (ratingDelta) return ratingDelta;
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      })
+      .slice(0, 6);
+  }, [properties]);
+
+  const nearbyProperties = useMemo(() => {
+    const featuredIds = new Set(featuredProperties.map((property) => property._id));
+    const areaCounts = properties.reduce((acc, property) => {
+      const key = getAreaKey(property.location);
+      if (key) acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+    const nearbyArea = Object.entries(areaCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+    const nearby = properties.filter((property) => {
+      if (featuredIds.has(property._id)) return false;
+      if (!nearbyArea) return true;
+      return getAreaKey(property.location) === nearbyArea;
+    });
+    const fallback = properties.filter((property) => !featuredIds.has(property._id));
+    return (nearby.length ? nearby : fallback.length ? fallback : properties).slice(0, 6);
+  }, [featuredProperties, properties]);
+
+  const closeDetailsModal = () => setShowDetailsId(null);
+  const openBookingPopup = (property) => setSelectedProperty(property);
+  const closeBookingPopup = () => setSelectedProperty(null);
+
+  const renderPropertyGrid = (items) => {
+    if (loading) {
+      return (
+        <div className="home-property-grid">
+          {[1, 2, 3].map((item) => (
+            <div className="home-property-skeleton" key={item} />
+          ))}
+        </div>
+      );
+    }
+
+    if (error) return <p className="home-state error">{error}</p>;
+    if (!items.length) return <p className="home-state">No approved properties are available right now.</p>;
+
+    return (
+      <div className="home-property-grid">
+        {items.map((property) => (
+          <PropertyCard
+            key={property._id}
+            property={property}
+            onViewDetails={() => setShowDetailsId(property._id)}
+            onApplyBooking={() => openBookingPopup(property)}
+          />
+        ))}
+      </div>
+    );
   };
 
-  const getStatusClass = (status) => String(status || 'pending').toLowerCase().replace(/\s+/g, '-');
-
-  const statusData = [
-    { name: 'Approved', value: stats.bookingStatusCount?.Approved || 0 },
-    { name: 'Pending', value: stats.bookingStatusCount?.Pending || 0 },
-    { name: 'Rejected', value: stats.bookingStatusCount?.Rejected || 0 },
-  ];
-  const totalStatusCount = statusData.reduce((sum, item) => sum + item.value, 0);
-  const approvedRate = totalStatusCount
-    ? Math.round(((stats.bookingStatusCount?.Approved || 0) / totalStatusCount) * 100)
-    : 0;
-  const topBookingMonth = Array.isArray(stats.bookingStats)
-    ? stats.bookingStats.reduce(
-        (max, item) => (item?.count > (max?.count || 0) ? item : max),
-        null
-      )
-    : null;
-
   return (
-    <div className="dashboard-container renter-dashboard">
-      <header className="dashboard-hero">
+    <div className="renter-home">
+      <section className="renter-home-hero">
         <div>
-          <p className="dashboard-eyebrow">Overview</p>
-          <h2>Renter Dashboard</h2>
-          <p className="dashboard-subtitle">
-            Stay on top of your bookings, favorites, and monthly rental activity.
+          <p className="home-eyebrow">DeraNow renter home</p>
+          <h2>Find your next room, flat, or house</h2>
+          <p>
+            Welcome{user?.name ? `, ${user.name}` : ''}. Browse featured rentals, explore nearby
+            options, and book approved properties from one place.
           </p>
         </div>
-      </header>
-
-      <div className="dashboard-cards">
-        <div className="dashboard-stat-card">
-          <p className="stat-label">Total Bookings</p>
-          <h3>{stats.bookings ?? 0}</h3>
+        <div className="home-hero-actions">
+          <Link to="/renter/listings" className="home-primary-link">Browse all listings</Link>
+          <Link to="/renter/favorites" className="home-secondary-link">View favorites</Link>
         </div>
-        <div className="dashboard-stat-card">
-          <p className="stat-label">Favorites</p>
-          <h3>{stats.favorites ?? 0}</h3>
+      </section>
+
+      <section className="home-section">
+        <div className="home-section-head">
+          <div>
+            <h3>Featured properties</h3>
+            <p>Highly rated and recently added rentals available for booking.</p>
+          </div>
+          <Link to="/renter/listings">See all</Link>
         </div>
-      </div>
+        {renderPropertyGrid(featuredProperties)}
+      </section>
 
-      <div className="dashboard-grid-two">
-        <section className="action-panel">
-          <div className="section-head">
-            <h3>Quick Actions</h3>
-            <p>Go straight to the tasks you use most.</p>
+      <section className="home-section">
+        <div className="home-section-head">
+          <div>
+            <h3>Nearby properties</h3>
+            <p>More approved rentals from active DeraNow locations.</p>
           </div>
-          <div className="action-grid">
-            <Link to="/renter/listings" className="action-link">Browse Listings</Link>
-            <Link to="/renter/bookings" className="action-link">View Bookings</Link>
-            <Link to="/renter/message" className="action-link">Open Messages</Link>
-            <Link to="/renter/payments" className="action-link">Manage Payments</Link>
-          </div>
-        </section>
-
-        <section className="action-panel">
-          <div className="section-head">
-            <h3>Insights</h3>
-            <p>Short performance signals from your account data.</p>
-          </div>
-          <div className="insight-grid">
-            <div className="insight-card">
-              <p className="insight-label">Approval Rate</p>
-              <p className="insight-value">{approvedRate}%</p>
-            </div>
-            <div className="insight-card">
-              <p className="insight-label">Pending Requests</p>
-              <p className="insight-value">{stats.bookingStatusCount?.Pending || 0}</p>
-            </div>
-            <div className="insight-card">
-              <p className="insight-label">Peak Month</p>
-              <p className="insight-value">{topBookingMonth?.month || '-'}</p>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <div className="chart-section">
-        <div className="chart-card">
-          <div className="section-head">
-            <h3>Booking Status Distribution</h3>
-            <p>How your booking requests are currently distributed.</p>
-          </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={statusData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label
-              >
-                {statusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          <Link to="/renter/listings">Explore nearby</Link>
         </div>
+        {renderPropertyGrid(nearbyProperties)}
+      </section>
 
-        <div className="chart-card">
-          <div className="section-head">
-            <h3>Bookings Per Month</h3>
-            <p>Monthly volume of your booking activity.</p>
+      {showDetailsId && (
+        <div className="modal-overlay" onClick={closeDetailsModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeDetailsModal} aria-label="Close popup" title="Close">
+              x
+            </button>
+            <PropertyDetails id={showDetailsId} />
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={stats.bookingStats}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" fill="#2a9d8f" />
-            </BarChart>
-          </ResponsiveContainer>
         </div>
-      </div>
-
-      <div className="recent-properties">
-        <div className="section-head">
-          <h3>Recent Bookings</h3>
-          <p>Your latest booking records and their current status.</p>
-        </div>
-        {Array.isArray(stats.recent) && stats.recent.length > 0 ? (
-          <ul className="dashboard-list">
-            {stats.recent.map((booking) => (
-              <li key={booking._id}>
-                <div>
-                  <p className="item-title">{booking.property?.title || 'Unknown Property'}</p>
-                  <p className="item-subtitle">{formatCurrency(booking.property?.price)}</p>
-                </div>
-                <span className={`status-pill ${getStatusClass(booking.status)}`}>
-                  {booking.status || 'Pending'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="empty-state">No recent bookings found.</p>
-        )}
-      </div>
+      )}
+      {selectedProperty && <BookingPopup property={selectedProperty} onClose={closeBookingPopup} />}
     </div>
   );
 }

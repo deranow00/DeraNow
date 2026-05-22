@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { NotificationContext } from '../../context/NotificationContext';
 import { API_BASE_URL } from '../../config/api';
 import { useLanguage } from '../../context/LanguageContext';
 import './Settings.css';
@@ -30,6 +31,7 @@ const DEFAULT_APP = {
 
 export default function Settings() {
   const { token, user, setUser } = useContext(AuthContext);
+  const { phoneNotificationPermission, requestPhoneNotifications } = useContext(NotificationContext);
   const { t, openLanguageChooser } = useLanguage();
   const [prefs, setPrefs] = useState({ inApp: true, email: false, types: DEFAULT_TYPES });
   const [privacyPrefs, setPrivacyPrefs] = useState(DEFAULT_PRIVACY);
@@ -104,6 +106,13 @@ export default function Settings() {
         <p>{t('settings.subtitle')}</p>
 
         <div className="settings-group">
+          <button
+            type="button"
+            className="settings-language-trigger"
+            onClick={requestPhoneNotifications}
+          >
+            {t('settings.phoneNotifications')}: {phoneNotificationPermission}
+          </button>
           <label className="toggle">
             <input
               type="checkbox"

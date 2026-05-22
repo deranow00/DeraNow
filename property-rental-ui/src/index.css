@@ -171,6 +171,80 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18);
 }
 
+.photo-upload-field {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.photo-upload-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.photo-upload-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.photo-upload-button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.72rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+  color: var(--accent-strong);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border var(--transition), background var(--transition), transform var(--transition);
+}
+
+.photo-upload-button:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 36%, var(--border));
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.photo-upload-input,
+input.photo-upload-input {
+  position: absolute;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.add-property-form .photo-upload-button,
+.form-group .photo-upload-button,
+.kyc-field .photo-upload-button,
+.verification-input-group .photo-upload-button {
+  margin: 0;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--accent-strong);
+}
+
+.photo-upload-selected {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
 h1,
 h2,
 h3,
@@ -260,6 +334,14 @@ p {
   select,
   textarea {
     min-height: 46px;
+  }
+
+  .photo-upload-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .photo-upload-button {
+    min-height: 48px;
   }
 
   input,

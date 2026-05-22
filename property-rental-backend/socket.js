@@ -8,11 +8,19 @@ import { canUsersChat } from './utils/chatAccess.js';
 let io;
 const onlineUsers = new Map();
 const DEFAULT_FRONTEND_ORIGIN = 'http://localhost:5173';
+const NATIVE_APP_ORIGINS = [
+  'capacitor://localhost',
+  'ionic://localhost',
+  'http://localhost',
+  'https://localhost',
+];
 
 const createCorsOriginChecker = () => {
   const configured = process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '';
-  const allowedOrigins = (configured || DEFAULT_FRONTEND_ORIGIN)
-    .split(',')
+  const allowedOrigins = [
+    ...(configured || DEFAULT_FRONTEND_ORIGIN).split(','),
+    ...NATIVE_APP_ORIGINS,
+  ]
     .map((origin) => origin.trim())
     .filter(Boolean)
     .map((origin) => origin.replace(/\/+$/, ''));

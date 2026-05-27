@@ -24,10 +24,34 @@ export default function Visits() {
   const [updatingId, setUpdatingId] = useState('');
   const [confirmVisit, setConfirmVisit] = useState(null);
   const [confirmForm, setConfirmForm] = useState({
+    fullName: '',
+    phone: '',
+    email: '',
     moveInDate: '',
+    occupants: '1',
+    employmentStatus: '',
+    monthlyIncome: '',
+    moveInReason: '',
+    emergencyContactName: '',
+    emergencyContactPhone: '',
     transactionRef: '',
     noteToOwner: '',
   });
+
+  const emptyConfirmForm = {
+    fullName: '',
+    phone: '',
+    email: '',
+    moveInDate: '',
+    occupants: '1',
+    employmentStatus: '',
+    monthlyIncome: '',
+    moveInReason: '',
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+    transactionRef: '',
+    noteToOwner: '',
+  };
 
   const loadVisits = async () => {
     if (!token) return;
@@ -104,7 +128,7 @@ export default function Visits() {
       if (!res.ok) throw new Error(payload.error || 'Failed to confirm booking');
       setSuccess('Booking confirmation submitted. Your visit promo code has ended.');
       setConfirmVisit(null);
-      setConfirmForm({ moveInDate: '', transactionRef: '', noteToOwner: '' });
+      setConfirmForm(emptyConfirmForm);
       await loadVisits();
     } catch (err) {
       setError(err.message || 'Failed to confirm booking');
@@ -183,7 +207,7 @@ export default function Visits() {
                     <button
                       onClick={() => {
                         setConfirmVisit(visit);
-                        setConfirmForm({ moveInDate: '', transactionRef: '', noteToOwner: '' });
+                        setConfirmForm(emptyConfirmForm);
                       }}
                     >
                       Confirm Booking
@@ -208,18 +232,99 @@ export default function Visits() {
               <strong>{confirmVisit.property?.title || 'this property'}</strong>.
             </p>
             <img src={QR_IMAGE_URL} alt="Booking confirmation payment QR" />
-            <label>Move-in Date *</label>
-            <input
-              type="date"
-              min={today}
-              value={confirmForm.moveInDate}
-              onChange={(e) => setConfirmForm((prev) => ({ ...prev, moveInDate: e.target.value }))}
-            />
-            <label>Transaction Reference *</label>
-            <input
-              placeholder="QR transaction id"
-              value={confirmForm.transactionRef}
-              onChange={(e) => setConfirmForm((prev) => ({ ...prev, transactionRef: e.target.value }))}
+            <div className="visit-confirm-form-grid">
+              <label>
+                Full Name *
+                <input
+                  value={confirmForm.fullName}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, fullName: e.target.value }))}
+                  placeholder="Your legal name"
+                />
+              </label>
+              <label>
+                Phone Number *
+                <input
+                  value={confirmForm.phone}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, phone: e.target.value }))}
+                  placeholder="Mobile number"
+                />
+              </label>
+              <label>
+                Email
+                <input
+                  type="email"
+                  value={confirmForm.email}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, email: e.target.value }))}
+                  placeholder="Email for booking updates"
+                />
+              </label>
+              <label>
+                Move-in Date *
+                <input
+                  type="date"
+                  min={today}
+                  value={confirmForm.moveInDate}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, moveInDate: e.target.value }))}
+                />
+              </label>
+              <label>
+                Occupants *
+                <input
+                  type="number"
+                  min="1"
+                  value={confirmForm.occupants}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, occupants: e.target.value }))}
+                />
+              </label>
+              <label>
+                Employment Status
+                <input
+                  value={confirmForm.employmentStatus}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, employmentStatus: e.target.value }))}
+                  placeholder="Student, employed, business..."
+                />
+              </label>
+              <label>
+                Monthly Income
+                <input
+                  type="number"
+                  min="0"
+                  value={confirmForm.monthlyIncome}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, monthlyIncome: e.target.value }))}
+                  placeholder="Optional"
+                />
+              </label>
+              <label>
+                Emergency Contact Name
+                <input
+                  value={confirmForm.emergencyContactName}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, emergencyContactName: e.target.value }))}
+                  placeholder="Contact person"
+                />
+              </label>
+              <label>
+                Emergency Contact Phone
+                <input
+                  value={confirmForm.emergencyContactPhone}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, emergencyContactPhone: e.target.value }))}
+                  placeholder="Contact number"
+                />
+              </label>
+              <label>
+                Transaction Reference *
+                <input
+                  placeholder="QR transaction id"
+                  value={confirmForm.transactionRef}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, transactionRef: e.target.value }))}
+                />
+              </label>
+            </div>
+            <label>Reason for Moving</label>
+            <textarea
+              rows="2"
+              value={confirmForm.moveInReason}
+              onChange={(e) => setConfirmForm((prev) => ({ ...prev, moveInReason: e.target.value }))}
+              placeholder="Short reason"
             />
             <label>Note to Owner</label>
             <textarea

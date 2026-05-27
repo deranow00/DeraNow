@@ -42,10 +42,10 @@ const renterPrimaryItems = [
   { to: '/renter/listings', labelKey: 'nav.browse', icon: <HiOutlineSquares2X2 /> },
   { to: '/renter/visits', labelKey: 'nav.visits', icon: <HiOutlineMapPin /> },
   { to: '/renter/bookings', labelKey: 'nav.bookings', icon: <HiOutlineCalendarDays /> },
-  { to: '/renter/message', labelKey: 'nav.messages', icon: <HiOutlineChatBubbleOvalLeftEllipsis /> },
 ];
 
 const renterSecondaryItems = [
+  { to: '/renter/message', labelKey: 'nav.messages', icon: <HiOutlineChatBubbleOvalLeftEllipsis /> },
   { to: '/renter/favorites', labelKey: 'nav.favorites', icon: <HiOutlineHeart /> },
   { to: '/renter/payments', labelKey: 'nav.payments', icon: <HiOutlineCreditCard /> },
   { to: '/renter/agreements', labelKey: 'nav.agreements', icon: <HiOutlineDocumentText /> },

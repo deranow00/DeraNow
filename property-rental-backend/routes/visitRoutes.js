@@ -286,9 +286,25 @@ router.post('/:id/confirm-booking', protect, async (req, res) => {
       return res.status(403).json({ error: 'Only renters can confirm booking after visit' });
     }
 
-    const { moveInDate, transactionRef = '', noteToOwner = '' } = req.body;
+    const {
+      moveInDate,
+      transactionRef = '',
+      fullName = '',
+      phone = '',
+      email = '',
+      occupants = 1,
+      employmentStatus = '',
+      monthlyIncome = '',
+      moveInReason = '',
+      emergencyContactName = '',
+      emergencyContactPhone = '',
+      noteToOwner = '',
+    } = req.body;
     if (!moveInDate) {
       return res.status(400).json({ error: 'Move-in date is required' });
+    }
+    if (!String(fullName).trim() || !String(phone).trim() || Number(occupants) < 1) {
+      return res.status(400).json({ error: 'Full name, phone number, and occupants are required' });
     }
     if (!String(transactionRef).trim()) {
       return res.status(400).json({ error: 'Payment transaction reference is required' });
@@ -325,9 +341,15 @@ router.post('/:id/confirm-booking', protect, async (req, res) => {
       toDate: parsedMoveInDate,
       agreedMonthlyRent: Number(visit.property?.price || 0),
       bookingDetails: {
-        fullName: req.user.name || visit.renter?.name || '',
-        email: req.user.email || visit.renter?.email || '',
-        occupants: 1,
+        fullName,
+        phone,
+        email: email || req.user.email || visit.renter?.email || '',
+        occupants: Number(occupants),
+        employmentStatus,
+        monthlyIncome: monthlyIncome ? Number(monthlyIncome) : undefined,
+        moveInReason,
+        emergencyContactName,
+        emergencyContactPhone,
         noteToOwner,
       },
       paymentStatus: 'pending_verification',

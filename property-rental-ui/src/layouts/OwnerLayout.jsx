@@ -42,10 +42,10 @@ const ownerPrimaryItems = [
   { to: '/owner/properties', labelKey: 'nav.properties', icon: <HiOutlineBuildingOffice2 /> },
   { to: '/owner/requests', labelKey: 'nav.bookings', icon: <HiOutlineCalendarDays /> },
   { to: '/owner/visits', labelKey: 'nav.visits', icon: <HiOutlineMapPin /> },
-  { to: '/owner/messages', labelKey: 'nav.messages', icon: <HiOutlineChatBubbleOvalLeftEllipsis /> },
 ];
 
 const ownerSecondaryItems = [
+  { to: '/owner/messages', labelKey: 'nav.messages', icon: <HiOutlineChatBubbleOvalLeftEllipsis /> },
   { to: '/owner/add', labelKey: 'nav.addProperty', icon: <HiOutlinePlusCircle /> },
   { to: '/owner/payment-status', labelKey: 'nav.rentStatus', icon: <HiOutlineBanknotes /> },
   { to: '/owner/agreements', labelKey: 'nav.agreements', icon: <HiOutlineDocumentText /> },

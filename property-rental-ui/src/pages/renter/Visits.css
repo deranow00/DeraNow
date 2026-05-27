@@ -163,7 +163,7 @@
 
 .visit-confirm-modal {
   position: relative;
-  width: min(460px, 96vw);
+  width: min(720px, 96vw);
   max-height: 92vh;
   overflow-y: auto;
   display: grid;
@@ -194,6 +194,8 @@
 }
 
 .visit-confirm-modal label {
+  display: grid;
+  gap: 6px;
   font-weight: 800;
   color: var(--text);
 }
@@ -207,6 +209,12 @@
   font: inherit;
 }
 
+.visit-confirm-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .visit-confirm-close {
   position: absolute;
   top: 10px;
@@ -218,6 +226,12 @@
   place-items: center;
   background: #f1f5f9 !important;
   color: var(--text) !important;
+}
+
+@media (max-width: 640px) {
+  .visit-confirm-form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {

@@ -8,6 +8,7 @@ import MyProperties from '../pages/owner/MyProperties';
 import RenterHome from '../pages/renter/Home';
 import AddProperty from '../pages/owner/AddProperty';
 import Bookings from '../pages/owner/Bookings';
+import OwnerVisits from '../pages/owner/OwnerVisits';
 import MyBookings from '../pages/renter/MyBookings';
 import Listings from '../pages/renter/Listings';
 import Favorites from '../pages/renter/Favorites';
@@ -92,6 +93,7 @@ export default function AppRoutes() {
         <Route path="properties" element={<MyProperties />} />
         <Route path="add" element={<AddProperty />} />
         <Route path="requests" element={<Bookings />} />
+        <Route path="visits" element={<OwnerVisits />} />
         <Route path="messages" element={<Messages />} />
         <Route path="ocomplaint" element={<OwnerComplaint />} />
         <Route path="payment-status" element={<PaymentStatus />} />

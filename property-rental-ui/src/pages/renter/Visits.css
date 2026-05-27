@@ -117,6 +117,109 @@
   color: #b42318;
 }
 
+.visits-alert.success {
+  color: #0f766e;
+}
+
+.visit-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.visit-card-actions button,
+.visit-confirm-modal button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.visit-card-actions button:disabled,
+.visit-confirm-modal button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.visit-booking-link {
+  color: #0f766e;
+  font-weight: 800;
+  align-self: center;
+}
+
+.visit-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.58);
+}
+
+.visit-confirm-modal {
+  position: relative;
+  width: min(460px, 96vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  display: grid;
+  gap: 12px;
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.visit-confirm-modal h2,
+.visit-confirm-modal p {
+  margin: 0;
+}
+
+.visit-confirm-modal p {
+  color: var(--text-muted);
+}
+
+.visit-confirm-modal img {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  justify-self: center;
+}
+
+.visit-confirm-modal label {
+  font-weight: 800;
+  color: var(--text);
+}
+
+.visit-confirm-modal input,
+.visit-confirm-modal textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  font: inherit;
+}
+
+.visit-confirm-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: #f1f5f9 !important;
+  color: var(--text) !important;
+}
+
 @media (max-width: 640px) {
   .visits-hero,
   .visit-pass-summary,

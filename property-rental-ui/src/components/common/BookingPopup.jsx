@@ -179,7 +179,7 @@ export default function BookingPopup({ property, onClose }) {
             <div>
               <h3>One-time visit pass</h3>
               <p>Pay once, get a promo code, then book visits for unlimited properties.</p>
-              <strong>Rs. {passState?.amount || 100}</strong>
+              <strong>Rs. {passState?.amount || 500}</strong>
             </div>
             <img src={QR_IMAGE_URL} alt="DeraNow visit pass payment QR" />
           </div>

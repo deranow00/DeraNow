@@ -16,7 +16,7 @@ const visitPassSchema = new mongoose.Schema(
     contactPhone: { type: String, trim: true, default: '' },
     status: {
       type: String,
-      enum: ['pending_payment', 'active', 'rejected'],
+      enum: ['pending_payment', 'active', 'consumed', 'rejected'],
       default: 'pending_payment',
     },
     requestedForProperty: { type: mongoose.Schema.Types.ObjectId, ref: 'Property' },
@@ -24,6 +24,8 @@ const visitPassSchema = new mongoose.Schema(
     paidNotifiedAt: { type: Date, default: Date.now },
     approvedAt: { type: Date },
     approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    consumedAt: { type: Date },
+    consumedByVisit: { type: mongoose.Schema.Types.ObjectId, ref: 'PropertyVisit' },
     rejectedAt: { type: Date },
     rejectedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     adminRemark: { type: String, trim: true, default: '' },

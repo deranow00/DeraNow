@@ -11,6 +11,7 @@ import {
   HiOutlineDocumentText,
   HiOutlineExclamationTriangle,
   HiOutlineFolderOpen,
+  HiOutlineMapPin,
   HiOutlinePlusCircle,
   HiOutlineSquares2X2,
   HiOutlineUserCircle,
@@ -26,6 +27,7 @@ const ownerNavItems = [
   { to: '/owner/properties', labelKey: 'nav.properties', icon: <HiOutlineBuildingOffice2 /> },
   { to: '/owner/add', labelKey: 'nav.addProperty', icon: <HiOutlinePlusCircle /> },
   { to: '/owner/requests', labelKey: 'nav.bookings', icon: <HiOutlineCalendarDays /> },
+  { to: '/owner/visits', labelKey: 'nav.visits', icon: <HiOutlineMapPin /> },
   { to: '/owner/messages', labelKey: 'nav.messages', icon: <HiOutlineChatBubbleOvalLeftEllipsis /> },
   { to: '/owner/agreements', labelKey: 'nav.agreements', icon: <HiOutlineDocumentText /> },
   { to: '/owner/documents', labelKey: 'nav.documents', icon: <HiOutlineFolderOpen /> },
@@ -39,6 +41,7 @@ const ownerPrimaryItems = [
   { to: '/owner', labelKey: 'nav.home', icon: <HiOutlineSquares2X2 />, end: true },
   { to: '/owner/properties', labelKey: 'nav.properties', icon: <HiOutlineBuildingOffice2 /> },
   { to: '/owner/requests', labelKey: 'nav.bookings', icon: <HiOutlineCalendarDays /> },
+  { to: '/owner/visits', labelKey: 'nav.visits', icon: <HiOutlineMapPin /> },
   { to: '/owner/messages', labelKey: 'nav.messages', icon: <HiOutlineChatBubbleOvalLeftEllipsis /> },
 ];
 

@@ -4,13 +4,19 @@ import VisitPass from '../models/VisitPass.js';
 import PropertyVisit from '../models/PropertyVisit.js';
 import Property from '../models/Property.js';
 import User from '../models/User.js';
+import Booking from '../models/Booking.js';
 import protect from '../middleware/authMiddleware.js';
 import adminOnly from '../middleware/adminMiddleware.js';
 import { sendNotification } from '../socket.js';
 
 const router = express.Router();
 
-const VISIT_PASS_AMOUNT = Number(process.env.VISIT_PASS_AMOUNT || 100);
+const VISIT_PASS_AMOUNT = Number(process.env.VISIT_PASS_AMOUNT || 500);
+const BOOKING_CONFIRMATION_AMOUNTS = {
+  Condo: 2000,
+  Apartment: 2500,
+  House: 4000,
+};
 
 const normalizeCode = (value = '') => String(value).trim().toUpperCase();
 
@@ -29,6 +35,9 @@ const getActivePassForRenter = async (renterId, promoCode = '') => {
   if (code) filter.promoCode = code;
   return VisitPass.findOne(filter).sort({ approvedAt: -1, createdAt: -1 });
 };
+
+const getBookingConfirmationAmount = (propertyType) =>
+  BOOKING_CONFIRMATION_AMOUNTS[propertyType] || BOOKING_CONFIRMATION_AMOUNTS.Condo;
 
 router.get('/pass/me', protect, async (req, res) => {
   try {
@@ -56,12 +65,33 @@ router.get('/me', protect, async (req, res) => {
     const visits = await PropertyVisit.find({ renter: req.user._id })
       .populate('property', 'title location image price type')
       .populate('owner', 'name email')
+      .populate('booking', 'status paymentStatus fromDate toDate')
       .sort({ visitDate: -1, createdAt: -1 })
       .lean();
     return res.json(visits);
   } catch (err) {
     console.error('get renter visits error:', err);
     return res.status(500).json({ error: 'Failed to load visits' });
+  }
+});
+
+router.get('/owner', protect, async (req, res) => {
+  try {
+    if (req.user.role !== 'owner') {
+      return res.status(403).json({ error: 'Only owners can view property visits' });
+    }
+
+    const visits = await PropertyVisit.find({ owner: req.user._id })
+      .populate('property', 'title location image price type')
+      .populate('renter', 'name email citizenshipNumber')
+      .populate('visitPass', 'promoCode status amount contactPhone transactionRef')
+      .populate('booking', 'status paymentStatus fromDate toDate')
+      .sort({ visitDate: -1, createdAt: -1 })
+      .lean();
+    return res.json(visits);
+  } catch (err) {
+    console.error('get owner visits error:', err);
+    return res.status(500).json({ error: 'Failed to load owner visits' });
   }
 });
 
@@ -201,6 +231,160 @@ router.post('/', protect, async (req, res) => {
   } catch (err) {
     console.error('book visit error:', err);
     return res.status(500).json({ error: 'Failed to book visit' });
+  }
+});
+
+router.patch('/:id/mark-done', protect, async (req, res) => {
+  try {
+    const visit = await PropertyVisit.findById(req.params.id)
+      .populate('property', 'title type ownerId')
+      .populate('renter', 'name email');
+    if (!visit) return res.status(404).json({ error: 'Visit not found' });
+
+    const isRenter = visit.renter?._id?.toString() === req.user._id.toString();
+    const isOwner = visit.owner?.toString() === req.user._id.toString();
+    if (!isRenter && !isOwner && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Not authorized to update this visit' });
+    }
+
+    const now = new Date();
+    if (isRenter || req.user.role === 'admin') visit.renterMarkedDoneAt = visit.renterMarkedDoneAt || now;
+    if (isOwner || req.user.role === 'admin') visit.ownerMarkedDoneAt = visit.ownerMarkedDoneAt || now;
+
+    if (visit.renterMarkedDoneAt && visit.ownerMarkedDoneAt && visit.status === 'scheduled') {
+      visit.status = 'completed';
+      await sendNotification(
+        visit.renter?._id || visit.renter,
+        'newBooking',
+        `Visit completed for "${visit.property?.title || 'property'}". You can now confirm booking.`,
+        '/renter/visits'
+      );
+    }
+
+    await visit.save();
+
+    const notifyUserId = isRenter ? visit.owner : visit.renter?._id || visit.renter;
+    if (notifyUserId) {
+      await sendNotification(
+        notifyUserId,
+        'newBooking',
+        `${req.user.name || 'User'} marked the visit for "${visit.property?.title || 'property'}" as done.`,
+        isRenter ? '/owner/visits' : '/renter/visits'
+      );
+    }
+
+    return res.json({ message: 'Visit marked as done', visit });
+  } catch (err) {
+    console.error('mark visit done error:', err);
+    return res.status(500).json({ error: 'Failed to mark visit done' });
+  }
+});
+
+router.post('/:id/confirm-booking', protect, async (req, res) => {
+  try {
+    if (req.user.role !== 'renter') {
+      return res.status(403).json({ error: 'Only renters can confirm booking after visit' });
+    }
+
+    const { moveInDate, transactionRef = '', noteToOwner = '' } = req.body;
+    if (!moveInDate) {
+      return res.status(400).json({ error: 'Move-in date is required' });
+    }
+    if (!String(transactionRef).trim()) {
+      return res.status(400).json({ error: 'Payment transaction reference is required' });
+    }
+
+    const parsedMoveInDate = new Date(moveInDate);
+    if (Number.isNaN(parsedMoveInDate.getTime())) {
+      return res.status(400).json({ error: 'Invalid move-in date' });
+    }
+
+    const visit = await PropertyVisit.findById(req.params.id)
+      .populate('property', 'title price type ownerId')
+      .populate('visitPass')
+      .populate('renter', 'name email');
+    if (!visit) return res.status(404).json({ error: 'Visit not found' });
+
+    if (visit.renter?._id?.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Not authorized to confirm this visit' });
+    }
+
+    if (!visit.renterMarkedDoneAt || !visit.ownerMarkedDoneAt) {
+      return res.status(400).json({ error: 'Both renter and owner must mark the visit as done first' });
+    }
+
+    if (visit.bookingConfirmationStatus !== 'none' || visit.booking) {
+      return res.status(409).json({ error: 'Booking confirmation already submitted for this visit' });
+    }
+
+    const amount = getBookingConfirmationAmount(visit.property?.type);
+    const booking = await Booking.create({
+      property: visit.property?._id || visit.property,
+      renter: req.user._id,
+      fromDate: parsedMoveInDate,
+      toDate: parsedMoveInDate,
+      agreedMonthlyRent: Number(visit.property?.price || 0),
+      bookingDetails: {
+        fullName: req.user.name || visit.renter?.name || '',
+        email: req.user.email || visit.renter?.email || '',
+        occupants: 1,
+        noteToOwner,
+      },
+      paymentStatus: 'pending_verification',
+      acceptedAt: null,
+      rejectedAt: null,
+    });
+
+    visit.booking = booking._id;
+    visit.status = 'booking_pending';
+    visit.bookingConfirmationStatus = 'pending_verification';
+    visit.bookingConfirmationAmount = amount;
+    visit.bookingConfirmationTransactionRef = transactionRef;
+    await visit.save();
+
+    if (visit.visitPass?._id) {
+      await VisitPass.findByIdAndUpdate(visit.visitPass._id, {
+        status: 'consumed',
+        consumedAt: new Date(),
+        consumedByVisit: visit._id,
+      });
+    }
+
+    if (visit.owner) {
+      await sendNotification(
+        visit.owner,
+        'newBooking',
+        `${req.user.name || 'Renter'} confirmed booking after visiting "${visit.property?.title || 'property'}".`,
+        '/owner/requests'
+      );
+    }
+
+    const admins = await User.find({ role: 'admin' }).select('_id');
+    for (const admin of admins) {
+      await sendNotification(
+        admin._id,
+        'payment',
+        `Post-visit booking payment of Rs. ${amount} submitted for "${visit.property?.title || 'property'}".`,
+        '/admin/visits'
+      );
+    }
+
+    await sendNotification(
+      req.user._id,
+      'payment',
+      `Booking confirmation submitted. Your visit promo code has been consumed.`,
+      '/renter/bookings'
+    );
+
+    return res.status(201).json({
+      message: 'Booking confirmation submitted',
+      amount,
+      booking,
+      visit,
+    });
+  } catch (err) {
+    console.error('confirm booking after visit error:', err);
+    return res.status(500).json({ error: 'Failed to confirm booking after visit' });
   }
 });
 

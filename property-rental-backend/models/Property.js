@@ -20,6 +20,16 @@ const propertySchema = new mongoose.Schema(
     description: { type: String },
     type: { type: String, enum: ['Apartment', 'House', 'Condo'], required: true },
     image: { type: String },
+    images: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: (value) => !Array.isArray(value) || value.length <= 5,
+        message: 'A property can have up to 5 images',
+      },
+    },
+    parkingAvailable: { type: Boolean, default: false },
+    petFriendly: { type: Boolean, default: false },
     ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     status: {
       type: String,

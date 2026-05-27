@@ -1,0 +1,140 @@
+.renter-visits-page {
+  display: grid;
+  gap: 22px;
+}
+
+.visits-hero,
+.visit-pass-summary,
+.visits-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+.visits-hero h1,
+.visit-pass-summary h2,
+.visits-list h2 {
+  margin: 0;
+  color: var(--text);
+}
+
+.visits-hero p,
+.visit-pass-summary p,
+.visits-empty {
+  color: var(--text-muted);
+  margin-bottom: 0;
+}
+
+.visit-pass-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.visit-pass-summary span {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.visit-pass-summary strong {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #ecfdf5;
+  color: #0f766e;
+  letter-spacing: 0.06em;
+}
+
+.visits-list {
+  display: grid;
+  gap: 14px;
+}
+
+.visits-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.visits-list-head span {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-weight: 800;
+}
+
+.visit-card {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.visit-card img {
+  width: 96px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.visit-card h3,
+.visit-card p {
+  margin: 0 0 6px;
+}
+
+.visit-card p {
+  color: var(--text-muted);
+}
+
+.visit-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.visit-card-meta span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.visits-alert.error {
+  color: #b42318;
+}
+
+@media (max-width: 640px) {
+  .visits-hero,
+  .visit-pass-summary,
+  .visits-list {
+    padding: 16px;
+  }
+
+  .visit-pass-summary,
+  .visit-card {
+    grid-template-columns: 1fr;
+  }
+
+  .visit-pass-summary {
+    display: grid;
+  }
+
+  .visit-card img {
+    width: 100%;
+    height: 170px;
+  }
+}

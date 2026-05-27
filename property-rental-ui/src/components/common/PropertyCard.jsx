@@ -8,6 +8,7 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
   const { token } = useContext(AuthContext);
   const [isFavorited, setIsFavorited] = useState(false);
   const displayType = property.type === 'Condo' ? 'Room' : property.type;
+  const primaryImage = property.image || property.images?.[0] || '/default-property.jpg';
 
   const handleFavoriteClick = async () => {
     if (!token) return;
@@ -66,12 +67,16 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
 
   return (
     <div className="property-card">
-      <img src={property.image || '/default-property.jpg'} alt={property.title} />
+      <img src={primaryImage} alt={property.title} />
       <div className="property-info">
         <h3>{property.title}</h3>
         <p>{property.location}</p>
         {displayType && <p>{displayType}</p>}
         <p>Rs. {property.price}/month</p>
+        <div className="property-amenities">
+          <span>{property.parkingAvailable ? 'Parking' : 'No parking'}</span>
+          <span>{property.petFriendly ? 'Pet friendly' : 'No pets'}</span>
+        </div>
 
         {property.ownerId?.ownerVerificationStatus === 'verified' && (
           <span className="verified-badge">Verified Owner</span>
@@ -90,7 +95,7 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
         <div className="property-actions">
           <div className="action-buttons">
             <button onClick={() => onViewDetails(property)}>View Details</button>
-            <button onClick={() => onApplyBooking(property)}>Apply Booking</button>
+            <button onClick={() => onApplyBooking(property)}>Book Visit</button>
           </div>
           <div
             className={`favorite-btn ${isFavorited ? 'favorited' : ''}`}

@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { PushNotifications } from '@capacitor/push-notifications';
 import { useSocket } from './SocketContext';
 import { AuthContext } from './AuthContext';
 import { API_BASE_URL } from '../config/api';
@@ -8,6 +10,9 @@ export const NotificationContext = createContext();
 const canUseBrowserNotifications = () =>
   typeof window !== 'undefined' && 'Notification' in window;
 
+const canUseNativePush = () =>
+  typeof window !== 'undefined' && Capacitor.isNativePlatform();
+
 export const NotificationProvider = ({ children }) => {
   const { user, token } = useContext(AuthContext);
   const socket = useSocket();
@@ -15,8 +20,56 @@ export const NotificationProvider = ({ children }) => {
   const [phoneNotificationPermission, setPhoneNotificationPermission] = useState(() =>
     canUseBrowserNotifications() ? Notification.permission : 'unsupported'
   );
+  const [nativePushPermission, setNativePushPermission] = useState(() =>
+    canUseNativePush() ? 'prompt' : 'unsupported'
+  );
+
+  const savePushToken = async (pushToken) => {
+    if (!token || !pushToken) return;
+    await fetch(`${API_BASE_URL}/api/notifications/push-token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        token: pushToken,
+        platform: Capacitor.getPlatform(),
+      }),
+    });
+  };
+
+  const registerNativePushNotifications = async () => {
+    if (!canUseNativePush()) {
+      setNativePushPermission('unsupported');
+      return 'unsupported';
+    }
+
+    const permission = await PushNotifications.requestPermissions();
+    const status = permission.receive || 'denied';
+    setNativePushPermission(status);
+    if (status !== 'granted') return status;
+
+    if (Capacitor.getPlatform() === 'android') {
+      await PushNotifications.createChannel({
+        id: 'deranow_default',
+        name: 'DeraNow notifications',
+        description: 'Booking, payment, message, and account updates.',
+        importance: 5,
+        visibility: 1,
+        sound: 'default',
+      }).catch(() => {});
+    }
+
+    await PushNotifications.register();
+    return status;
+  };
 
   const requestPhoneNotifications = async () => {
+    if (canUseNativePush()) {
+      return registerNativePushNotifications();
+    }
+
     if (!canUseBrowserNotifications()) {
       setPhoneNotificationPermission('unsupported');
       return 'unsupported';
@@ -30,6 +83,80 @@ export const NotificationProvider = ({ children }) => {
     if (!user || !canUseBrowserNotifications()) return;
     setPhoneNotificationPermission(Notification.permission);
   }, [user?._id]);
+
+  useEffect(() => {
+    if (!user || !token || !canUseNativePush()) return undefined;
+
+    let mounted = true;
+    const listeners = [];
+
+    const setupPush = async () => {
+      const currentPermission = await PushNotifications.checkPermissions();
+      if (!mounted) return;
+      setNativePushPermission(currentPermission.receive || 'prompt');
+
+      listeners.push(
+        await PushNotifications.addListener('registration', ({ value }) => {
+          savePushToken(value).catch((err) => {
+            console.error('Failed to save push token:', err);
+          });
+        })
+      );
+
+      listeners.push(
+        await PushNotifications.addListener('registrationError', (err) => {
+          console.error('Push registration error:', err);
+        })
+      );
+
+      listeners.push(
+        await PushNotifications.addListener('pushNotificationReceived', (notification) => {
+          setNotifications((prev) => [
+            {
+              _id: notification.id || `push-${Date.now()}`,
+              type: notification.data?.type || 'message',
+              message: notification.body || notification.title || 'You have a new notification.',
+              link: notification.data?.link || '',
+              read: false,
+              createdAt: new Date().toISOString(),
+            },
+            ...prev,
+          ]);
+        })
+      );
+
+      listeners.push(
+        await PushNotifications.addListener('pushNotificationActionPerformed', (event) => {
+          const link = event.notification?.data?.link;
+          if (link) window.location.assign(link);
+        })
+      );
+
+      if (currentPermission.receive === 'granted') {
+        if (Capacitor.getPlatform() === 'android') {
+          await PushNotifications.createChannel({
+            id: 'deranow_default',
+            name: 'DeraNow notifications',
+            description: 'Booking, payment, message, and account updates.',
+            importance: 5,
+            visibility: 1,
+            sound: 'default',
+          }).catch(() => {});
+        }
+        await PushNotifications.register();
+      }
+    };
+
+    setupPush().catch((err) => {
+      console.error('Push setup failed:', err);
+    });
+
+    return () => {
+      mounted = false;
+      listeners.forEach((listener) => listener.remove());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id, token]);
 
   useEffect(() => {
     if (!user || !token) {
@@ -121,6 +248,7 @@ export const NotificationProvider = ({ children }) => {
         unreadCount,
         markAsRead,
         phoneNotificationPermission,
+        nativePushPermission,
         requestPhoneNotifications,
       }}
     >

@@ -4,6 +4,7 @@ import Notification from './models/Notification.js';
 import User from './models/User.js';
 import Message from './models/Message.js';
 import { canUsersChat } from './utils/chatAccess.js';
+import { getFirebaseMessaging } from './config/firebase.js';
 
 let io;
 const onlineUsers = new Map();
@@ -191,7 +192,7 @@ export const sendNotification = async (userId, type, message, link = '') => {
   }
 
   try {
-    const user = await User.findById(userId).select('notificationPreferences');
+    const user = await User.findById(userId).select('notificationPreferences +pushTokens');
     const prefs = user?.notificationPreferences;
     const inAppEnabled = prefs?.inApp !== false;
     const typeEnabled = prefs?.types?.[type] !== false;
@@ -222,6 +223,55 @@ export const sendNotification = async (userId, type, message, link = '') => {
       console.log(`📢 Notification sent in real-time to ${userId} (${type})`);
     } else {
       console.log(`🕒 User ${userId} offline, notification saved (${type})`);
+    }
+
+    const pushTokens = (user?.pushTokens || []).map((item) => item.token).filter(Boolean);
+    const messaging = getFirebaseMessaging();
+
+    if (messaging && pushTokens.length) {
+      const response = await messaging.sendEachForMulticast({
+        tokens: pushTokens,
+        notification: {
+          title: 'DeraNow',
+          body: message,
+        },
+        data: {
+          type: String(type || ''),
+          link: String(link || ''),
+          notificationId: notification._id.toString(),
+        },
+        android: {
+          priority: 'high',
+          notification: {
+            channelId: 'deranow_default',
+            icon: 'ic_launcher',
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: 'default',
+            },
+          },
+        },
+      });
+
+      const invalidTokens = response.responses
+        .map((result, index) => {
+          const code = result.error?.code || '';
+          return code.includes('registration-token-not-registered') ||
+            code.includes('invalid-registration-token')
+            ? pushTokens[index]
+            : null;
+        })
+        .filter(Boolean);
+
+      if (invalidTokens.length) {
+        await User.updateOne(
+          { _id: userId },
+          { $pull: { pushTokens: { token: { $in: invalidTokens } } } }
+        );
+      }
     }
   } catch (err) {
     console.error('❌ Error sending notification:', err.message);

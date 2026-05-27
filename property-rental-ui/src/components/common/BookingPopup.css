@@ -109,6 +109,102 @@
   cursor: pointer;
 }
 
+.booking-submit-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.visit-modal h3 {
+  margin: 0 0 6px;
+}
+
+.visit-muted {
+  color: var(--text-muted);
+}
+
+.visit-pass-card,
+.visit-payment-panel,
+.visit-history {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 14px 0;
+  background: #f8fafc;
+}
+
+.visit-pass-card {
+  display: grid;
+  gap: 4px;
+}
+
+.visit-pass-card span {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.visit-pass-card strong {
+  font-size: 1.4rem;
+  letter-spacing: 0.08em;
+}
+
+.visit-pass-card p,
+.visit-payment-panel p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.visit-pass-card.active {
+  border-color: rgba(20, 184, 166, 0.32);
+  background: #ecfdf5;
+}
+
+.visit-pass-card.pending {
+  border-color: rgba(245, 158, 11, 0.36);
+  background: #fffbeb;
+}
+
+.visit-payment-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px;
+  gap: 16px;
+  align-items: center;
+}
+
+.visit-payment-panel strong {
+  display: inline-flex;
+  margin-top: 10px;
+  font-size: 1.3rem;
+}
+
+.visit-payment-panel img {
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
+.visit-history {
+  display: grid;
+  gap: 8px;
+}
+
+.visit-history-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.visit-history-row:first-of-type {
+  border-top: 0;
+}
+
 .modal-content .error {
   color: #b42318;
   margin-top: 10px;
@@ -155,5 +251,16 @@
 
   .booking-grid .span-2 {
     grid-column: auto;
+  }
+
+  .visit-payment-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .visit-payment-panel img {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+    aspect-ratio: 1;
   }
 }

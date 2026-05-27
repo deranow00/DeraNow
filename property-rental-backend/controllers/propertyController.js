@@ -26,14 +26,22 @@ export const uploadPropertyImage = async (req, res) => {
       return res.status(500).json({ error: 'Cloudinary credentials are not configured on server' });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ error: 'Image file is required' });
+    const files = req.files?.length ? req.files : req.file ? [req.file] : [];
+    if (!files.length) {
+      return res.status(400).json({ error: 'At least one image file is required' });
+    }
+    if (files.length > 5) {
+      return res.status(400).json({ error: 'You can upload up to 5 images per property' });
     }
 
-    const uploaded = await uploadImageBufferToCloudinary(req.file.buffer);
+    const uploadedImages = await Promise.all(
+      files.map((file) => uploadImageBufferToCloudinary(file.buffer))
+    );
+    const imageUrls = uploadedImages.map((uploaded) => uploaded.secure_url);
     return res.status(201).json({
-      imageUrl: uploaded.secure_url,
-      publicId: uploaded.public_id,
+      imageUrl: imageUrls[0],
+      imageUrls,
+      publicIds: uploadedImages.map((uploaded) => uploaded.public_id),
     });
   } catch (error) {
     console.error('Cloudinary upload error:', error);
@@ -43,12 +51,29 @@ export const uploadPropertyImage = async (req, res) => {
 
 export const addProperty = async (req, res) => {
   try {
-    const { title, description, location, price, type, bedrooms, bathrooms, image } = req.body;
+    const {
+      title,
+      description,
+      location,
+      price,
+      type,
+      bedrooms,
+      bathrooms,
+      image,
+      images = [],
+      parkingAvailable = false,
+      petFriendly = false,
+    } = req.body;
     const ownerId = req.user._id;
 
     if (!title || !location || !price || !type || bedrooms == null || bathrooms == null) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+
+    const normalizedImages = Array.isArray(images)
+      ? images.filter(Boolean).slice(0, 5)
+      : [];
+    const primaryImage = image || normalizedImages[0] || '';
 
     const newProperty = new Property({
       title,
@@ -58,7 +83,10 @@ export const addProperty = async (req, res) => {
       type,
       bedrooms,
       bathrooms,
-      image,
+      image: primaryImage,
+      images: normalizedImages.length ? normalizedImages : primaryImage ? [primaryImage] : [],
+      parkingAvailable: Boolean(parkingAvailable),
+      petFriendly: Boolean(petFriendly),
       ownerId,
       status: 'Pending',
     });
@@ -103,7 +131,13 @@ export const updateProperty = async (req, res) => {
       return res.status(404).json({ error: 'Property not found' });
     }
 
-    Object.assign(property, req.body);
+    const update = { ...req.body };
+    if (Array.isArray(update.images)) {
+      update.images = update.images.filter(Boolean).slice(0, 5);
+      update.image = update.image || update.images[0] || property.image;
+    }
+
+    Object.assign(property, update);
 
     await property.save();
     res.status(200).json({ message: 'Property updated successfully', property });

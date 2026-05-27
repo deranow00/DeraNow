@@ -14,6 +14,7 @@ import {
   HiOutlineSquares2X2,
   HiOutlineUserCircle,
   HiOutlineCreditCard,
+  HiOutlineMapPin,
 } from 'react-icons/hi2';
 import NotificationList from '../components/NotificationList.jsx';
 import MobileBottomNav from '../components/common/MobileBottomNav.jsx';
@@ -25,6 +26,7 @@ const renterNavItems = [
   { to: '/renter', labelKey: 'nav.home', icon: <HiOutlineHome />, end: true },
   { to: '/renter/bookings', labelKey: 'nav.bookings', icon: <HiOutlineCalendarDays /> },
   { to: '/renter/listings', labelKey: 'nav.listings', icon: <HiOutlineSquares2X2 /> },
+  { to: '/renter/visits', labelKey: 'nav.visits', icon: <HiOutlineMapPin /> },
   { to: '/renter/favorites', labelKey: 'nav.favorites', icon: <HiOutlineHeart /> },
   { to: '/renter/message', labelKey: 'nav.messages', icon: <HiOutlineChatBubbleOvalLeftEllipsis /> },
   { to: '/renter/agreements', labelKey: 'nav.agreements', icon: <HiOutlineDocumentText /> },
@@ -38,6 +40,7 @@ const renterNavItems = [
 const renterPrimaryItems = [
   { to: '/renter', labelKey: 'nav.home', icon: <HiOutlineHome />, end: true },
   { to: '/renter/listings', labelKey: 'nav.browse', icon: <HiOutlineSquares2X2 /> },
+  { to: '/renter/visits', labelKey: 'nav.visits', icon: <HiOutlineMapPin /> },
   { to: '/renter/bookings', labelKey: 'nav.bookings', icon: <HiOutlineCalendarDays /> },
   { to: '/renter/message', labelKey: 'nav.messages', icon: <HiOutlineChatBubbleOvalLeftEllipsis /> },
 ];

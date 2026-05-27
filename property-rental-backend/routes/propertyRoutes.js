@@ -24,7 +24,7 @@ router.get('/admin/pending', protect, adminOnly, adminGetPendingProperties);
 router.put('/admin/:id/status', protect, adminOnly, adminUpdatePropertyStatus);
 
 router.get('/my', protect, getOwnerPropertiesWithBookingStatus);
-router.post('/upload-image', protect, upload.single('image'), uploadPropertyImage);
+router.post('/upload-image', protect, upload.array('images', 5), uploadPropertyImage);
 router.post('/', protect, addProperty);
 router.put('/:id', protect, updateProperty);
 router.delete('/:id', protect, deleteProperty);

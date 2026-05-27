@@ -82,6 +82,10 @@ export default function PropertyDetails({ id }) {
   if (error) return <p className="error">{error}</p>;
   if (!property) return <p>No property found</p>;
 
+  const galleryImages = Array.isArray(property.images) && property.images.length
+    ? property.images
+    : [property.image || '/default-property.jpg'];
+
   return (
     <div className="property-details-popup">
       {routeId && (
@@ -90,7 +94,16 @@ export default function PropertyDetails({ id }) {
         </button>
       )}
       <h2>{property.title}</h2>
-      <img src={property.image || '/default-property.jpg'} alt={property.title} />
+      <div className="property-details-gallery">
+        <img src={galleryImages[0]} alt={property.title} />
+        {galleryImages.length > 1 && (
+          <div className="property-details-thumbs">
+            {galleryImages.slice(1, 5).map((imageUrl, index) => (
+              <img key={`${imageUrl}-${index}`} src={imageUrl} alt={`${property.title} ${index + 2}`} />
+            ))}
+          </div>
+        )}
+      </div>
       <p>
         <strong>Location:</strong> {property.location}
       </p>
@@ -102,6 +115,12 @@ export default function PropertyDetails({ id }) {
       </p>
       <p>
         <strong>Status:</strong> {property.status}
+      </p>
+      <p>
+        <strong>Parking:</strong> {property.parkingAvailable ? 'Available' : 'Not available'}
+      </p>
+      <p>
+        <strong>Pet Friendly:</strong> {property.petFriendly ? 'Yes' : 'No'}
       </p>
       {property.ownerId && (
         <p>

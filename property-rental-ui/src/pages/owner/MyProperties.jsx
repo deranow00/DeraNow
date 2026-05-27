@@ -26,9 +26,12 @@ export default function MyProperties() {
     description: '',
     type: PROPERTY_TYPES[0],
     image: '',
+    images: [],
+    parkingAvailable: false,
+    petFriendly: false,
   });
   const [formError, setFormError] = useState('');
-  const [editImageFile, setEditImageFile] = useState(null);
+  const [editImageFiles, setEditImageFiles] = useState([]);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
@@ -67,17 +70,29 @@ export default function MyProperties() {
       description: property.description || '',
       type: toBackendPropertyType(property.type || PROPERTY_TYPES[0]),
       image: property.image || '',
+      images: Array.isArray(property.images) ? property.images : property.image ? [property.image] : [],
+      parkingAvailable: Boolean(property.parkingAvailable),
+      petFriendly: Boolean(property.petFriendly),
     });
     setFormError('');
-    setEditImageFile(null);
+    setEditImageFiles([]);
     setIsEditing(true);
   };
 
   const uploadImageToCloudinary = async () => {
-    if (!editImageFile) return formData.image;
+    if (!editImageFiles.length) {
+      return {
+        imageUrl: formData.image,
+        imageUrls: Array.isArray(formData.images) && formData.images.length
+          ? formData.images
+          : formData.image ? [formData.image] : [],
+      };
+    }
 
     const formPayload = new FormData();
-    formPayload.append('image', editImageFile);
+    editImageFiles.slice(0, 5).forEach((file) => {
+      formPayload.append('images', file);
+    });
 
     setUploadingImage(true);
     try {
@@ -90,7 +105,10 @@ export default function MyProperties() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Image upload failed');
-      return data.imageUrl;
+      return {
+        imageUrl: data.imageUrl,
+        imageUrls: Array.isArray(data.imageUrls) ? data.imageUrls : [data.imageUrl].filter(Boolean),
+      };
     } finally {
       setUploadingImage(false);
     }
@@ -115,7 +133,7 @@ export default function MyProperties() {
     }
 
     try {
-      const imageUrl = await uploadImageToCloudinary();
+      const uploaded = await uploadImageToCloudinary();
       const res = await fetch(`${API_BASE_URL}/api/properties/${currentProperty._id}`, {
         method: 'PUT',
         headers: {
@@ -125,10 +143,13 @@ export default function MyProperties() {
         body: JSON.stringify({
           ...formData,
           type: toBackendPropertyType(formData.type),
-          image: imageUrl,
+          image: uploaded.imageUrl,
+          images: uploaded.imageUrls,
           price: Number(formData.price),
           bedrooms: Number(formData.bedrooms),
           bathrooms: Number(formData.bathrooms),
+          parkingAvailable: Boolean(formData.parkingAvailable),
+          petFriendly: Boolean(formData.petFriendly),
         }),
       });
 
@@ -141,7 +162,7 @@ export default function MyProperties() {
 
       setIsEditing(false);
       setCurrentProperty(null);
-      setEditImageFile(null);
+      setEditImageFiles([]);
     } catch (err) {
       setFormError(err.message || 'Something went wrong');
     }
@@ -172,7 +193,7 @@ export default function MyProperties() {
   const handleCancel = () => {
     setIsEditing(false);
     setFormError('');
-    setEditImageFile(null);
+    setEditImageFiles([]);
   };
 
   return (
@@ -189,7 +210,7 @@ export default function MyProperties() {
           {properties.map((property) => (
             <div key={property._id} className="property-card">
               <img
-                src={property.image || '/default-image.jpg'}
+                src={property.image || property.images?.[0] || '/default-image.jpg'}
                 alt={property.title}
                 className="property-image"
               />
@@ -199,6 +220,8 @@ export default function MyProperties() {
                 <p>
                   Rent: <span className="rent-amount">Rs. {property.price}</span>
                 </p>
+                <p>Parking: {property.parkingAvailable ? 'Available' : 'Not available'}</p>
+                <p>Pet Friendly: {property.petFriendly ? 'Yes' : 'No'}</p>
                 <p className="status available">Approval: {property.approvalStatus}</p>
                 <p
                   className={`status ${
@@ -291,8 +314,30 @@ export default function MyProperties() {
                 ))}
               </select>
             </div>
+            <div className="form-group amenity-edit-grid">
+              <label className="amenity-edit-toggle">
+                <input
+                  type="checkbox"
+                  checked={Boolean(formData.parkingAvailable)}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, parkingAvailable: e.target.checked }))
+                  }
+                />
+                <span>Parking Available</span>
+              </label>
+              <label className="amenity-edit-toggle">
+                <input
+                  type="checkbox"
+                  checked={Boolean(formData.petFriendly)}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, petFriendly: e.target.checked }))
+                  }
+                />
+                <span>Pet Friendly</span>
+              </label>
+            </div>
             <div className="form-group">
-              <span className="photo-upload-label">Upload New Image</span>
+              <span className="photo-upload-label">Upload New Images</span>
               <div className="photo-upload-actions">
                 <label className="photo-upload-button" htmlFor="edit-property-image-gallery">
                   Choose from Photos
@@ -306,7 +351,8 @@ export default function MyProperties() {
                 className="photo-upload-input"
                 type="file"
                 accept="image/*"
-                onChange={(e) => setEditImageFile(e.target.files?.[0] || null)}
+                multiple
+                onChange={(e) => setEditImageFiles(Array.from(e.target.files || []).slice(0, 5))}
               />
               <input
                 id="edit-property-image-camera"
@@ -314,10 +360,10 @@ export default function MyProperties() {
                 type="file"
                 accept="image/*"
                 capture="environment"
-                onChange={(e) => setEditImageFile(e.target.files?.[0] || null)}
+                onChange={(e) => setEditImageFiles(Array.from(e.target.files || []).slice(0, 5))}
               />
               <small className="photo-upload-selected">
-                {editImageFile ? editImageFile.name : 'No image selected'}
+                {editImageFiles.length ? `${editImageFiles.length} image${editImageFiles.length > 1 ? 's' : ''} selected` : 'No image selected'}
               </small>
             </div>
             <div className="form-group">
@@ -349,10 +395,17 @@ export default function MyProperties() {
             </button>
             <h2>Property Details</h2>
             <img
-              src={viewProperty.image || '/default-image.jpg'}
+              src={viewProperty.image || viewProperty.images?.[0] || '/default-image.jpg'}
               alt={viewProperty.title}
               className="modal-image"
             />
+            {Array.isArray(viewProperty.images) && viewProperty.images.length > 1 && (
+              <div className="modal-image-thumbs">
+                {viewProperty.images.slice(1, 5).map((imageUrl, index) => (
+                  <img key={`${imageUrl}-${index}`} src={imageUrl} alt={`${viewProperty.title} ${index + 2}`} />
+                ))}
+              </div>
+            )}
             <p>
               <strong>Title:</strong> {viewProperty.title}
             </p>
@@ -373,6 +426,12 @@ export default function MyProperties() {
             </p>
             <p>
               <strong>Type:</strong> {displayPropertyType(viewProperty.type)}
+            </p>
+            <p>
+              <strong>Parking:</strong> {viewProperty.parkingAvailable ? 'Available' : 'Not available'}
+            </p>
+            <p>
+              <strong>Pet Friendly:</strong> {viewProperty.petFriendly ? 'Yes' : 'No'}
             </p>
             <div className="modal-buttons">
               <button className="btn-cancel" onClick={() => setViewProperty(null)}>

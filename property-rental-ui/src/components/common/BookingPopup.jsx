@@ -1,57 +1,86 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
 import './BookingPopup.css';
 
+const QR_IMAGE_URL =
+  import.meta.env.VITE_VISIT_PASS_QR_URL ||
+  import.meta.env.VITE_MANUAL_PAYMENT_QR_URL ||
+  'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg';
+
 export default function BookingPopup({ property, onClose }) {
-  const { token, user } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  const [fromDate, setFromDate] = useState('');
-  const [form, setForm] = useState({
-    fullName: user?.name || '',
-    phone: '',
-    email: user?.email || '',
-    occupants: '1',
-    employmentStatus: '',
-    monthlyIncome: '',
-    moveInReason: '',
-    emergencyContactName: '',
-    emergencyContactPhone: '',
-    noteToOwner: '',
-  });
-
+  const [visitDate, setVisitDate] = useState('');
+  const [transactionRef, setTransactionRef] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [promoCode, setPromoCode] = useState('');
+  const [note, setNote] = useState('');
+  const [passState, setPassState] = useState(null);
+  const [visits, setVisits] = useState([]);
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingPass, setLoadingPass] = useState(false);
 
-  const handleChange = (key, value) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+  const activePass = passState?.activePass;
+  const latestPass = passState?.latestPass;
+  const hasActivePass = Boolean(passState?.hasActivePass);
+  const hasPendingPass = latestPass?.status === 'pending_payment';
+
+  const loadVisitState = async () => {
+    if (!token) return;
+    setLoadingPass(true);
+    try {
+      const [passRes, visitsRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/visits/pass/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch(`${API_BASE_URL}/api/visits/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+      const passPayload = await passRes.json();
+      const visitsPayload = await visitsRes.json();
+      if (!passRes.ok) throw new Error(passPayload.error || 'Failed to load visit pass');
+      if (!visitsRes.ok) throw new Error(visitsPayload.error || 'Failed to load visits');
+      setPassState(passPayload);
+      setVisits(Array.isArray(visitsPayload) ? visitsPayload : []);
+      if (passPayload?.activePass?.promoCode) {
+        setPromoCode(passPayload.activePass.promoCode);
+      }
+    } catch (err) {
+      setMessage(err.message);
+    } finally {
+      setLoadingPass(false);
+    }
   };
 
-  const handleBooking = async () => {
+  useEffect(() => {
+    loadVisitState();
+  }, [token]);
+
+  const submitVisitPassPayment = async () => {
     setMessage('');
     setSuccess('');
 
     if (!token) {
-      setMessage('Please log in to book a property.');
+      setMessage('Please log in to book a property visit.');
       return;
     }
-
-    if (!fromDate) {
-      setMessage('Please select move-in date.');
+    if (!visitDate) {
+      setMessage('Please select the date you want to visit.');
       return;
     }
-
-    if (!form.fullName || !form.phone || !form.occupants) {
-      setMessage('Please fill full name, phone, and occupants.');
+    if (!contactPhone.trim()) {
+      setMessage('Please enter your phone number for admin verification.');
       return;
     }
 
     setLoading(true);
-
     try {
-      const res = await fetch(`${API_BASE_URL}/api/bookings`, {
+      const res = await fetch(`${API_BASE_URL}/api/visits/pass/payment-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,24 +88,51 @@ export default function BookingPopup({ property, onClose }) {
         },
         body: JSON.stringify({
           propertyId: property._id,
-          fromDate,
-          bookingDetails: {
-            ...form,
-            occupants: Number(form.occupants),
-            monthlyIncome: form.monthlyIncome ? Number(form.monthlyIncome) : undefined,
-          },
+          visitDate,
+          transactionRef,
+          contactPhone,
         }),
       });
-
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to submit visit pass payment');
+      setSuccess('Payment notification sent. Admin will verify and send your promo code.');
+      await loadVisitState();
+    } catch (err) {
+      setMessage(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      if (!res.ok) throw new Error(data.error || 'Failed to book');
+  const bookVisit = async () => {
+    setMessage('');
+    setSuccess('');
 
-      setSuccess('Booking request sent successfully!');
+    if (!visitDate) {
+      setMessage('Please select a visit date.');
+      return;
+    }
 
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/visits`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          propertyId: property._id,
+          visitDate,
+          promoCode,
+          note,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to book visit');
+      setSuccess('Visit booked successfully.');
+      await loadVisitState();
+      setTimeout(onClose, 1200);
     } catch (err) {
       setMessage(err.message);
     } finally {
@@ -87,107 +143,117 @@ export default function BookingPopup({ property, onClose }) {
   const handleClose = () => {
     setMessage('');
     setSuccess('');
-    setFromDate('');
+    setVisitDate('');
     setLoading(false);
     onClose();
   };
 
   return (
     <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content booking-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content booking-modal visit-modal" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={handleClose} aria-label="Close popup" title="Close">
-          ✕
+          x
         </button>
 
-        <h2>Apply for Booking</h2>
+        <h2>Book a Visit</h2>
         <p className="booking-subtitle">
-          Complete details for <strong>{property.title}</strong>
+          Visit <strong>{property.title}</strong> before sending a rent booking request.
         </p>
+
+        {loadingPass ? (
+          <p className="visit-muted">Checking your visit pass...</p>
+        ) : hasActivePass ? (
+          <div className="visit-pass-card active">
+            <span>Active visit promo</span>
+            <strong>{activePass?.promoCode}</strong>
+            <p>Use this code to book unlimited DeraNow property visits.</p>
+          </div>
+        ) : hasPendingPass ? (
+          <div className="visit-pass-card pending">
+            <span>Payment waiting for admin approval</span>
+            <strong>Submitted</strong>
+            <p>Your promo code will arrive in notifications after admin verifies the QR payment.</p>
+          </div>
+        ) : (
+          <div className="visit-payment-panel">
+            <div>
+              <h3>One-time visit pass</h3>
+              <p>Pay once, get a promo code, then book visits for unlimited properties.</p>
+              <strong>Rs. {passState?.amount || 100}</strong>
+            </div>
+            <img src={QR_IMAGE_URL} alt="DeraNow visit pass payment QR" />
+          </div>
+        )}
 
         <div className="booking-grid">
           <div>
-            <label>Move-in Date *</label>
-            <input type="date" min={today} value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+            <label>Visit Date *</label>
+            <input type="date" min={today} value={visitDate} onChange={(e) => setVisitDate(e.target.value)} />
           </div>
 
-          <div>
-            <label>Full Name *</label>
-            <input value={form.fullName} onChange={(e) => handleChange('fullName', e.target.value)} />
-          </div>
-          <div>
-            <label>Phone *</label>
-            <input value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} />
-          </div>
+          {hasActivePass ? (
+            <div>
+              <label>Promo Code *</label>
+              <input value={promoCode} onChange={(e) => setPromoCode(e.target.value.toUpperCase())} />
+            </div>
+          ) : (
+            <div>
+              <label>Phone *</label>
+              <input
+                placeholder="Your phone number"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                disabled={hasPendingPass}
+              />
+            </div>
+          )}
 
-          <div>
-            <label>Email</label>
-            <input value={form.email} onChange={(e) => handleChange('email', e.target.value)} />
-          </div>
-          <div>
-            <label>Occupants *</label>
-            <input
-              type="number"
-              min="1"
-              value={form.occupants}
-              onChange={(e) => handleChange('occupants', e.target.value)}
-            />
-          </div>
+          {!hasActivePass && (
+            <div className="span-2">
+              <label>Transaction Reference</label>
+              <input
+                placeholder="QR transaction id or note"
+                value={transactionRef}
+                onChange={(e) => setTransactionRef(e.target.value)}
+                disabled={hasPendingPass}
+              />
+            </div>
+          )}
 
-          <div>
-            <label>Employment Status</label>
-            <input
-              placeholder="Employed / Self-employed / Student"
-              value={form.employmentStatus}
-              onChange={(e) => handleChange('employmentStatus', e.target.value)}
-            />
-          </div>
-          <div>
-            <label>Monthly Income (NPR)</label>
-            <input
-              type="number"
-              min="0"
-              value={form.monthlyIncome}
-              onChange={(e) => handleChange('monthlyIncome', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label>Emergency Contact Name</label>
-            <input
-              value={form.emergencyContactName}
-              onChange={(e) => handleChange('emergencyContactName', e.target.value)}
-            />
-          </div>
-          <div>
-            <label>Emergency Contact Phone</label>
-            <input
-              value={form.emergencyContactPhone}
-              onChange={(e) => handleChange('emergencyContactPhone', e.target.value)}
-            />
-          </div>
-
-          <div className="span-2">
-            <label>Purpose / Move-in Reason</label>
-            <textarea
-              rows="2"
-              value={form.moveInReason}
-              onChange={(e) => handleChange('moveInReason', e.target.value)}
-            />
-          </div>
-
-          <div className="span-2">
-            <label>Note to Owner</label>
-            <textarea
-              rows="3"
-              value={form.noteToOwner}
-              onChange={(e) => handleChange('noteToOwner', e.target.value)}
-            />
-          </div>
+          {hasActivePass && (
+            <div className="span-2">
+              <label>Visit Note</label>
+              <textarea
+                rows="3"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Preferred time or anything admin should know"
+              />
+            </div>
+          )}
         </div>
 
-        <button className="booking-submit-btn" onClick={handleBooking} disabled={loading}>
-          {loading ? 'Processing...' : 'Submit Booking Request'}
-        </button>
+        {hasActivePass ? (
+          <button className="booking-submit-btn" onClick={bookVisit} disabled={loading}>
+            {loading ? 'Booking Visit...' : 'Book Visit'}
+          </button>
+        ) : (
+          <button className="booking-submit-btn" onClick={submitVisitPassPayment} disabled={loading || hasPendingPass}>
+            {hasPendingPass ? 'Waiting for Admin Approval' : loading ? 'Submitting...' : 'I Have Paid - Notify Admin'}
+          </button>
+        )}
+
+        {visits.length > 0 && (
+          <div className="visit-history">
+            <h3>Your recent visits</h3>
+            {visits.slice(0, 3).map((visit) => (
+              <div key={visit._id} className="visit-history-row">
+                <span>{visit.property?.title || 'Property'}</span>
+                <strong>{new Date(visit.visitDate).toLocaleDateString()}</strong>
+              </div>
+            ))}
+          </div>
+        )}
 
         {message && <p className="error">{message}</p>}
         {success && <p className="success">{success}</p>}

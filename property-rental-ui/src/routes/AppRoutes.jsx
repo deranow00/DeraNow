@@ -26,6 +26,7 @@ import ComplaintHistory from '../pages/renter/ComplaintHistory';
 import PaymentPage from '../pages/renter/PaymentPage';
 import PaymentSuccess from '../pages/renter/PaymentSuccess';
 import PaymentFailure from '../pages/renter/PaymentFailure';
+import Visits from '../pages/renter/Visits';
 import Settings from '../pages/common/Settings';
 import Agreements from '../pages/common/Agreements';
 import Profile from '../pages/common/Profile';
@@ -112,6 +113,7 @@ export default function AppRoutes() {
         <Route path="bookings" element={<MyBookings />} />
         <Route path="listings" element={<Listings />} />
         <Route path="favorites" element={<Favorites />} />
+        <Route path="visits" element={<Visits />} />
         <Route path="message" element={<Message />} />
         <Route path="agreements" element={<Agreements />} />
         <Route path="profile" element={<Profile />} />

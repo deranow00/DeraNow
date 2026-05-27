@@ -17,6 +17,7 @@ import paymentRoutes from './routes/paymentRoutes.js';
 import ratingRoutes from './routes/ratingRoutes.js'
 import notificationRoutes from './routes/notificationRoutes.js';
 import agreementRoutes from './routes/agreementRoutes.js';
+import visitRoutes from './routes/visitRoutes.js';
 import securityHeaders from './middleware/securityHeaders.js';
 import requestLogger from './middleware/requestLogger.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
@@ -91,6 +92,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/properties', ratingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/agreements', agreementRoutes);
+app.use('/api/visits', visitRoutes);
 
 app.get('/', (req, res) => {
   res.send('Property Rental API is running');

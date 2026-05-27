@@ -22,11 +22,30 @@
   cursor: pointer;
 }
 
-.property-details-popup img {
+.property-details-gallery {
+  display: grid;
+  gap: 10px;
+}
+
+.property-details-gallery > img {
   width: 100%;
   height: 280px;
   object-fit: cover;
   border-radius: var(--radius-md);
+}
+
+.property-details-thumbs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.property-details-thumbs img {
+  width: 100%;
+  height: 82px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .property-details-popup h2 {

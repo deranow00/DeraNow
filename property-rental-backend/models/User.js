@@ -40,6 +40,15 @@ const appPreferencesSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const pushTokenSchema = new mongoose.Schema(
+  {
+    token: { type: String, required: true },
+    platform: { type: String, enum: ['android', 'ios', 'web', 'unknown'], default: 'unknown' },
+    lastSeenAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
 const ownerVerificationDocumentSchema = new mongoose.Schema(
   {
     imageUrl: { type: String, required: true },
@@ -119,6 +128,11 @@ const userSchema = new mongoose.Schema({
   appPreferences: {
     type: appPreferencesSchema,
     default: () => ({}),
+  },
+  pushTokens: {
+    type: [pushTokenSchema],
+    default: [],
+    select: false,
   },
   pinnedChats: [
     {

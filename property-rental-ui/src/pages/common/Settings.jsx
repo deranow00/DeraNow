@@ -31,7 +31,11 @@ const DEFAULT_APP = {
 
 export default function Settings() {
   const { token, user, setUser } = useContext(AuthContext);
-  const { phoneNotificationPermission, requestPhoneNotifications } = useContext(NotificationContext);
+  const {
+    phoneNotificationPermission,
+    nativePushPermission,
+    requestPhoneNotifications,
+  } = useContext(NotificationContext);
   const { t, openLanguageChooser } = useLanguage();
   const [prefs, setPrefs] = useState({ inApp: true, email: false, types: DEFAULT_TYPES });
   const [privacyPrefs, setPrivacyPrefs] = useState(DEFAULT_PRIVACY);
@@ -111,7 +115,7 @@ export default function Settings() {
             className="settings-language-trigger"
             onClick={requestPhoneNotifications}
           >
-            {t('settings.phoneNotifications')}: {phoneNotificationPermission}
+            {t('settings.phoneNotifications')}: {nativePushPermission !== 'unsupported' ? nativePushPermission : phoneNotificationPermission}
           </button>
           <label className="toggle">
             <input

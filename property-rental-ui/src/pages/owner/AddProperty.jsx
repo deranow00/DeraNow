@@ -12,7 +12,9 @@ export default function AddProperty() {
   const [description, setDescription] = useState('');
   const [type, setType] = useState('Apartment');
   const [image, setImage] = useState('');
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [parkingAvailable, setParkingAvailable] = useState(false);
+  const [petFriendly, setPetFriendly] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,10 +23,15 @@ export default function AddProperty() {
   const { token } = useContext(AuthContext);
 
   const uploadImageToCloudinary = async () => {
-    if (!imageFile) return image;
+    if (!imageFiles.length) {
+      const fallbackImages = image ? [image] : [];
+      return { imageUrl: image, imageUrls: fallbackImages };
+    }
 
     const formData = new FormData();
-    formData.append('image', imageFile);
+    imageFiles.slice(0, 5).forEach((file) => {
+      formData.append('images', file);
+    });
 
     setUploadingImage(true);
     try {
@@ -37,7 +44,10 @@ export default function AddProperty() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Image upload failed');
-      return data.imageUrl;
+      return {
+        imageUrl: data.imageUrl,
+        imageUrls: Array.isArray(data.imageUrls) ? data.imageUrls : [data.imageUrl].filter(Boolean),
+      };
     } finally {
       setUploadingImage(false);
     }
@@ -61,7 +71,7 @@ export default function AddProperty() {
     setLoading(true);
 
     try {
-      const imageUrl = await uploadImageToCloudinary();
+      const uploaded = await uploadImageToCloudinary();
 
       const response = await fetch(`${API_BASE_URL}/api/properties`, {
         method: 'POST',
@@ -77,7 +87,10 @@ export default function AddProperty() {
           bathrooms: Number(bathrooms),
           description,
           type,
-          image: imageUrl,
+          image: uploaded.imageUrl,
+          images: uploaded.imageUrls,
+          parkingAvailable,
+          petFriendly,
         }),
       });
 
@@ -95,7 +108,9 @@ export default function AddProperty() {
         setDescription('');
         setType('Apartment');
         setImage('');
-        setImageFile(null);
+        setImageFiles([]);
+        setParkingAvailable(false);
+        setPetFriendly(false);
       }
     } catch (err) {
       setError(err.message || 'Server error. Please try again later.');
@@ -155,6 +170,25 @@ export default function AddProperty() {
           <option value="Condo">Room</option>
         </select>
 
+        <div className="amenity-toggle-grid">
+          <label className="amenity-toggle">
+            <input
+              type="checkbox"
+              checked={parkingAvailable}
+              onChange={(e) => setParkingAvailable(e.target.checked)}
+            />
+            <span>Parking Available</span>
+          </label>
+          <label className="amenity-toggle">
+            <input
+              type="checkbox"
+              checked={petFriendly}
+              onChange={(e) => setPetFriendly(e.target.checked)}
+            />
+            <span>Pet Friendly</span>
+          </label>
+        </div>
+
         <label>Description</label>
         <textarea
           placeholder="Additional details about the property"
@@ -164,7 +198,7 @@ export default function AddProperty() {
         ></textarea>
 
         <div className="photo-upload-field">
-          <span className="photo-upload-label">Property Image</span>
+          <span className="photo-upload-label">Property Images</span>
           <div className="photo-upload-actions">
             <label className="photo-upload-button" htmlFor="property-image-gallery">
               Choose from Photos
@@ -178,7 +212,8 @@ export default function AddProperty() {
             className="photo-upload-input"
             type="file"
             accept="image/*"
-            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            multiple
+            onChange={(e) => setImageFiles(Array.from(e.target.files || []).slice(0, 5))}
           />
           <input
             id="property-image-camera"
@@ -186,14 +221,14 @@ export default function AddProperty() {
             type="file"
             accept="image/*"
             capture="environment"
-            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            onChange={(e) => setImageFiles(Array.from(e.target.files || []).slice(0, 5))}
           />
           <small className="photo-upload-selected">
-            {imageFile ? imageFile.name : 'No image selected'}
+            {imageFiles.length ? `${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''} selected` : 'No image selected'}
           </small>
         </div>
 
-        <label>Or Image URL</label>
+        <label>Or Primary Image URL</label>
         <input
           type="text"
           placeholder="http://example.com/image.jpg"

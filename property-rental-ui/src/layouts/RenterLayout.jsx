@@ -25,6 +25,7 @@ import './RenterLayout.css';
 const renterNavItems = [
   { to: '/renter', labelKey: 'nav.home', icon: <HiOutlineHome />, end: true },
   { to: '/renter/bookings', labelKey: 'nav.bookings', icon: <HiOutlineCalendarDays /> },
+  { to: '/renter/booking-requests', label: 'Requests', icon: <HiOutlineCalendarDays /> },
   { to: '/renter/listings', labelKey: 'nav.listings', icon: <HiOutlineSquares2X2 /> },
   { to: '/renter/visits', labelKey: 'nav.visits', icon: <HiOutlineMapPin /> },
   { to: '/renter/favorites', labelKey: 'nav.favorites', icon: <HiOutlineHeart /> },
@@ -45,6 +46,7 @@ const renterPrimaryItems = [
 ];
 
 const renterSecondaryItems = [
+  { to: '/renter/booking-requests', label: 'Requests', icon: <HiOutlineCalendarDays /> },
   { to: '/renter/message', labelKey: 'nav.messages', icon: <HiOutlineChatBubbleOvalLeftEllipsis /> },
   { to: '/renter/favorites', labelKey: 'nav.favorites', icon: <HiOutlineHeart /> },
   { to: '/renter/payments', labelKey: 'nav.payments', icon: <HiOutlineCreditCard /> },
@@ -60,7 +62,7 @@ function resolveRenterTitle(pathname, t) {
     .sort((a, b) => b.to.length - a.to.length)
     .find((item) => pathname === item.to || pathname.startsWith(`${item.to}/`));
 
-  return matched ? t(matched.labelKey) : t('common.workspace');
+  return matched ? (matched.labelKey ? t(matched.labelKey) : matched.label) : t('common.workspace');
 }
 
 export default function RenterLayout() {
@@ -105,7 +107,7 @@ export default function RenterLayout() {
               className={({ isActive }) => (isActive ? 'active' : '')}
             >
               <span className="nav-short">{item.icon}</span>
-              <span className="nav-label">{t(item.labelKey)}</span>
+              <span className="nav-label">{item.labelKey ? t(item.labelKey) : item.label}</span>
             </NavLink>
           ))}
           <button

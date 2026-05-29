@@ -1,5 +1,7 @@
 import Property from '../models/Property.js';
 import Booking from '../models/Booking.js';
+import PropertyVisit from '../models/PropertyVisit.js';
+import VisitPass from '../models/VisitPass.js';
 import User from '../models/User.js';
 import { sendNotification } from '../socket.js';
 import mongoose from 'mongoose';
@@ -19,6 +21,125 @@ const uploadImageBufferToCloudinary = (buffer) =>
     );
     stream.end(buffer);
   });
+
+const availabilityPriority = {
+  Available: 0,
+  'Visit Scheduled': 1,
+  'Booking Pending': 2,
+  Occupied: 3,
+};
+
+const setAvailability = (map, propertyId, status) => {
+  const key = String(propertyId);
+  const current = map.get(key) || 'Available';
+  if (availabilityPriority[status] > availabilityPriority[current]) {
+    map.set(key, status);
+  }
+};
+
+const buildAvailabilityMap = async (propertyIds = []) => {
+  const ids = propertyIds.filter(Boolean);
+  const availabilityMap = new Map(ids.map((id) => [String(id), 'Available']));
+  if (!ids.length) return availabilityMap;
+
+  const now = new Date();
+  const [occupiedBookings, pendingBookings, activeVisits] = await Promise.all([
+    Booking.find({
+      property: { $in: ids },
+      status: 'Approved',
+      fromDate: { $lte: now },
+      toDate: { $gte: now },
+    }).select('property').lean(),
+    Booking.find({
+      property: { $in: ids },
+      status: 'Pending',
+    }).select('property').lean(),
+    PropertyVisit.find({
+      property: { $in: ids },
+      status: { $in: ['scheduled', 'completed', 'booking_pending'] },
+      bookingConfirmationStatus: { $ne: 'failed' },
+    }).select('property').lean(),
+  ]);
+
+  activeVisits.forEach((visit) => setAvailability(availabilityMap, visit.property, 'Visit Scheduled'));
+  pendingBookings.forEach((booking) => setAvailability(availabilityMap, booking.property, 'Booking Pending'));
+  occupiedBookings.forEach((booking) => setAvailability(availabilityMap, booking.property, 'Occupied'));
+
+  return availabilityMap;
+};
+
+const attachAvailability = async (input) => {
+  const list = Array.isArray(input) ? input : [input];
+  const propertyIds = list.map((property) => property?._id).filter(Boolean);
+  const availabilityMap = await buildAvailabilityMap(propertyIds);
+  const mapped = list.map((property) => {
+    const plain = typeof property?.toObject === 'function' ? property.toObject() : property;
+    if (!plain) return plain;
+    return {
+      ...plain,
+      availabilityStatus: availabilityMap.get(String(plain._id)) || 'Available',
+    };
+  });
+  return Array.isArray(input) ? mapped : mapped[0];
+};
+
+const getApproximateLocation = (property = {}) => {
+  if (property.approximateLocation) return property.approximateLocation;
+  const parts = String(property.location || '')
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length >= 2) return parts.slice(-2).join(', ');
+  return parts[0] || 'Approximate area available after visit booking';
+};
+
+const canViewExactLocation = async (property, user) => {
+  if (!user?._id || !property?._id) return false;
+  if (user.role === 'admin') return true;
+  if (String(property.ownerId?._id || property.ownerId) === String(user._id)) return true;
+  if (user.role !== 'renter') return false;
+
+  const [visit, activePass] = await Promise.all([
+    PropertyVisit.exists({
+      property: property._id,
+      renter: user._id,
+      status: { $ne: 'cancelled' },
+    }),
+    VisitPass.exists({
+      renter: user._id,
+      requestedForProperty: property._id,
+      status: 'active',
+    }),
+  ]);
+  return Boolean(visit || activePass);
+};
+
+const applyLocationPrivacy = async (input, user) => {
+  const list = Array.isArray(input) ? input : [input];
+  const mapped = await Promise.all(list.map(async (property) => {
+    if (!property) return property;
+    const plain = typeof property.toObject === 'function' ? property.toObject() : { ...property };
+    const exactLocation = plain.location;
+    const hasExactLocationAccess = await canViewExactLocation(plain, user);
+    if (hasExactLocationAccess) {
+      return {
+        ...plain,
+        location: exactLocation,
+        exactLocation,
+        approximateLocation: plain.approximateLocation || getApproximateLocation(plain),
+        exactLocationLocked: false,
+      };
+    }
+    return {
+      ...plain,
+      location: getApproximateLocation(plain),
+      approximateLocation: plain.approximateLocation || getApproximateLocation(plain),
+      exactLocation: '',
+      exactLocationLocked: true,
+    };
+  }));
+  return Array.isArray(input) ? mapped : mapped[0];
+};
 
 export const uploadPropertyImage = async (req, res) => {
   try {
@@ -61,6 +182,7 @@ export const addProperty = async (req, res) => {
       bathrooms,
       image,
       images = [],
+      approximateLocation = '',
       parkingAvailable = false,
       petFriendly = false,
     } = req.body;
@@ -79,6 +201,7 @@ export const addProperty = async (req, res) => {
       title,
       description,
       location,
+      approximateLocation,
       price,
       type,
       bedrooms,
@@ -113,7 +236,8 @@ export const addProperty = async (req, res) => {
 export const getMyProperties = async (req, res) => {
   try {
     const properties = await Property.find({ ownerId: req.user._id });
-    res.status(200).json(properties);
+    const propertiesWithAvailability = await attachAvailability(properties);
+    res.status(200).json(propertiesWithAvailability);
   } catch (error) {
     console.error('Get my properties error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -132,6 +256,9 @@ export const updateProperty = async (req, res) => {
     }
 
     const update = { ...req.body };
+    if (update.approximateLocation != null) {
+      update.approximateLocation = String(update.approximateLocation).trim();
+    }
     if (Array.isArray(update.images)) {
       update.images = update.images.filter(Boolean).slice(0, 5);
       update.image = update.image || update.images[0] || property.image;
@@ -244,7 +371,9 @@ export const getProperty = async (req, res) => {
       .populate('ownerId', 'name ownerVerificationStatus')
       .sort(sortMap[sort] || { createdAt: -1 });
 
-    res.status(200).json(properties);
+    const propertiesWithAvailability = await attachAvailability(properties);
+    const publicProperties = await applyLocationPrivacy(propertiesWithAvailability, req.user);
+    res.status(200).json(publicProperties);
   } catch (error) {
     console.error('Error fetching properties:', error);
     res.status(500).json({ error: 'Failed to fetch properties' });
@@ -258,7 +387,7 @@ export const getPropertyById = async (req, res) => {
       .populate('reviews.user', 'name email');
     if (!property) return res.status(404).json({ error: 'Property not found' });
 
-    const response = property.toObject();
+    const response = await applyLocationPrivacy(await attachAvailability(property), req.user);
     if (req.user?._id) {
       const userRating = property.reviews?.find(
         (review) => review.user?._id?.toString() === req.user._id.toString()

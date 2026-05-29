@@ -5,12 +5,23 @@
 
 .visits-hero,
 .visit-pass-summary,
-.visits-list {
+.visits-list,
+.visits-state-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 22px;
   box-shadow: var(--shadow-sm);
+}
+
+.visits-state-card {
+  display: grid;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.visits-state-card strong {
+  color: var(--text);
 }
 
 .visits-hero h1,
@@ -184,7 +195,39 @@
   color: var(--text-muted);
 }
 
-.visit-confirm-modal img {
+.visit-confirm-payment {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 14px;
+  align-items: start;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-muted);
+}
+
+.visit-confirm-payment span {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.visit-confirm-payment strong {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--text);
+  font-size: 1.35rem;
+}
+
+.visit-confirm-payment ol {
+  margin: 0.8rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--text-muted);
+}
+
+.visit-confirm-payment img {
   width: 180px;
   height: 180px;
   object-fit: cover;
@@ -230,6 +273,10 @@
 
 @media (max-width: 640px) {
   .visit-confirm-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .visit-confirm-payment {
     grid-template-columns: 1fr;
   }
 }

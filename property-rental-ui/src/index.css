@@ -652,3 +652,57 @@ p {
     pointer-events: none !important;
   }
 }
+
+.modal-content .modal-close,
+.modal-overlay .modal-close,
+.property-details-popup .details-close-btn,
+.agreements-modal .agreements-close,
+.visit-confirm-modal .visit-confirm-close {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  z-index: 50 !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  border: 1px solid color-mix(in srgb, var(--border) 72%, #94a3b8) !important;
+  border-radius: 999px !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18) !important;
+  font-size: 0 !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+.modal-content .modal-close::before,
+.modal-overlay .modal-close::before,
+.property-details-popup .details-close-btn::before,
+.agreements-modal .agreements-close::before,
+.visit-confirm-modal .visit-confirm-close::before {
+  content: "×";
+  font-size: 22px;
+  line-height: 1;
+}
+
+.modal-content .modal-close:hover,
+.modal-overlay .modal-close:hover,
+.property-details-popup .details-close-btn:hover,
+.agreements-modal .agreements-close:hover,
+.visit-confirm-modal .visit-confirm-close:hover {
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface)) !important;
+  transform: scale(1.04);
+}
+
+.modal-content,
+.property-details-popup,
+.agreements-modal-card,
+.visit-confirm-modal {
+  position: relative;
+}

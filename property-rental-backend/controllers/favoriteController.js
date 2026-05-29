@@ -1,5 +1,25 @@
 import Favorite from '../models/Favorite.js';
 
+const getApproximateLocation = (property = {}) => {
+  if (property.approximateLocation) return property.approximateLocation;
+  const parts = String(property.location || '')
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length >= 2) return parts.slice(-2).join(', ');
+  return parts[0] || 'Approximate area available after visit booking';
+};
+
+const hideExactLocation = (property) => {
+  const plain = typeof property?.toObject === 'function' ? property.toObject() : property;
+  return {
+    ...plain,
+    location: getApproximateLocation(plain),
+    exactLocation: '',
+    exactLocationLocked: true,
+  };
+};
+
 export const addFavorite = async (req, res) => {
   try {
     const { propertyId } = req.body;
@@ -26,7 +46,7 @@ export const getFavorites = async (req, res) => {
       await Favorite.deleteMany({ _id: { $in: staleFavoriteIds } });
     }
 
-    res.json(validFavorites.map((f) => f.property));
+    res.json(validFavorites.map((f) => hideExactLocation(f.property)));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch favorites' });

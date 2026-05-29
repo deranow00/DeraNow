@@ -15,7 +15,7 @@ const getAreaKey = (location = '') =>
     ?.toLowerCase() || '';
 
 export default function RenterHome() {
-  const { user } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -37,6 +37,7 @@ export default function RenterHome() {
         });
         const res = await fetch(`${API_BASE_URL}/api/properties?${params.toString()}`, {
           signal: controller.signal,
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to load properties');
@@ -54,7 +55,7 @@ export default function RenterHome() {
       active = false;
       controller.abort();
     };
-  }, []);
+  }, [token]);
 
   const featuredProperties = useMemo(() => {
     return [...properties]

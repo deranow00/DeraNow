@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './MyBookings.css';
 import PropertyDetails from '../../components/common/PropertyDetails';
 import { AuthContext } from '../../context/AuthContext';
@@ -10,7 +11,47 @@ const jsonHeaders = (token) => ({
   Authorization: `Bearer ${token}`,
 });
 
-export default function Bookings() {
+const isConfirmedBooking = (booking) => String(booking?.status || '').toLowerCase() === 'approved';
+
+const getRequestInsight = (booking) => {
+  const status = String(booking?.status || 'Pending');
+  const paymentStatus = String(booking?.paymentStatus || 'pending');
+  if (status === 'Pending' && paymentStatus === 'pending_verification') {
+    return {
+      title: 'Payment under review',
+      actor: 'DeraNow admin',
+      next: 'Admin verifies your booking charge, then your booking becomes confirmed.',
+    };
+  }
+  if (status === 'Pending') {
+    return {
+      title: 'Waiting for approval',
+      actor: 'Owner or admin',
+      next: 'No action needed right now. You will be notified when the request changes.',
+    };
+  }
+  if (status === 'Rejected') {
+    return {
+      title: 'Request rejected',
+      actor: 'Owner or admin',
+      next: booking?.bookingDetails?.adminRemark || 'Review the property and book another visit if needed.',
+    };
+  }
+  if (status === 'Cancelled') {
+    return {
+      title: 'Request cancelled',
+      actor: booking?.cancelledByRole || 'User/admin',
+      next: booking?.cancellationReason || 'You can explore other properties or submit a new request.',
+    };
+  }
+  return {
+    title: 'Request in progress',
+    actor: 'DeraNow',
+    next: 'Follow the next step shown in the booking timeline.',
+  };
+};
+
+export default function Bookings({ view = 'confirmed' }) {
   const { token } = useContext(AuthContext);
   const { t } = useLanguage();
   const [bookings, setBookings] = useState([]);
@@ -242,17 +283,62 @@ export default function Bookings() {
     return t('renterBookings.continueFlow');
   };
 
+  const confirmedBookings = bookings.filter(isConfirmedBooking);
+  const otherBookings = bookings.filter((booking) => !isConfirmedBooking(booking));
+  const displayBookings = view === 'requests' ? otherBookings : confirmedBookings;
+  const isRequestsView = view === 'requests';
+  const pendingRequests = otherBookings.filter((booking) => booking.status === 'Pending').length;
+  const reviewRequests = otherBookings.filter((booking) => booking.paymentStatus === 'pending_verification').length;
+
   return (
     <div className="bookings-container renter-bookings-container">
-      <h2>{t('renterBookings.title')}</h2>
+      <div className="renter-bookings-header">
+        <div>
+          <h2>{isRequestsView ? 'Booking Requests' : t('renterBookings.title')}</h2>
+          <p>
+            {isRequestsView
+              ? 'Track pending, rejected, cancelled, and in-review booking requests.'
+              : 'Your confirmed DeraNow properties are shown here.'}
+          </p>
+        </div>
+        <div className="renter-bookings-switch">
+          <Link className={!isRequestsView ? 'active' : ''} to="/renter/bookings">
+            Confirmed ({confirmedBookings.length})
+          </Link>
+          <Link className={isRequestsView ? 'active' : ''} to="/renter/booking-requests">
+            Other Requests ({otherBookings.length})
+          </Link>
+        </div>
+      </div>
       {loading ? (
-        <p>{t('renterBookings.loading')}</p>
+        <div className="booking-state-card">
+          <strong>{t('renterBookings.loading')}</strong>
+          <p>Loading your booking timeline, payment status, and next actions.</p>
+        </div>
       ) : error ? (
-        <p className="error">{error}</p>
-      ) : bookings.length === 0 ? (
-        <p>{t('renterBookings.empty')}</p>
+        <div className="booking-state-card error">
+          <strong>Could not load bookings</strong>
+          <p>{error}</p>
+          <button className="btn-renew" onClick={fetchBookings}>Try Again</button>
+        </div>
+      ) : displayBookings.length === 0 ? (
+        <div className="booking-state-card">
+          <strong>{isRequestsView ? 'No other booking requests found.' : 'No confirmed bookings yet.'}</strong>
+          <p>
+            {isRequestsView
+              ? 'Pending, rejected, cancelled, and verification requests will appear here.'
+              : 'After admin confirms your post-visit booking charge, approved properties appear here.'}
+          </p>
+        </div>
       ) : (
         <>
+          {isRequestsView && (
+            <section className="booking-request-summary">
+              <article><span>Total Requests</span><strong>{otherBookings.length}</strong></article>
+              <article><span>Waiting Approval</span><strong>{pendingRequests}</strong></article>
+              <article><span>Payment Review</span><strong>{reviewRequests}</strong></article>
+            </section>
+          )}
           <table className="bookings-table">
             <thead>
               <tr>
@@ -267,7 +353,9 @@ export default function Bookings() {
               </tr>
             </thead>
             <tbody>
-              {bookings.map(({ _id, property, fromDate, toDate, status, paymentStatus, workflow, renewalStatus }) => (
+              {displayBookings.map(({ _id, property, fromDate, toDate, status, paymentStatus, workflow, renewalStatus, bookingDetails, cancellationReason, cancelledByRole }) => {
+                const requestInsight = getRequestInsight({ status, paymentStatus, bookingDetails, cancellationReason, cancelledByRole });
+                return (
                 <React.Fragment key={`table-${_id}`}>
                   <tr>
                     <td data-label={t('renterBookings.property')}>{property?.title || 'N/A'}</td>
@@ -275,7 +363,16 @@ export default function Bookings() {
                     <td data-label={t('renterBookings.to')}>{new Date(toDate).toLocaleDateString()}</td>
                     <td data-label={t('renterBookings.status')}>{status || 'N/A'}</td>
                     <td data-label={t('renterBookings.timeline')}>{renderTimeline(workflow)}</td>
-                    <td data-label={t('renterBookings.nextStep')}><span className="workflow-hint">{getWorkflowHint({ status, paymentStatus, workflow })}</span></td>
+                    <td data-label={t('renterBookings.nextStep')}>
+                      {isRequestsView ? (
+                        <span className="workflow-hint">
+                          <strong>{requestInsight.title}</strong><br />
+                          {requestInsight.next}
+                        </span>
+                      ) : (
+                        <span className="workflow-hint">{getWorkflowHint({ status, paymentStatus, workflow })}</span>
+                      )}
+                    </td>
                     <td data-label={t('renterBookings.payment')}>{paymentStatus === 'pending_verification' ? t('renterBookings.pendingVerification') : paymentStatus || 'pending'}</td>
                     <td data-label={t('renterBookings.actions')}>
                       <div className="booking-actions">
@@ -298,6 +395,17 @@ export default function Bookings() {
                       </div>
                     </td>
                   </tr>
+                  {isRequestsView && (
+                    <tr>
+                      <td className="booking-panel-cell" colSpan="8">
+                        <div className="booking-request-panel">
+                          <span>Who acts next: <strong>{requestInsight.actor}</strong></span>
+                          <span>Payment: <strong>{paymentStatus === 'pending_verification' ? 'Waiting admin verification' : paymentStatus || 'pending'}</strong></span>
+                          <span>Reason/status: <strong>{requestInsight.next}</strong></span>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                   {activeBookingId === _id ? (
                     <tr>
                       <td className="booking-panel-cell" colSpan="8">
@@ -355,12 +463,15 @@ export default function Bookings() {
                     </tr>
                   ) : null}
                 </React.Fragment>
-              ))}
+              );
+              })}
             </tbody>
           </table>
 
           <div className="bookings-mobile-list">
-            {bookings.map(({ _id, property, fromDate, toDate, status, paymentStatus, workflow, renewalStatus }) => (
+            {displayBookings.map(({ _id, property, fromDate, toDate, status, paymentStatus, workflow, renewalStatus, bookingDetails, cancellationReason, cancelledByRole }) => {
+              const requestInsight = getRequestInsight({ status, paymentStatus, bookingDetails, cancellationReason, cancelledByRole });
+              return (
               <article key={`mobile-${_id}`} className="booking-mobile-card">
                 <div className="booking-mobile-block">
                   <span className="booking-mobile-label">{t('renterBookings.property')}</span>
@@ -386,8 +497,16 @@ export default function Bookings() {
                 </div>
                 <div className="booking-mobile-block">
                   <span className="booking-mobile-label">{t('renterBookings.nextStep')}</span>
-                  <span className="workflow-hint booking-mobile-hint">{getWorkflowHint({ status, paymentStatus, workflow })}</span>
+                  <span className="workflow-hint booking-mobile-hint">
+                    {isRequestsView ? `${requestInsight.title}: ${requestInsight.next}` : getWorkflowHint({ status, paymentStatus, workflow })}
+                  </span>
                 </div>
+                {isRequestsView && (
+                  <div className="booking-request-panel mobile">
+                    <span>Who acts next: <strong>{requestInsight.actor}</strong></span>
+                    <span>Payment: <strong>{paymentStatus === 'pending_verification' ? 'Waiting admin verification' : paymentStatus || 'pending'}</strong></span>
+                  </div>
+                )}
                 <div className="booking-mobile-block">
                   <span className="booking-mobile-label">{t('renterBookings.payment')}</span>
                   <span className="booking-mobile-value">{paymentStatus === 'pending_verification' ? t('renterBookings.pendingVerification') : paymentStatus || 'pending'}</span>
@@ -463,7 +582,8 @@ export default function Bookings() {
                   </div>
                 ) : null}
               </article>
-            ))}
+            );
+            })}
           </div>
         </>
       )}

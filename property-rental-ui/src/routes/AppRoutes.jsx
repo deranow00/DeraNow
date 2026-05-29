@@ -113,6 +113,7 @@ export default function AppRoutes() {
       >
         <Route index element={<RenterHome />} />
         <Route path="bookings" element={<MyBookings />} />
+        <Route path="booking-requests" element={<MyBookings view="requests" />} />
         <Route path="listings" element={<Listings />} />
         <Route path="favorites" element={<Favorites />} />
         <Route path="visits" element={<Visits />} />

@@ -33,6 +33,12 @@ export default function OwnerVisits() {
     loadVisits();
   }, [token]);
 
+  const now = new Date();
+  const upcomingVisits = visits.filter((visit) => new Date(visit.visitDate) >= now && visit.status === 'scheduled');
+  const completedVisits = visits.filter((visit) => visit.renterMarkedDoneAt && visit.ownerMarkedDoneAt);
+  const pendingOwnerAction = visits.filter((visit) => !visit.ownerMarkedDoneAt && visit.status !== 'cancelled');
+  const bookingConversions = visits.filter((visit) => visit.booking || visit.bookingConfirmationStatus === 'paid');
+
   const markDone = async (visitId) => {
     setUpdatingId(visitId);
     setError('');
@@ -53,7 +59,16 @@ export default function OwnerVisits() {
     }
   };
 
-  if (loading) return <p>Loading property visits...</p>;
+  if (loading) {
+    return (
+      <div className="owner-visits-page">
+        <div className="owner-visits-state">
+          <strong>Loading property visits...</strong>
+          <p>Preparing visit schedule, renter contact details, and booking conversion status.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="owner-visits-page">
@@ -65,12 +80,29 @@ export default function OwnerVisits() {
       {error && <p className="owner-visits-alert error">{error}</p>}
       {success && <p className="owner-visits-alert success">{success}</p>}
 
+      <section className="owner-visits-summary">
+        <article><span>Upcoming</span><strong>{upcomingVisits.length}</strong></article>
+        <article><span>Needs Your Mark</span><strong>{pendingOwnerAction.length}</strong></article>
+        <article><span>Completed</span><strong>{completedVisits.length}</strong></article>
+        <article><span>Booking Conversions</span><strong>{bookingConversions.length}</strong></article>
+      </section>
+
       <section className="owner-visits-list">
         {visits.length === 0 ? (
-          <p className="owner-visits-empty">No property visits scheduled yet.</p>
+          <div className="owner-visits-state">
+            <strong>No property visits scheduled yet.</strong>
+            <p>When renters book visits for your properties, they will appear here with contact details and completion controls.</p>
+          </div>
         ) : (
           visits.map((visit) => {
             const bothMarkedDone = Boolean(visit.renterMarkedDoneAt && visit.ownerMarkedDoneAt);
+            const conversionLabel = visit.booking
+              ? `Booking ${visit.booking.paymentStatus || visit.booking.status || 'submitted'}`
+              : visit.bookingConfirmationStatus === 'pending_verification'
+                ? 'Booking fee under admin review'
+                : bothMarkedDone
+                  ? 'Waiting renter confirmation'
+                  : 'Visit in progress';
             return (
               <article className="owner-visit-card" key={visit._id}>
                 <img src={visit.property?.image || '/default-property.jpg'} alt={visit.property?.title || 'Property'} />
@@ -82,11 +114,18 @@ export default function OwnerVisits() {
                   <div className="owner-visit-grid">
                     <span>Renter</span><strong>{visit.renter?.name || visit.renter?.email || 'N/A'}</strong>
                     <span>Phone</span><strong>{visit.visitPass?.contactPhone || 'N/A'}</strong>
+                    <span>Email</span><strong>{visit.renter?.email || 'N/A'}</strong>
                     <span>Date</span><strong>{new Date(visit.visitDate).toLocaleDateString()}</strong>
                     <span>Promo</span><strong>{visit.promoCode}</strong>
                     <span>Renter Done</span><strong>{visit.renterMarkedDoneAt ? 'Yes' : 'No'}</strong>
                     <span>Owner Done</span><strong>{visit.ownerMarkedDoneAt ? 'Yes' : 'No'}</strong>
-                    <span>Booking</span><strong>{visit.booking ? 'Submitted' : visit.bookingConfirmationStatus || 'None'}</strong>
+                    <span>Conversion</span><strong>{conversionLabel}</strong>
+                  </div>
+                  <div className="owner-visit-progress">
+                    <span className={visit.renterMarkedDoneAt ? 'done' : ''}>Renter marked done</span>
+                    <span className={visit.ownerMarkedDoneAt ? 'done' : ''}>Owner marked done</span>
+                    <span className={visit.booking ? 'done' : ''}>Booking created</span>
+                    <span className={visit.bookingConfirmationStatus === 'paid' ? 'done' : ''}>Fee verified</span>
                   </div>
                   <div className="owner-visit-actions">
                     {!visit.ownerMarkedDoneAt && (

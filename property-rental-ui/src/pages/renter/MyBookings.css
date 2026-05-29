@@ -8,12 +8,123 @@
   animation: pageFade 0.4s ease;
 }
 
-.bookings-container h2 {
+.renter-bookings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+.renter-bookings-header h2 {
   font-size: clamp(1.8rem, 3.6vw, 2.4rem);
   font-weight: 700;
   color: var(--text);
+  margin: 0;
+}
+
+.renter-bookings-header p {
+  margin: 0.4rem 0 0;
+  color: var(--text-muted);
+}
+
+.renter-bookings-switch {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
+.renter-bookings-switch a {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.58rem 0.85rem;
+  color: var(--text-muted);
+  background: var(--surface);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.renter-bookings-switch a.active {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.booking-state-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  max-width: 620px;
+  margin: 1rem auto;
   text-align: center;
-  margin-bottom: 2rem;
+  color: var(--text-muted);
+}
+
+.booking-state-card strong {
+  display: block;
+  color: var(--text);
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+}
+
+.booking-state-card.error {
+  border-color: color-mix(in srgb, #ef4444 38%, var(--border));
+}
+
+.booking-request-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.booking-request-summary article {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  padding: 1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.booking-request-summary span {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.booking-request-summary strong {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--text);
+  font-size: 1.45rem;
+}
+
+.booking-request-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  border-radius: 14px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+}
+
+.booking-request-panel span {
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.65rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.booking-request-panel strong {
+  color: var(--text);
 }
 
 .bookings-container > p {
@@ -123,6 +234,40 @@
   .bookings-container h2 {
     font-size: 1.28rem;
     margin-bottom: 0.8rem;
+  }
+
+  .renter-bookings-header {
+    display: grid;
+    gap: 0.8rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .renter-bookings-switch {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .renter-bookings-switch a {
+    text-align: center;
+    padding: 0.54rem 0.65rem;
+    font-size: 0.76rem;
+  }
+
+  .booking-request-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-request-panel,
+  .booking-request-panel.mobile {
+    display: grid;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+  }
+
+  .booking-request-panel span {
+    border-radius: 12px;
+    overflow-wrap: anywhere;
   }
 
   .renter-bookings-container .bookings-table {

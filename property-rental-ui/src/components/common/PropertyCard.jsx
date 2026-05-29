@@ -9,6 +9,9 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
   const [isFavorited, setIsFavorited] = useState(false);
   const displayType = property.type === 'Condo' ? 'Room' : property.type;
   const primaryImage = property.image || property.images?.[0] || '/default-property.jpg';
+  const availabilityStatus = property.availabilityStatus || property.bookingStatus || 'Available';
+  const availabilityClass = availabilityStatus.toLowerCase().replace(/\s+/g, '-');
+  const isOccupied = availabilityStatus === 'Occupied';
 
   const handleFavoriteClick = async () => {
     if (!token) return;
@@ -70,7 +73,8 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
       <img src={primaryImage} alt={property.title} />
       <div className="property-info">
         <h3>{property.title}</h3>
-        <p>{property.location}</p>
+        <p>{property.location}{property.exactLocationLocked ? ' (approx.)' : ''}</p>
+        <span className={`availability-pill ${availabilityClass}`}>{availabilityStatus}</span>
         {displayType && <p>{displayType}</p>}
         <p>Rs. {property.price}/month</p>
         <div className="property-amenities">
@@ -95,7 +99,13 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
         <div className="property-actions">
           <div className="action-buttons">
             <button onClick={() => onViewDetails(property)}>View Details</button>
-            <button onClick={() => onApplyBooking(property)}>Book Visit</button>
+            <button
+              onClick={() => onApplyBooking(property)}
+              disabled={isOccupied}
+              title={isOccupied ? 'This property is currently occupied' : 'Book a visit'}
+            >
+              {isOccupied ? 'Occupied' : 'Book Visit'}
+            </button>
           </div>
           <div
             className={`favorite-btn ${isFavorited ? 'favorited' : ''}`}

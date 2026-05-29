@@ -4,7 +4,8 @@
 }
 
 .owner-visits-header,
-.owner-visits-list {
+.owner-visits-list,
+.owner-visits-state {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -20,9 +21,49 @@
 
 .owner-visits-header p,
 .owner-visit-card p,
-.owner-visits-empty {
+.owner-visits-empty,
+.owner-visits-state p {
   margin-bottom: 0;
   color: var(--text-muted);
+}
+
+.owner-visits-state {
+  text-align: center;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.owner-visits-state strong {
+  color: var(--text);
+}
+
+.owner-visits-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.owner-visits-summary article {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.owner-visits-summary span {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.owner-visits-summary strong {
+  display: block;
+  color: var(--text);
+  font-size: 1.55rem;
+  margin-top: 0.35rem;
 }
 
 .owner-visits-list {
@@ -73,6 +114,31 @@
   align-items: center;
 }
 
+.owner-visit-progress {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.owner-visit-progress span {
+  min-height: 38px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.owner-visit-progress span.done {
+  color: #0f766e;
+  border-color: rgba(20, 184, 166, 0.3);
+  background: #ecfdf5;
+}
+
 .owner-visit-actions button {
   border: 0;
   border-radius: 999px;
@@ -111,8 +177,20 @@
     grid-template-columns: 1fr;
   }
 
+  .owner-visits-summary,
+  .owner-visit-progress {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .owner-visit-card img {
     width: 100%;
     height: 180px;
+  }
+}
+
+@media (max-width: 420px) {
+  .owner-visits-summary,
+  .owner-visit-progress {
+    grid-template-columns: 1fr;
   }
 }

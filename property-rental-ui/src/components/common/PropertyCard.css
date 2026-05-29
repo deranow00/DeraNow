@@ -42,6 +42,37 @@
   color: var(--text-muted);
 }
 
+.availability-pill {
+  width: fit-content;
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+  border-radius: 999px;
+  padding: 0.3rem 0.68rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.availability-pill.visit-scheduled {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.availability-pill.booking-pending {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.availability-pill.occupied {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
 .property-rating {
   display: flex;
   align-items: center;
@@ -100,6 +131,14 @@
 .action-buttons button:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 24px rgba(15, 118, 110, 0.35);
+}
+
+.action-buttons button:disabled {
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  background: #cbd5e1;
+  color: #475569;
 }
 
 .favorite-btn {

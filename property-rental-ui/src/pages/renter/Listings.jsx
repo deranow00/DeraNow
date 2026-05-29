@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PropertyCard from '../../components/common/PropertyCard';
 import './Listings.css';
 import PropertyDetails from '../../components/common/PropertyDetails';
 import BookingPopup from '../../components/common/BookingPopup';
 import { API_BASE_URL } from '../../config/api';
+import { AuthContext } from '../../context/AuthContext';
 
 const DEFAULT_FILTERS = {
   minPrice: '',
@@ -49,6 +50,7 @@ const sortListings = (items, sortBy) => {
 };
 
 export default function Listings() {
+  const { token } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
   const searchParamsString = searchParams.toString();
   const [filteredProperties, setFilteredProperties] = useState([]);
@@ -69,7 +71,10 @@ export default function Listings() {
       approvedParams.set('status', 'Approved');
       approvedParams.set('availableOnly', 'true');
 
-      const approvedRes = await fetch(`${API_BASE_URL}/api/properties?${approvedParams.toString()}`, { signal });
+      const approvedRes = await fetch(`${API_BASE_URL}/api/properties?${approvedParams.toString()}`, {
+        signal,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       const approvedData = await approvedRes.json();
       if (!approvedRes.ok) throw new Error(approvedData.error || 'Failed to fetch listed properties');
 
@@ -107,7 +112,7 @@ export default function Listings() {
       clearTimeout(timeout);
       controller.abort();
     };
-  }, [searchTerm, filters]);
+  }, [searchTerm, filters, token]);
 
   const closeDetailsModal = () => setShowDetailsId(null);
   const openBookingPopup = (property) => setSelectedProperty(property);

@@ -28,7 +28,7 @@ router.post('/upload-image', protect, upload.array('images', 5), uploadPropertyI
 router.post('/', protect, addProperty);
 router.put('/:id', protect, updateProperty);
 router.delete('/:id', protect, deleteProperty);
-router.get('/', getProperty);
+router.get('/', optionalAuth, getProperty);
 router.get('/:id', optionalAuth, getPropertyById);
 
 router.get('/:id/reviews', getReviews);

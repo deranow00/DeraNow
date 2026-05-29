@@ -1,35 +1,96 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { FaCamera, FaImages, FaPlus, FaTimes } from 'react-icons/fa';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
 import './AddProperty.css';
 
+const initialForm = {
+  title: '',
+  location: '',
+  approximateLocation: '',
+  price: '',
+  bedrooms: '',
+  bathrooms: '',
+  description: '',
+  type: 'Apartment',
+  image: '',
+  imageFiles: [],
+  parkingAvailable: false,
+  petFriendly: false,
+};
+
 export default function AddProperty() {
-  const [title, setTitle] = useState('');
-  const [location, setLocation] = useState('');
-  const [price, setPrice] = useState('');
-  const [bedrooms, setBedrooms] = useState('');
-  const [bathrooms, setBathrooms] = useState('');
-  const [description, setDescription] = useState('');
-  const [type, setType] = useState('Apartment');
-  const [image, setImage] = useState('');
-  const [imageFiles, setImageFiles] = useState([]);
-  const [parkingAvailable, setParkingAvailable] = useState(false);
-  const [petFriendly, setPetFriendly] = useState(false);
+  const [form, setForm] = useState(initialForm);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [createdCount, setCreatedCount] = useState(0);
+  const [keepAdding, setKeepAdding] = useState(true);
 
   const { token } = useContext(AuthContext);
 
+  const imagePreviews = useMemo(
+    () => form.imageFiles.map((file) => ({
+      id: `${file.name}-${file.lastModified}-${file.size}`,
+      name: file.name,
+      size: file.size,
+      url: URL.createObjectURL(file),
+    })),
+    [form.imageFiles]
+  );
+
+  useEffect(() => () => {
+    imagePreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+  }, [imagePreviews]);
+
+  const updateField = (field, value) => {
+    setError('');
+    setSuccess('');
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const addImageFiles = (files) => {
+    const incoming = Array.from(files || []).filter((file) => file.type.startsWith('image/'));
+    if (!incoming.length) return;
+
+    setError('');
+    setSuccess('');
+    setForm((prev) => {
+      const merged = [...prev.imageFiles, ...incoming]
+        .filter((file, index, list) => (
+          list.findIndex((item) => (
+            item.name === file.name &&
+            item.size === file.size &&
+            item.lastModified === file.lastModified
+          )) === index
+        ))
+        .slice(0, 5);
+      return { ...prev, imageFiles: merged };
+    });
+  };
+
+  const removeImageFile = (id) => {
+    setForm((prev) => ({
+      ...prev,
+      imageFiles: prev.imageFiles.filter((file) => `${file.name}-${file.lastModified}-${file.size}` !== id),
+    }));
+  };
+
+  const resetForm = () => {
+    setForm(initialForm);
+    setError('');
+    setSuccess('');
+  };
+
   const uploadImageToCloudinary = async () => {
-    if (!imageFiles.length) {
-      const fallbackImages = image ? [image] : [];
-      return { imageUrl: image, imageUrls: fallbackImages };
+    if (!form.imageFiles.length) {
+      const fallbackImages = form.image ? [form.image] : [];
+      return { imageUrl: form.image, imageUrls: fallbackImages };
     }
 
     const formData = new FormData();
-    imageFiles.slice(0, 5).forEach((file) => {
+    form.imageFiles.slice(0, 5).forEach((file) => {
       formData.append('images', file);
     });
 
@@ -58,7 +119,7 @@ export default function AddProperty() {
     setError('');
     setSuccess('');
 
-    if (!title || !location || !price || !bedrooms || !bathrooms || !type) {
+    if (!form.title || !form.location || !form.approximateLocation || !form.price || !form.bedrooms || !form.bathrooms || !form.type) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -80,17 +141,18 @@ export default function AddProperty() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          title,
-          location,
-          price: Number(price),
-          bedrooms: Number(bedrooms),
-          bathrooms: Number(bathrooms),
-          description,
-          type,
+          title: form.title,
+          location: form.location,
+          approximateLocation: form.approximateLocation,
+          price: Number(form.price),
+          bedrooms: Number(form.bedrooms),
+          bathrooms: Number(form.bathrooms),
+          description: form.description,
+          type: form.type,
           image: uploaded.imageUrl,
           images: uploaded.imageUrls,
-          parkingAvailable,
-          petFriendly,
+          parkingAvailable: form.parkingAvailable,
+          petFriendly: form.petFriendly,
         }),
       });
 
@@ -99,18 +161,12 @@ export default function AddProperty() {
       if (!response.ok) {
         setError(data.message || 'Failed to add property.');
       } else {
-        setSuccess('Property added successfully!');
-        setTitle('');
-        setLocation('');
-        setPrice('');
-        setBedrooms('');
-        setBathrooms('');
-        setDescription('');
-        setType('Apartment');
-        setImage('');
-        setImageFiles([]);
-        setParkingAvailable(false);
-        setPetFriendly(false);
+        setCreatedCount((prev) => prev + 1);
+        setSuccess(keepAdding ? 'Property submitted for approval. You can add another listing now.' : 'Property submitted for approval.');
+        if (keepAdding) {
+          setForm(initialForm);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       }
     } catch (err) {
       setError(err.message || 'Server error. Please try again later.');
@@ -121,127 +177,245 @@ export default function AddProperty() {
 
   return (
     <div className="add-property-container">
-      <h2>Add New Property</h2>
-      <form onSubmit={handleSubmit} className="add-property-form">
-        <label>Title *</label>
-        <input
-          type="text"
-          placeholder="Property title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-
-        <label>Location *</label>
-        <input
-          type="text"
-          placeholder="Property location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
-
-        <label>Price (per month) *</label>
-        <input
-          type="number"
-          placeholder="e.g. 15000"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-
-        <label>Bedrooms *</label>
-        <input
-          type="number"
-          placeholder="Number of bedrooms"
-          value={bedrooms}
-          onChange={(e) => setBedrooms(e.target.value)}
-        />
-
-        <label>Bathrooms *</label>
-        <input
-          type="number"
-          placeholder="Number of bathrooms"
-          value={bathrooms}
-          onChange={(e) => setBathrooms(e.target.value)}
-        />
-
-        <label>Type *</label>
-        <select value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="Apartment">Apartment</option>
-          <option value="House">House</option>
-          <option value="Condo">Room</option>
-        </select>
-
-        <div className="amenity-toggle-grid">
-          <label className="amenity-toggle">
-            <input
-              type="checkbox"
-              checked={parkingAvailable}
-              onChange={(e) => setParkingAvailable(e.target.checked)}
-            />
-            <span>Parking Available</span>
-          </label>
-          <label className="amenity-toggle">
-            <input
-              type="checkbox"
-              checked={petFriendly}
-              onChange={(e) => setPetFriendly(e.target.checked)}
-            />
-            <span>Pet Friendly</span>
-          </label>
+      <div className="add-property-header">
+        <div>
+          <span className="add-property-eyebrow">Owner Workspace</span>
+          <h2>Add Property</h2>
+          <p>Create a complete DeraNow listing with photos, amenities, rent details, and review-ready information.</p>
         </div>
+        <div className="add-property-stat">
+          <span>Created this session</span>
+          <strong>{createdCount}</strong>
+        </div>
+      </div>
 
-        <label>Description</label>
-        <textarea
-          placeholder="Additional details about the property"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-        ></textarea>
+      <form onSubmit={handleSubmit} className="add-property-form">
+        <section className="add-property-panel details-panel">
+          <div className="panel-heading">
+            <span>01</span>
+            <div>
+              <h3>Listing Details</h3>
+              <p>Exact location stays private until a renter has paid and booked a visit.</p>
+            </div>
+          </div>
 
-        <div className="photo-upload-field">
-          <span className="photo-upload-label">Property Images</span>
-          <div className="photo-upload-actions">
-            <label className="photo-upload-button" htmlFor="property-image-gallery">
-              Choose from Photos
+          <div className="form-grid">
+            <label className="form-field span-2">
+              <span>Title *</span>
+              <input
+                type="text"
+                placeholder="e.g. Sunny room near Balkumari"
+                value={form.title}
+                onChange={(e) => updateField('title', e.target.value)}
+              />
             </label>
-            <label className="photo-upload-button" htmlFor="property-image-camera">
-              Take Live Photo
+
+            <label className="form-field span-2">
+              <span>Exact Location *</span>
+              <input
+                type="text"
+                placeholder="House number, street, area, city, nearby landmark"
+                value={form.location}
+                onChange={(e) => updateField('location', e.target.value)}
+              />
+            </label>
+
+            <label className="form-field span-2">
+              <span>Approximate Public Location *</span>
+              <input
+                type="text"
+                placeholder="e.g. Balkumari, Lalitpur"
+                value={form.approximateLocation}
+                onChange={(e) => updateField('approximateLocation', e.target.value)}
+              />
+            </label>
+
+            <label className="form-field">
+              <span>Monthly Rent *</span>
+              <input
+                type="number"
+                min="0"
+                placeholder="15000"
+                value={form.price}
+                onChange={(e) => updateField('price', e.target.value)}
+              />
+            </label>
+
+            <label className="form-field">
+              <span>Property Type *</span>
+              <select value={form.type} onChange={(e) => updateField('type', e.target.value)}>
+                <option value="Apartment">Flat</option>
+                <option value="House">House</option>
+                <option value="Condo">Room</option>
+              </select>
+            </label>
+
+            <label className="form-field">
+              <span>Bedrooms *</span>
+              <input
+                type="number"
+                min="0"
+                placeholder="1"
+                value={form.bedrooms}
+                onChange={(e) => updateField('bedrooms', e.target.value)}
+              />
+            </label>
+
+            <label className="form-field">
+              <span>Bathrooms *</span>
+              <input
+                type="number"
+                min="0"
+                placeholder="1"
+                value={form.bathrooms}
+                onChange={(e) => updateField('bathrooms', e.target.value)}
+              />
             </label>
           </div>
-          <input
-            id="property-image-gallery"
-            className="photo-upload-input"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => setImageFiles(Array.from(e.target.files || []).slice(0, 5))}
-          />
-          <input
-            id="property-image-camera"
-            className="photo-upload-input"
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={(e) => setImageFiles(Array.from(e.target.files || []).slice(0, 5))}
-          />
-          <small className="photo-upload-selected">
-            {imageFiles.length ? `${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''} selected` : 'No image selected'}
-          </small>
-        </div>
 
-        <label>Or Primary Image URL</label>
-        <input
-          type="text"
-          placeholder="http://example.com/image.jpg"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
-        />
+          <div className="amenity-toggle-grid">
+            <label className="amenity-toggle">
+              <input
+                type="checkbox"
+                checked={form.parkingAvailable}
+                onChange={(e) => updateField('parkingAvailable', e.target.checked)}
+              />
+              <span>Parking Available</span>
+            </label>
+            <label className="amenity-toggle">
+              <input
+                type="checkbox"
+                checked={form.petFriendly}
+                onChange={(e) => updateField('petFriendly', e.target.checked)}
+              />
+              <span>Pet Friendly</span>
+            </label>
+          </div>
 
-        {error && <p className="error">{error}</p>}
-        {success && <p className="success">{success}</p>}
+          <label className="form-field">
+            <span>Description</span>
+            <textarea
+              placeholder="Mention sunlight, floor, water access, nearby transport, house rules, and what is included in rent."
+              value={form.description}
+              onChange={(e) => updateField('description', e.target.value)}
+              rows={5}
+            />
+          </label>
+        </section>
 
-        <button type="submit" disabled={loading || uploadingImage}>
-          {uploadingImage ? 'Uploading Image...' : loading ? 'Adding...' : 'Add Property'}
-        </button>
+        <section className="add-property-panel photos-panel">
+          <div className="panel-heading">
+            <span>02</span>
+            <div>
+              <h3>Photos</h3>
+              <p>Add up to 5 clear photos. The first photo becomes the cover image.</p>
+            </div>
+          </div>
+
+          <div className="photo-upload-field">
+            <div className="photo-upload-drop">
+              <FaImages aria-hidden="true" />
+              <strong>{form.imageFiles.length ? `${form.imageFiles.length}/5 photos selected` : 'Add property photos'}</strong>
+              <small>Use bright, real photos of the room, flat, house, bathroom, and entrance.</small>
+              <div className="photo-upload-actions">
+                <label className="photo-upload-button" htmlFor="property-image-gallery">
+                  <FaPlus aria-hidden="true" />
+                  <span>Choose Photos</span>
+                </label>
+                <label className="photo-upload-button secondary" htmlFor="property-image-camera">
+                  <FaCamera aria-hidden="true" />
+                  <span>Take Photo</span>
+                </label>
+              </div>
+            </div>
+
+            <input
+              id="property-image-gallery"
+              className="photo-upload-input"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                addImageFiles(e.target.files);
+                e.target.value = '';
+              }}
+            />
+            <input
+              id="property-image-camera"
+              className="photo-upload-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={(e) => {
+                addImageFiles(e.target.files);
+                e.target.value = '';
+              }}
+            />
+          </div>
+
+          {imagePreviews.length ? (
+            <div className="photo-preview-grid">
+              {imagePreviews.map((preview, index) => (
+                <figure className="photo-preview-card" key={preview.id}>
+                  <img src={preview.url} alt={`Selected property ${index + 1}`} />
+                  <figcaption>
+                    <span>{index === 0 ? 'Cover photo' : `Photo ${index + 1}`}</span>
+                    <small>{(preview.size / 1024 / 1024).toFixed(1)} MB</small>
+                  </figcaption>
+                  <button type="button" onClick={() => removeImageFile(preview.id)} aria-label={`Remove ${preview.name}`}>
+                    <FaTimes aria-hidden="true" />
+                  </button>
+                </figure>
+              ))}
+            </div>
+          ) : (
+            <div className="photo-empty-preview">
+              <span>No photos selected yet.</span>
+              <small>You can still submit with an image URL below, but real uploaded photos look better on renter listings.</small>
+            </div>
+          )}
+
+          <label className="form-field">
+            <span>Primary Image URL</span>
+            <input
+              type="text"
+              placeholder="https://example.com/image.jpg"
+              value={form.image}
+              onChange={(e) => updateField('image', e.target.value)}
+            />
+          </label>
+        </section>
+
+        <section className="add-property-panel publish-panel">
+          <div className="panel-heading">
+            <span>03</span>
+            <div>
+              <h3>Publish</h3>
+              <p>New listings go to admin review before becoming public.</p>
+            </div>
+          </div>
+
+          <label className="keep-adding-toggle">
+            <input
+              type="checkbox"
+              checked={keepAdding}
+              onChange={(e) => setKeepAdding(e.target.checked)}
+            />
+            <span>After saving, clear the form so I can add another property</span>
+          </label>
+
+          {error && <p className="error">{error}</p>}
+          {success && <p className="success">{success}</p>}
+
+          <div className="submit-row">
+            <button type="button" className="reset-btn" onClick={resetForm} disabled={loading || uploadingImage}>
+              Reset
+            </button>
+            <button type="submit" disabled={loading || uploadingImage}>
+              {uploadingImage ? 'Uploading Photos...' : loading ? 'Submitting...' : keepAdding ? 'Submit & Add Another' : 'Submit Property'}
+            </button>
+          </div>
+        </section>
       </form>
     </div>
   );

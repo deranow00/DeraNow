@@ -137,7 +137,16 @@ export default function Visits() {
     }
   };
 
-  if (loading) return <p>Loading visits...</p>;
+  if (loading) {
+    return (
+      <div className="renter-visits-page">
+        <div className="visits-state-card">
+          <strong>Loading visits...</strong>
+          <p>Checking your visit pass, scheduled visits, and booking confirmation status.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="renter-visits-page">
@@ -173,7 +182,10 @@ export default function Visits() {
         </div>
 
         {visits.length === 0 ? (
-          <p className="visits-empty">No visits booked yet.</p>
+          <div className="visits-state-card">
+            <strong>No visits booked yet.</strong>
+            <p>Open a property, pay the Rs. 500 visit pass, and schedule your first visit.</p>
+          </div>
         ) : (
           visits.map((visit) => {
             const bothMarkedDone = Boolean(visit.renterMarkedDoneAt && visit.ownerMarkedDoneAt);
@@ -231,7 +243,18 @@ export default function Visits() {
               Pay Rs. {getConfirmationAmount(confirmVisit)} to confirm booking for{' '}
               <strong>{confirmVisit.property?.title || 'this property'}</strong>.
             </p>
-            <img src={QR_IMAGE_URL} alt="Booking confirmation payment QR" />
+            <div className="visit-confirm-payment">
+              <div>
+                <span>Booking charge</span>
+                <strong>Rs. {getConfirmationAmount(confirmVisit).toLocaleString()}</strong>
+                <ol>
+                  <li>Scan the QR and pay the exact amount shown.</li>
+                  <li>Enter transaction reference and renter details below.</li>
+                  <li>Admin verifies payment, then your confirmed booking appears in Bookings.</li>
+                </ol>
+              </div>
+              <img src={QR_IMAGE_URL} alt="Booking confirmation payment QR" />
+            </div>
             <div className="visit-confirm-form-grid">
               <label>
                 Full Name *

@@ -5,14 +5,15 @@ import PropertyVisit from '../models/PropertyVisit.js';
 import Property from '../models/Property.js';
 import User from '../models/User.js';
 import Booking from '../models/Booking.js';
+import AdminSetting from '../models/AdminSetting.js';
 import protect from '../middleware/authMiddleware.js';
 import adminOnly from '../middleware/adminMiddleware.js';
 import { sendNotification } from '../socket.js';
 
 const router = express.Router();
 
-const VISIT_PASS_AMOUNT = Number(process.env.VISIT_PASS_AMOUNT || 500);
-const BOOKING_CONFIRMATION_AMOUNTS = {
+const DEFAULT_VISIT_PASS_AMOUNT = Number(process.env.VISIT_PASS_AMOUNT || 500);
+const DEFAULT_BOOKING_CONFIRMATION_AMOUNTS = {
   Condo: 2000,
   Apartment: 2500,
   House: 4000,
@@ -36,8 +37,23 @@ const getActivePassForRenter = async (renterId, promoCode = '') => {
   return VisitPass.findOne(filter).sort({ approvedAt: -1, createdAt: -1 });
 };
 
-const getBookingConfirmationAmount = (propertyType) =>
-  BOOKING_CONFIRMATION_AMOUNTS[propertyType] || BOOKING_CONFIRMATION_AMOUNTS.Condo;
+const getNumericSetting = async (key, fallback) => {
+  const setting = await AdminSetting.findOne({ key }).lean();
+  const value = Number(setting?.value);
+  return Number.isFinite(value) && value >= 0 ? value : fallback;
+};
+
+const getVisitPassAmount = () => getNumericSetting('visitCharge', DEFAULT_VISIT_PASS_AMOUNT);
+
+const getBookingConfirmationAmount = async (propertyType) => {
+  const keyByType = {
+    Condo: 'roomBookingCharge',
+    Apartment: 'flatBookingCharge',
+    House: 'houseBookingCharge',
+  };
+  const key = keyByType[propertyType] || keyByType.Condo;
+  return getNumericSetting(key, DEFAULT_BOOKING_CONFIRMATION_AMOUNTS[propertyType] || DEFAULT_BOOKING_CONFIRMATION_AMOUNTS.Condo);
+};
 
 router.get('/pass/me', protect, async (req, res) => {
   try {
@@ -49,7 +65,7 @@ router.get('/pass/me', protect, async (req, res) => {
     const activePass = latestPass?.status === 'active' ? latestPass : await getActivePassForRenter(req.user._id);
 
     return res.json({
-      amount: VISIT_PASS_AMOUNT,
+      amount: await getVisitPassAmount(),
       latestPass,
       activePass,
       hasActivePass: Boolean(activePass),
@@ -137,9 +153,10 @@ router.post('/pass/payment-request', protect, async (req, res) => {
       });
     }
 
+    const visitPassAmount = await getVisitPassAmount();
     const visitPass = await VisitPass.create({
       renter: req.user._id,
-      amount: VISIT_PASS_AMOUNT,
+      amount: visitPassAmount,
       transactionRef,
       contactPhone,
       requestedForProperty: property._id,
@@ -333,7 +350,7 @@ router.post('/:id/confirm-booking', protect, async (req, res) => {
       return res.status(409).json({ error: 'Booking confirmation already submitted for this visit' });
     }
 
-    const amount = getBookingConfirmationAmount(visit.property?.type);
+    const amount = await getBookingConfirmationAmount(visit.property?.type);
     const booking = await Booking.create({
       property: visit.property?._id || visit.property,
       renter: req.user._id,

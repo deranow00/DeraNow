@@ -15,6 +15,10 @@ const propertySchema = new mongoose.Schema(
     title: { type: String, required: true },
     location: { type: String, required: true },
     approximateLocation: { type: String, trim: true, default: '' },
+    locationCoordinates: {
+      lat: { type: Number, default: null },
+      lng: { type: Number, default: null },
+    },
     price: { type: Number, required: true },
     bedrooms: { type: Number, required: true },
     bathrooms: { type: Number, required: true },
@@ -30,6 +34,11 @@ const propertySchema = new mongoose.Schema(
       },
     },
     parkingAvailable: { type: Boolean, default: false },
+    parkingType: {
+      type: String,
+      enum: ['none', 'bike', 'car', 'both'],
+      default: 'none',
+    },
     petFriendly: { type: Boolean, default: false },
     ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     status: {

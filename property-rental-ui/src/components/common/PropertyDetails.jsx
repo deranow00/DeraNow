@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FaStar } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
@@ -12,6 +12,12 @@ const BOOKING_CHARGE_BY_TYPE = {
 };
 
 const displayPropertyType = (type) => (type === 'Condo' ? 'Room' : type === 'Apartment' ? 'Flat' : type || 'Property');
+const parkingLabel = (type, available) => {
+  if (type === 'bike') return 'Bike parking available';
+  if (type === 'car') return 'Car parking available';
+  if (type === 'both') return 'Car and bike parking available';
+  return available ? 'Parking available' : 'No parking listed';
+};
 
 export default function PropertyDetails({ id }) {
   const { id: routeId } = useParams();
@@ -25,6 +31,7 @@ export default function PropertyDetails({ id }) {
   const [hover, setHover] = useState(null);
   const [rated, setRated] = useState(false);
   const [comment, setComment] = useState('');
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
     if (!propertyId) return;
@@ -51,6 +58,10 @@ export default function PropertyDetails({ id }) {
     };
     fetchProperty();
   }, [propertyId, token]);
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [propertyId]);
 
   const submitReview = async () => {
     try {
@@ -114,6 +125,7 @@ export default function PropertyDetails({ id }) {
   const galleryImages = Array.isArray(property.images) && property.images.length
     ? property.images
     : [property.image || '/default-property.jpg'];
+  const activeGalleryImage = galleryImages[activeImageIndex] || galleryImages[0] || '/default-property.jpg';
   const ownerVerified = property.ownerId?.ownerVerificationStatus === 'verified';
   const bookingCharge = BOOKING_CHARGE_BY_TYPE[property.type] || BOOKING_CHARGE_BY_TYPE.Condo;
   const availabilityStatus = property.availabilityStatus || 'Available';
@@ -146,10 +158,41 @@ export default function PropertyDetails({ id }) {
         </div>
       </div>
       <div className="property-details-gallery">
-        <img src={galleryImages[0]} alt={property.title} />
+        <div className="property-details-slider">
+          <img src={activeGalleryImage} alt={`${property.title} photo ${activeImageIndex + 1}`} />
+          {galleryImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                className="details-slide-btn prev"
+                onClick={() => setActiveImageIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1))}
+                aria-label="Previous property photo"
+              >
+                <FaChevronLeft aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="details-slide-btn next"
+                onClick={() => setActiveImageIndex((prev) => (prev + 1) % galleryImages.length)}
+                aria-label="Next property photo"
+              >
+                <FaChevronRight aria-hidden="true" />
+              </button>
+              <span className="details-slide-count">{activeImageIndex + 1} / {galleryImages.length}</span>
+            </>
+          )}
+        </div>
         <div className="property-details-thumbs">
           {galleryImages.slice(0, 5).map((imageUrl, index) => (
-            <img key={`${imageUrl}-${index}`} src={imageUrl} alt={`${property.title} ${index + 1}`} />
+            <button
+              type="button"
+              key={`${imageUrl}-${index}`}
+              className={index === activeImageIndex ? 'active' : ''}
+              onClick={() => setActiveImageIndex(index)}
+              aria-label={`Show property photo ${index + 1}`}
+            >
+              <img src={imageUrl} alt={`${property.title} ${index + 1}`} />
+            </button>
           ))}
         </div>
       </div>
@@ -163,7 +206,7 @@ export default function PropertyDetails({ id }) {
       </section>
 
       <section className="property-badge-row">
-        <span>{property.parkingAvailable ? 'Parking available' : 'No parking listed'}</span>
+        <span>{parkingLabel(property.parkingType, property.parkingAvailable)}</span>
         <span>{property.petFriendly ? 'Pet friendly' : 'Pets not listed'}</span>
         <span>{ownerVerified ? 'Verified owner' : 'Owner verification pending'}</span>
         <span>{availabilityStatus}</span>

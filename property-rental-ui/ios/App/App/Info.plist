@@ -35,6 +35,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>DeraNow needs camera access so you can capture listing, profile, and verification documents.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>DeraNow uses your location to help owners select the exact property location on the map.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

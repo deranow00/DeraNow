@@ -1,17 +1,42 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { FaHeart, FaRegHeart, FaStar } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart, FaStar } from 'react-icons/fa';
 import './PropertyCard.css';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
+
+const parkingLabel = (type, available) => {
+  if (type === 'bike') return 'Bike parking';
+  if (type === 'car') return 'Car parking';
+  if (type === 'both') return 'Car & bike parking';
+  return available ? 'Parking' : 'No parking';
+};
 
 function PropertyCard({ property, onViewDetails, onApplyBooking }) {
   const { token } = useContext(AuthContext);
   const [isFavorited, setIsFavorited] = useState(false);
   const displayType = property.type === 'Condo' ? 'Room' : property.type;
-  const primaryImage = property.image || property.images?.[0] || '/default-property.jpg';
+  const galleryImages = Array.isArray(property.images) && property.images.length
+    ? property.images
+    : [property.image || '/default-property.jpg'];
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const activeImage = galleryImages[activeImageIndex] || galleryImages[0] || '/default-property.jpg';
   const availabilityStatus = property.availabilityStatus || property.bookingStatus || 'Available';
   const availabilityClass = availabilityStatus.toLowerCase().replace(/\s+/g, '-');
   const isOccupied = availabilityStatus === 'Occupied';
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [property?._id]);
+
+  const showPreviousImage = (event) => {
+    event.stopPropagation();
+    setActiveImageIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+  };
+
+  const showNextImage = (event) => {
+    event.stopPropagation();
+    setActiveImageIndex((prev) => (prev + 1) % galleryImages.length);
+  };
 
   const handleFavoriteClick = async () => {
     if (!token) return;
@@ -70,7 +95,33 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
 
   return (
     <div className="property-card">
-      <img src={primaryImage} alt={property.title} />
+      <div className="property-card-slider">
+        <img src={activeImage} alt={property.title} />
+        {galleryImages.length > 1 && (
+          <>
+            <button type="button" className="property-slide-btn prev" onClick={showPreviousImage} aria-label="Previous property photo">
+              <FaChevronLeft aria-hidden="true" />
+            </button>
+            <button type="button" className="property-slide-btn next" onClick={showNextImage} aria-label="Next property photo">
+              <FaChevronRight aria-hidden="true" />
+            </button>
+            <div className="property-slide-dots" aria-label="Property photo position">
+              {galleryImages.map((imageUrl, index) => (
+                <button
+                  type="button"
+                  key={`${imageUrl}-${index}`}
+                  className={index === activeImageIndex ? 'active' : ''}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setActiveImageIndex(index);
+                  }}
+                  aria-label={`Show photo ${index + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
       <div className="property-info">
         <h3>{property.title}</h3>
         <p>{property.location}{property.exactLocationLocked ? ' (approx.)' : ''}</p>
@@ -78,7 +129,7 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
         {displayType && <p>{displayType}</p>}
         <p>Rs. {property.price}/month</p>
         <div className="property-amenities">
-          <span>{property.parkingAvailable ? 'Parking' : 'No parking'}</span>
+          <span>{parkingLabel(property.parkingType, property.parkingAvailable)}</span>
           <span>{property.petFriendly ? 'Pet friendly' : 'No pets'}</span>
         </div>
 

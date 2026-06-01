@@ -183,7 +183,9 @@ export const addProperty = async (req, res) => {
       image,
       images = [],
       approximateLocation = '',
+      locationCoordinates = {},
       parkingAvailable = false,
+      parkingType = parkingAvailable ? 'both' : 'none',
       petFriendly = false,
     } = req.body;
     const ownerId = req.user._id;
@@ -196,19 +198,29 @@ export const addProperty = async (req, res) => {
       ? images.filter(Boolean).slice(0, 5)
       : [];
     const primaryImage = image || normalizedImages[0] || '';
+    const normalizedParkingType = ['none', 'bike', 'car', 'both'].includes(parkingType) ? parkingType : 'none';
+    const coordinates =
+      Number.isFinite(Number(locationCoordinates?.lat)) && Number.isFinite(Number(locationCoordinates?.lng))
+        ? {
+            lat: Number(locationCoordinates.lat),
+            lng: Number(locationCoordinates.lng),
+          }
+        : undefined;
 
     const newProperty = new Property({
       title,
       description,
       location,
       approximateLocation,
+      ...(coordinates ? { locationCoordinates: coordinates } : {}),
       price,
       type,
       bedrooms,
       bathrooms,
       image: primaryImage,
       images: normalizedImages.length ? normalizedImages : primaryImage ? [primaryImage] : [],
-      parkingAvailable: Boolean(parkingAvailable),
+      parkingAvailable: normalizedParkingType !== 'none',
+      parkingType: normalizedParkingType,
       petFriendly: Boolean(petFriendly),
       ownerId,
       status: 'Pending',
@@ -258,6 +270,19 @@ export const updateProperty = async (req, res) => {
     const update = { ...req.body };
     if (update.approximateLocation != null) {
       update.approximateLocation = String(update.approximateLocation).trim();
+    }
+    if (update.locationCoordinates) {
+      const lat = Number(update.locationCoordinates.lat);
+      const lng = Number(update.locationCoordinates.lng);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        update.locationCoordinates = { lat, lng };
+      } else {
+        delete update.locationCoordinates;
+      }
+    }
+    if (update.parkingType != null) {
+      update.parkingType = ['none', 'bike', 'car', 'both'].includes(update.parkingType) ? update.parkingType : 'none';
+      update.parkingAvailable = update.parkingType !== 'none';
     }
     if (Array.isArray(update.images)) {
       update.images = update.images.filter(Boolean).slice(0, 5);

@@ -129,9 +129,12 @@ export default function RenterHome() {
         </div>
         <div className="home-hero-actions">
           <Link to="/renter/listings" className="home-primary-link">Browse all listings</Link>
-          <Link to="/renter/favorites" className="home-secondary-link">View favorites</Link>
         </div>
       </section>
+
+      <div className="home-shortcut-row">
+        <Link to="/renter/favorites" className="home-secondary-link">View favorites</Link>
+      </div>
 
       <section className="home-section">
         <div className="home-section-head">

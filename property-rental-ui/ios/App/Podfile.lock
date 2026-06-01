@@ -2,6 +2,9 @@ PODS:
   - Capacitor (8.3.1):
     - CapacitorCordova
   - CapacitorCordova (8.3.1)
+  - CapacitorGeolocation (8.2.0):
+    - Capacitor
+    - IONGeolocationLib (= 2.1.0)
   - CapacitorPushNotifications (8.1.1):
     - Capacitor
   - FirebaseCore (12.13.0):
@@ -18,10 +21,12 @@ PODS:
   - "GoogleUtilities/NSData+zlib (8.1.0)":
     - GoogleUtilities/Privacy
   - GoogleUtilities/Privacy (8.1.0)
+  - IONGeolocationLib (2.1.0)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorGeolocation (from `../../node_modules/@capacitor/geolocation`)"
   - "CapacitorPushNotifications (from `../../node_modules/@capacitor/push-notifications`)"
   - FirebaseCore
 
@@ -30,23 +35,28 @@ SPEC REPOS:
     - FirebaseCore
     - FirebaseCoreInternal
     - GoogleUtilities
+    - IONGeolocationLib
 
 EXTERNAL SOURCES:
   Capacitor:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
+  CapacitorGeolocation:
+    :path: "../../node_modules/@capacitor/geolocation"
   CapacitorPushNotifications:
     :path: "../../node_modules/@capacitor/push-notifications"
 
 SPEC CHECKSUMS:
   Capacitor: 46dbaa89c1d1cd121b9fc2dc839c1f39cc49e326
   CapacitorCordova: 9010447fe25e869705fcf525e5f490facde87608
+  CapacitorGeolocation: b36f6287bfc9f2eefa04dc900496f2c8ae666136
   CapacitorPushNotifications: ec08d589c226a2c0db7c032ec1bf5b044ec85f8e
   FirebaseCore: 58905958aa00a061397a0fd759ae4b55bddb3576
   FirebaseCoreInternal: 37bee58388fc6d183f0ab1b32d69ae44f2cf8aad
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
+  IONGeolocationLib: 6a7b6f76063fb1b01cfb14fae7d0f526e3c9b271
 
-PODFILE CHECKSUM: 97aa3ebaaf818dc037a06a9d69a47a4327da7aa0
+PODFILE CHECKSUM: c726cef15fc7a4ef0cc824b99f509520e66146d5
 
 COCOAPODS: 1.16.2

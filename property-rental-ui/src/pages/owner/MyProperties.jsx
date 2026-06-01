@@ -1,11 +1,43 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { FaCrosshairs, FaMapMarkerAlt, FaTimes } from 'react-icons/fa';
+import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import './MyProperties.css';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
+import 'leaflet/dist/leaflet.css';
 
 const PROPERTY_TYPES = ['Apartment', 'House', 'Condo'];
 const displayPropertyType = (type) => (type === 'Condo' ? 'Room' : type);
 const toBackendPropertyType = (type) => (type === 'Room' ? 'Condo' : type);
+const DEFAULT_MAP_CENTER = { lat: 27.7172, lng: 85.324 };
+
+function MapResize() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => map.invalidateSize(), 120);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
+
+function MapRecenter({ center, version }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!center) return;
+    map.setView([center.lat, center.lng], Math.max(map.getZoom(), 17), { animate: false });
+  }, [center, map, version]);
+  return null;
+}
+
+function MapCenterPicker({ onSelect }) {
+  const map = useMapEvents({
+    moveend() {
+      const center = map.getCenter();
+      onSelect({ lat: center.lat, lng: center.lng }, 'Map moved. The pin marks the selected point.');
+    },
+  });
+  return null;
+}
 
 export default function MyProperties() {
   const [viewProperty, setViewProperty] = useState(null);
@@ -27,12 +59,18 @@ export default function MyProperties() {
     type: PROPERTY_TYPES[0],
     image: '',
     images: [],
+    locationCoordinates: null,
     parkingAvailable: false,
     petFriendly: false,
   });
   const [formError, setFormError] = useState('');
   const [editImageFiles, setEditImageFiles] = useState([]);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [mapCenter, setMapCenter] = useState(DEFAULT_MAP_CENTER);
+  const [mapRecenterVersion, setMapRecenterVersion] = useState(0);
+  const [mapStatus, setMapStatus] = useState('');
+  const [mapSearch, setMapSearch] = useState('');
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -60,6 +98,7 @@ export default function MyProperties() {
   }, [token]);
 
   const handleEditClick = (property) => {
+    const selectedCoordinates = getValidCoordinates(property.locationCoordinates);
     setCurrentProperty(property);
     setFormData({
       title: property.title || '',
@@ -71,12 +110,89 @@ export default function MyProperties() {
       type: toBackendPropertyType(property.type || PROPERTY_TYPES[0]),
       image: property.image || '',
       images: Array.isArray(property.images) ? property.images : property.image ? [property.image] : [],
+      locationCoordinates: selectedCoordinates,
       parkingAvailable: Boolean(property.parkingAvailable),
       petFriendly: Boolean(property.petFriendly),
     });
+    setMapCenter(selectedCoordinates || DEFAULT_MAP_CENTER);
+    setMapRecenterVersion((prev) => prev + 1);
+    setMapStatus(selectedCoordinates ? 'Saved location loaded. Move the map to update it.' : '');
+    setMapSearch('');
     setFormError('');
     setEditImageFiles([]);
     setIsEditing(true);
+  };
+
+  const getValidCoordinates = (coordinates = {}) => {
+    const lat = Number(coordinates?.lat);
+    const lng = Number(coordinates?.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+    return { lat, lng };
+  };
+
+  const formatCoordinates = (coords) =>
+    coords ? `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}` : '';
+
+  const setExactCoordinates = (coords, options = {}) => {
+    const normalized = getValidCoordinates(coords);
+    if (!normalized) return;
+    if (options.recenter) {
+      setMapCenter(normalized);
+      setMapRecenterVersion((prev) => prev + 1);
+    }
+    setFormData((prev) => ({
+      ...prev,
+      locationCoordinates: normalized,
+      location: prev.location || formatCoordinates(normalized),
+    }));
+  };
+
+  const locateMe = () => {
+    if (!navigator.geolocation) {
+      setMapStatus('Location is not supported on this device.');
+      return;
+    }
+
+    if (!window.isSecureContext && window.location.hostname !== 'localhost') {
+      setMapStatus('Current location needs HTTPS. Use deployed app or enter/search location manually.');
+      return;
+    }
+
+    setMapStatus('Finding your current location...');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setExactCoordinates(
+          { lat: position.coords.latitude, lng: position.coords.longitude },
+          { recenter: true }
+        );
+        setMapStatus('Location selected. Move the map with your finger; the center pin marks the exact point.');
+      },
+      () => setMapStatus('Could not access location. Check location permission, then try again.'),
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 }
+    );
+  };
+
+  const searchMapLocation = async () => {
+    const query = mapSearch.trim();
+    if (!query) return;
+    setMapStatus('Searching location...');
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`
+      );
+      const data = await res.json();
+      const result = Array.isArray(data) ? data[0] : null;
+      if (!result) {
+        setMapStatus('No matching location found. Try a nearby landmark or area name.');
+        return;
+      }
+      const coords = { lat: Number(result.lat), lng: Number(result.lon) };
+      setExactCoordinates(coords, { recenter: true });
+      setMapStatus('Location found. Move the map with your finger; the center pin marks the exact point.');
+    } catch {
+      setMapStatus('Search failed. Please try again or use current location.');
+    }
   };
 
   const uploadImageToCloudinary = async () => {
@@ -192,6 +308,7 @@ export default function MyProperties() {
 
   const handleCancel = () => {
     setIsEditing(false);
+    setMapOpen(false);
     setFormError('');
     setEditImageFiles([]);
   };
@@ -266,7 +383,18 @@ export default function MyProperties() {
             </div>
             <div className="form-group">
               <label>Location*</label>
-              <input name="location" value={formData.location} onChange={handleInputChange} />
+              <div className="location-edit-row">
+                <input name="location" value={formData.location} onChange={handleInputChange} />
+                <button type="button" onClick={() => setMapOpen(true)}>
+                  <FaMapMarkerAlt aria-hidden="true" />
+                  Pick on Map
+                </button>
+              </div>
+              {formData.locationCoordinates && (
+                <small className="location-coordinate-note">
+                  Selected coordinates: {formatCoordinates(formData.locationCoordinates)}
+                </small>
+              )}
             </div>
             <div className="form-group">
               <label>Price (Rs)*</label>
@@ -378,6 +506,94 @@ export default function MyProperties() {
               <button className="btn-cancel" onClick={handleCancel}>
                 Cancel
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {mapOpen && (
+        <div className="edit-map-picker-overlay" onClick={() => setMapOpen(false)}>
+          <div className="edit-map-picker-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="edit-map-picker-header">
+              <div>
+                <h3>Update Exact Location</h3>
+                <p>Move the map and keep the pin on the property. This exact point unlocks for renters after visit access.</p>
+              </div>
+              <button type="button" onClick={() => setMapOpen(false)} aria-label="Close map picker">
+                <FaTimes aria-hidden="true" />
+              </button>
+            </div>
+            <div className="edit-map-picker-toolbar">
+              <div className="edit-map-picker-search">
+                <input
+                  value={mapSearch}
+                  onChange={(e) => setMapSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      searchMapLocation();
+                    }
+                  }}
+                  placeholder="Search address, area, or landmark"
+                />
+                <button type="button" onClick={searchMapLocation}>Search</button>
+              </div>
+              <button type="button" onClick={locateMe}>
+                <FaCrosshairs aria-hidden="true" />
+                Use Current Location
+              </button>
+            </div>
+            <div className="edit-map-picker-canvas">
+              <MapContainer
+                center={[mapCenter.lat, mapCenter.lng]}
+                zoom={17}
+                scrollWheelZoom
+                dragging
+                tap={false}
+                touchZoom
+                doubleClickZoom
+                className="edit-map-picker-leaflet"
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <MapResize />
+                <MapRecenter center={mapCenter} version={mapRecenterVersion} />
+                <MapCenterPicker
+                  onSelect={(coords, status) => {
+                    setExactCoordinates(coords);
+                    setMapStatus(status);
+                  }}
+                />
+              </MapContainer>
+              <span className="edit-map-center-pin"><FaMapMarkerAlt aria-hidden="true" /></span>
+            </div>
+            <div className="edit-map-picker-footer">
+              <label>
+                <span>Coordinates</span>
+                <input
+                  value={formatCoordinates(formData.locationCoordinates || mapCenter)}
+                  onChange={(e) => {
+                    const [lat, lng] = e.target.value.split(',').map((item) => Number(item.trim()));
+                    setExactCoordinates({ lat, lng }, { recenter: true });
+                  }}
+                />
+              </label>
+              {mapStatus && <p>{mapStatus}</p>}
+              <div>
+                <button type="button" className="btn-cancel" onClick={() => setMapOpen(false)}>Cancel</button>
+                <button
+                  type="button"
+                  className="btn-save"
+                  onClick={() => {
+                    const coords = formData.locationCoordinates || mapCenter;
+                    setExactCoordinates(coords);
+                    setMapOpen(false);
+                  }}
+                >
+                  Use This Location
+                </button>
+              </div>
             </div>
           </div>
         </div>

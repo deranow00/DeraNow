@@ -253,6 +253,37 @@
 .form-group textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
 .form-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; appearance: none; }
 
+.location-edit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.6rem;
+}
+
+.location-edit-row button,
+.edit-map-picker-toolbar button,
+.edit-map-picker-footer button {
+  min-height: 48px;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: var(--primary);
+  padding: 0.65rem 0.9rem;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.location-coordinate-note {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
 .amenity-edit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -295,6 +326,143 @@
 .modal-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 .modal-content::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+.edit-map-picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(15, 23, 42, 0.62);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.edit-map-picker-modal {
+  width: min(880px, 100%);
+  max-height: min(760px, 94vh);
+  overflow: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: var(--shadow-medium);
+  padding: 1rem;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.edit-map-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.edit-map-picker-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.edit-map-picker-header p,
+.edit-map-picker-footer p {
+  margin: 0.25rem 0 0;
+  color: var(--text-secondary);
+}
+
+.edit-map-picker-header > button {
+  width: 38px;
+  height: 38px;
+  min-height: 38px;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  background: #f8fafc;
+  color: var(--text-primary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.edit-map-picker-toolbar,
+.edit-map-picker-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.edit-map-picker-search input,
+.edit-map-picker-footer input {
+  min-height: 44px;
+  border: 2px solid #e2e8f0;
+  border-radius: 999px;
+  background: #fff;
+  color: #374151;
+  padding: 0.65rem 0.85rem;
+  font: inherit;
+}
+
+.edit-map-picker-canvas {
+  position: relative;
+  width: 100%;
+  height: min(430px, 54vh);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #dbeafe;
+  touch-action: none;
+  user-select: none;
+}
+
+.edit-map-picker-leaflet {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.edit-map-center-pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 500;
+  transform: translate(-50%, -96%);
+  color: #dc2626;
+  font-size: 2.1rem;
+  filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.35));
+  pointer-events: none;
+}
+
+.edit-map-picker-canvas::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 499;
+  width: 10px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.18);
+  box-shadow: 0 0 0 14px rgba(220, 38, 38, 0.08);
+  pointer-events: none;
+}
+
+.edit-map-picker-footer {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.edit-map-picker-footer label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.edit-map-picker-footer > div {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
 @media (max-width: 1024px) {
   .my-properties-container { padding: 1.5rem; }
   .properties-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
@@ -311,6 +479,9 @@
   .modal-buttons { flex-direction: column; }
   .modal-buttons button { width: 100%; }
   .amenity-edit-grid { grid-template-columns: 1fr; }
+  .location-edit-row,
+  .edit-map-picker-toolbar,
+  .edit-map-picker-search { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {

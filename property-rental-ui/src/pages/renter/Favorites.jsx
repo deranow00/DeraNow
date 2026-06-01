@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
 import PropertyDetails from '../../components/common/PropertyDetails';
@@ -11,6 +12,7 @@ export default function Favorites() {
   const [error, setError] = useState('');
   const [viewDetailsId, setViewDetailsId] = useState(null);
   const [bookingProperty, setBookingProperty] = useState(null);
+  const [activeImages, setActiveImages] = useState({});
   const validFavorites = favorites.filter(Boolean);
 
   useEffect(() => {
@@ -49,6 +51,26 @@ export default function Favorites() {
     }
   };
 
+  const getGalleryImages = (property) => (
+    Array.isArray(property.images) && property.images.length
+      ? property.images
+      : [property.image || '/default-property.jpg']
+  );
+
+  const showPreviousImage = (propertyId, total) => {
+    setActiveImages((prev) => ({
+      ...prev,
+      [propertyId]: (prev[propertyId] || 0) === 0 ? total - 1 : (prev[propertyId] || 0) - 1,
+    }));
+  };
+
+  const showNextImage = (propertyId, total) => {
+    setActiveImages((prev) => ({
+      ...prev,
+      [propertyId]: ((prev[propertyId] || 0) + 1) % total,
+    }));
+  };
+
   return (
     <div className="favorites-container">
       <h1>My Favorites</h1>
@@ -57,28 +79,68 @@ export default function Favorites() {
         <p>No favorite properties found.</p>
       ) : (
         <div className="favorites-grid">
-          {validFavorites.map((property) => (
-            <div className="favorite-card" key={property._id}>
-              <img
-                src={property.image || '/default-image.jpg'}
-                alt={property.title || 'Property image'}
-              />
-              <h3>{property.title}</h3>
-              <p>Location: {property.location}</p>
-              <p>Price: Rs. {property.price}</p>
-              <div className="favorite-actions">
-                <button className="btn-primary" onClick={() => setViewDetailsId(property._id)}>
-                  View Details
-                </button>
-                <button className="btn-primary" onClick={() => setBookingProperty(property)}>
-                  Apply Booking
-                </button>
-                <button className="btn-danger" onClick={() => removeFavorite(property._id)}>
-                  Remove
-                </button>
+          {validFavorites.map((property) => {
+            const galleryImages = getGalleryImages(property);
+            const activeIndex = Math.min(activeImages[property._id] || 0, galleryImages.length - 1);
+            const activeImage = galleryImages[activeIndex] || '/default-property.jpg';
+
+            return (
+              <div className="favorite-card" key={property._id}>
+                <div className="favorite-card-slider">
+                  <img
+                    src={activeImage}
+                    alt={`${property.title || 'Property'} photo ${activeIndex + 1}`}
+                  />
+                  {galleryImages.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        className="favorite-slide-btn prev"
+                        onClick={() => showPreviousImage(property._id, galleryImages.length)}
+                        aria-label="Previous property photo"
+                      >
+                        <FaChevronLeft aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
+                        className="favorite-slide-btn next"
+                        onClick={() => showNextImage(property._id, galleryImages.length)}
+                        aria-label="Next property photo"
+                      >
+                        <FaChevronRight aria-hidden="true" />
+                      </button>
+                      <span className="favorite-slide-count">{activeIndex + 1} / {galleryImages.length}</span>
+                      <div className="favorite-slide-dots" aria-label="Property photo position">
+                        {galleryImages.map((imageUrl, index) => (
+                          <button
+                            type="button"
+                            key={`${imageUrl}-${index}`}
+                            className={index === activeIndex ? 'active' : ''}
+                            onClick={() => setActiveImages((prev) => ({ ...prev, [property._id]: index }))}
+                            aria-label={`Show photo ${index + 1}`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+                <h3>{property.title}</h3>
+                <p>Location: {property.location}</p>
+                <p>Price: Rs. {property.price}</p>
+                <div className="favorite-actions">
+                  <button className="btn-primary" onClick={() => setViewDetailsId(property._id)}>
+                    View Details
+                  </button>
+                  <button className="btn-primary" onClick={() => setBookingProperty(property)}>
+                    Apply Booking
+                  </button>
+                  <button className="btn-danger" onClick={() => removeFavorite(property._id)}>
+                    Remove
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

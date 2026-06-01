@@ -18,6 +18,13 @@ const parkingLabel = (type, available) => {
   if (type === 'both') return 'Car and bike parking available';
   return available ? 'Parking available' : 'No parking listed';
 };
+const getValidCoordinates = (coordinates = {}) => {
+  const lat = Number(coordinates?.lat);
+  const lng = Number(coordinates?.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  return { lat, lng };
+};
 
 export default function PropertyDetails({ id }) {
   const { id: routeId } = useParams();
@@ -130,6 +137,10 @@ export default function PropertyDetails({ id }) {
   const bookingCharge = BOOKING_CHARGE_BY_TYPE[property.type] || BOOKING_CHARGE_BY_TYPE.Condo;
   const availabilityStatus = property.availabilityStatus || 'Available';
   const availabilityClass = availabilityStatus.toLowerCase().replace(/\s+/g, '-');
+  const exactCoordinates = !property.exactLocationLocked ? getValidCoordinates(property.locationCoordinates) : null;
+  const mapQuery = exactCoordinates
+    ? `${exactCoordinates.lat.toFixed(6)},${exactCoordinates.lng.toFixed(6)}`
+    : property.location || property.approximateLocation || 'Nepal';
   const nearbyHints = [
     'Check walking distance to bus stops, markets, pharmacies, and your daily route before final booking.',
     'During your visit, verify water access, noise level, sunlight, and mobile network quality.',
@@ -242,8 +253,8 @@ export default function PropertyDetails({ id }) {
         <h3>Nearby and map preview</h3>
         <div className="property-map-preview">
           <iframe
-            title={`Map preview for ${property.location}`}
-            src={`https://maps.google.com/maps?q=${encodeURIComponent(property.location || 'Nepal')}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+            title={`Map preview for ${property.location || property.approximateLocation || 'property'}`}
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=${exactCoordinates ? '17' : '14'}&ie=UTF8&iwloc=&output=embed`}
             loading="lazy"
           />
         </div>

@@ -93,6 +93,14 @@ const getApproximateLocation = (property = {}) => {
   return parts[0] || 'Approximate area available after visit booking';
 };
 
+const getValidCoordinates = (coordinates = {}) => {
+  const lat = Number(coordinates?.lat);
+  const lng = Number(coordinates?.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  return { lat, lng };
+};
+
 const canViewExactLocation = async (property, user) => {
   if (!user?._id || !property?._id) return false;
   if (user.role === 'admin') return true;
@@ -126,6 +134,7 @@ const applyLocationPrivacy = async (input, user) => {
         ...plain,
         location: exactLocation,
         exactLocation,
+        locationCoordinates: getValidCoordinates(plain.locationCoordinates),
         approximateLocation: plain.approximateLocation || getApproximateLocation(plain),
         exactLocationLocked: false,
       };
@@ -135,6 +144,7 @@ const applyLocationPrivacy = async (input, user) => {
       location: getApproximateLocation(plain),
       approximateLocation: plain.approximateLocation || getApproximateLocation(plain),
       exactLocation: '',
+      locationCoordinates: null,
       exactLocationLocked: true,
     };
   }));

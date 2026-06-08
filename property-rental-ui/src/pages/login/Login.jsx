@@ -68,11 +68,6 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <div className="login-password-actions">
-              <Link to="/forgot-password" className="forgot-password-link">
-                {t('auth.forgotPassword')}
-              </Link>
-            </div>
 
             <label>{t('auth.loginAs')}</label>
             <select value={role} onChange={(e) => setRole(e.target.value)}>
@@ -85,6 +80,11 @@ export default function Login() {
             <button type="submit" disabled={loading}>
               {loading ? t('auth.loggingIn') : t('auth.login')}
             </button>
+            <div className="login-password-actions">
+              <Link to="/forgot-password" className="forgot-password-link">
+                {t('auth.forgotPassword')}
+              </Link>
+            </div>
           </form>
           <div className="login-footer">
             <p>

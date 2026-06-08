@@ -176,8 +176,8 @@
 
 .login-password-actions {
   display: flex;
-  justify-content: flex-end;
-  margin-top: -0.75rem;
+  justify-content: center;
+  margin-top: 0.75rem;
 }
 
 .forgot-password-link {
@@ -433,7 +433,7 @@
   }
 
   .login-password-actions {
-    margin-top: -0.5rem;
+    margin-top: 0.6rem;
   }
 
   .login-box button[type="submit"] {

@@ -105,6 +105,7 @@ const bookingSchema = new mongoose.Schema({
     emergencyContactName: { type: String, trim: true },
     emergencyContactPhone: { type: String, trim: true },
     noteToOwner: { type: String, trim: true },
+    leaseDurationMonths: { type: Number, min: 1, max: 60 },
   }
 }, { timestamps: true });
 

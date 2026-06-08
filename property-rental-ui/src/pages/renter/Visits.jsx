@@ -3,12 +3,6 @@ import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
 import './Visits.css';
 
-const BOOKING_CONFIRMATION_AMOUNTS = {
-  Condo: 2000,
-  Apartment: 2500,
-  House: 4000,
-};
-
 const QR_IMAGE_URL =
   import.meta.env.VITE_BOOKING_CONFIRMATION_QR_URL ||
   import.meta.env.VITE_MANUAL_PAYMENT_QR_URL ||
@@ -37,6 +31,7 @@ export default function Visits() {
     emergencyContactPhone: '',
     transactionRef: '',
     noteToOwner: '',
+    leaseDurationMonths: '12',
   });
 
   const emptyConfirmForm = {
@@ -52,6 +47,7 @@ export default function Visits() {
     emergencyContactPhone: '',
     transactionRef: '',
     noteToOwner: '',
+    leaseDurationMonths: '12',
   };
 
   const loadVisits = async () => {
@@ -102,8 +98,9 @@ export default function Visits() {
   const pastVisits = visits.filter((visit) => isVisitPast(visit));
   const visibleVisits = activeTab === 'past' ? pastVisits : pendingVisits;
 
+  const bookingChargeAmounts = passInfo?.bookingConfirmationAmounts || {};
   const getConfirmationAmount = (visit) =>
-    BOOKING_CONFIRMATION_AMOUNTS[visit?.property?.type] || BOOKING_CONFIRMATION_AMOUNTS.Condo;
+    Number(bookingChargeAmounts[visit?.property?.type] || bookingChargeAmounts.Condo || 2000);
 
   const getVisitStatusLabel = (visit) => {
     if (!visit) return 'Visit';
@@ -307,7 +304,7 @@ export default function Visits() {
               : latestPass?.status === 'pending_payment'
                 ? 'Admin is verifying your QR payment.'
                 : latestPass?.status === 'consumed'
-                  ? 'Your previous promo was used for a booking. Pay Rs. 500 again to book more visits.'
+                  ? `Your previous promo was used for a booking. Pay Rs. ${Number(passInfo?.amount || 500).toLocaleString()} again to book more visits.`
                 : 'Open any property and book a visit to submit your first pass payment.'}
           </p>
         </div>
@@ -410,6 +407,16 @@ export default function Visits() {
                   min={today}
                   value={confirmForm.moveInDate}
                   onChange={(e) => setConfirmForm((prev) => ({ ...prev, moveInDate: e.target.value }))}
+                />
+              </label>
+              <label>
+                Lease Duration (months) *
+                <input
+                  type="number"
+                  min="1"
+                  max="60"
+                  value={confirmForm.leaseDurationMonths}
+                  onChange={(e) => setConfirmForm((prev) => ({ ...prev, leaseDurationMonths: e.target.value }))}
                 />
               </label>
               <label>

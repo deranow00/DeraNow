@@ -105,11 +105,105 @@
   box-shadow: var(--shadow-medium), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
+.property-card-slider {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #dbeafe 0%, #e2e8f0 100%);
+  touch-action: pan-y;
+}
+
 .property-image {
   width: 100%;
   height: 220px;
   object-fit: cover;
   display: block;
+  transition: transform 0.35s ease;
+}
+
+.property-card:hover .property-image {
+  transform: scale(1.015);
+}
+
+.property-slide-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.62);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  z-index: 2;
+}
+
+.property-card:hover .property-slide-btn,
+.property-slide-btn:focus-visible {
+  opacity: 1;
+}
+
+.property-slide-btn.prev {
+  left: 10px;
+}
+
+.property-slide-btn.next {
+  right: 10px;
+}
+
+.property-slide-btn:hover {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.property-slide-btn svg {
+  font-size: 0.95rem;
+}
+
+.property-slide-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 0.3rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.42);
+  z-index: 2;
+}
+
+.property-slide-dots button {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+}
+
+.property-slide-dots button.active {
+  width: 18px;
+  border-radius: 999px;
+  background: #fff;
+}
+
+.property-card-count {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.35rem 0.6rem;
 }
 
 .property-details {
@@ -227,21 +321,58 @@
 
 .modal-content h2 { font-size: 1.875rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.5rem; text-align: center; }
 
-.modal-image { width: 100%; height: 250px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; }
+.modal-image-slider {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.85rem;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(135deg, #dbeafe 0%, #e2e8f0 100%);
+  touch-action: pan-y;
+}
+
+.modal-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 0.85rem;
+  border: 1px solid #e2e8f0;
+  display: block;
+}
 
 .modal-image-thumbs {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
-  margin: -0.75rem 0 1.25rem;
+  margin: -0.25rem 0 1.25rem;
 }
 
-.modal-image-thumbs img {
+.modal-thumb {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 0.65rem;
+  overflow: hidden;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.modal-thumb:hover,
+.modal-thumb:focus-visible,
+.modal-thumb.active {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.modal-thumb img {
   width: 100%;
   height: 74px;
   object-fit: cover;
-  border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
+  display: block;
+}
+
+.modal-card-count {
+  top: 14px;
+  left: 14px;
 }
 
 .form-group { margin-bottom: 1.5rem; }
@@ -473,8 +604,15 @@
   .my-properties-container { padding: 1rem; }
   .my-properties-container h1 { font-size: 2rem; margin-bottom: 2rem; }
   .properties-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-  .property-actions { flex-direction: column; }
-  .property-actions button { flex: none; }
+  .property-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+  .property-actions button {
+    width: 100%;
+  }
+  .property-slide-btn { opacity: 1; }
   .modal-content { min-width: 90vw; max-width: 95vw; padding: 1rem; }
   .modal-buttons { flex-direction: column; }
   .modal-buttons button { width: 100%; }
@@ -482,15 +620,62 @@
   .location-edit-row,
   .edit-map-picker-toolbar,
   .edit-map-picker-search { grid-template-columns: 1fr; }
+  .modal-image-thumbs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 480px) {
   .my-properties-container { padding: 0.75rem; }
   .my-properties-container h1 { font-size: 1.75rem; margin-bottom: 1.5rem; }
   .properties-grid { grid-template-columns: 1fr; gap: 1rem; }
-  .property-details { padding: 1rem; }
+  .property-details { padding: 0.95rem 0.95rem 1rem; }
+  .property-details h3 { font-size: 1.1rem; margin-bottom: 0.7rem; }
+  .property-details p { font-size: 0.82rem; margin: 0.35rem 0; }
+  .status {
+    padding: 0.28rem 0.55rem;
+    font-size: 0.64rem;
+    margin: 0.35rem 0 0.75rem;
+  }
+  .property-image { height: 186px; }
+  .property-card-count {
+    top: 9px;
+    left: 9px;
+    font-size: 0.64rem;
+    padding: 0.28rem 0.5rem;
+  }
+  .property-slide-btn {
+    width: 28px;
+    height: 28px;
+    opacity: 1;
+  }
+  .property-slide-btn.prev { left: 7px; }
+  .property-slide-btn.next { right: 7px; }
+  .property-slide-btn svg { font-size: 0.8rem; }
+  .property-slide-dots {
+    bottom: 7px;
+    gap: 4px;
+    padding: 0.22rem 0.35rem;
+  }
+  .property-slide-dots button {
+    width: 6px;
+    height: 6px;
+  }
+  .property-slide-dots button.active {
+    width: 14px;
+  }
+  .property-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+  .property-actions button {
+    padding: 0.56rem 0.35rem;
+    font-size: 0.62rem;
+    min-height: 36px;
+    letter-spacing: 0.03em;
+  }
   .modal-content { min-width: 95vw; max-width: 98vw; padding: 1rem; border-radius: 0.5rem; }
   .modal-image { height: 200px; }
+  .modal-image-thumbs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .modal-card-count { top: 10px; left: 10px; }
 }
 
 @media (prefers-contrast: high) {

@@ -55,6 +55,56 @@ const getBookingConfirmationAmount = async (propertyType) => {
   return getNumericSetting(key, DEFAULT_BOOKING_CONFIRMATION_AMOUNTS[propertyType] || DEFAULT_BOOKING_CONFIRMATION_AMOUNTS.Condo);
 };
 
+const getBookingConfirmationAmounts = async () => {
+  const [room, flat, house] = await Promise.all([
+    getBookingConfirmationAmount('Condo'),
+    getBookingConfirmationAmount('Apartment'),
+    getBookingConfirmationAmount('House'),
+  ]);
+  return {
+    Condo: room,
+    Apartment: flat,
+    House: house,
+  };
+};
+
+const addMonthsInclusive = (startDate, months) => {
+  const start = new Date(startDate);
+  const targetMonthIndex = start.getMonth() + months;
+  const targetMonth = ((targetMonthIndex % 12) + 12) % 12;
+  const sameDayCandidate = new Date(
+    start.getFullYear(),
+    targetMonthIndex,
+    start.getDate(),
+    start.getHours(),
+    start.getMinutes(),
+    start.getSeconds(),
+    start.getMilliseconds()
+  );
+  const exclusiveEnd =
+    sameDayCandidate.getMonth() === targetMonth
+      ? sameDayCandidate
+      : new Date(start.getFullYear(), targetMonthIndex + 1, 1);
+  const inclusiveEnd = new Date(exclusiveEnd);
+  inclusiveEnd.setDate(inclusiveEnd.getDate() - 1);
+  return inclusiveEnd;
+};
+
+const findOverlappingApprovedBooking = async ({ propertyId, fromDate, toDate, excludeBookingId = null }) => {
+  const filter = {
+    property: propertyId,
+    status: 'Approved',
+    fromDate: { $lte: toDate },
+    toDate: { $gte: fromDate },
+  };
+
+  if (excludeBookingId) {
+    filter._id = { $ne: excludeBookingId };
+  }
+
+  return Booking.findOne(filter).select('_id fromDate toDate renter').lean();
+};
+
 router.get('/pass/me', protect, async (req, res) => {
   try {
     const latestPass = await VisitPass.findOne({ renter: req.user._id })
@@ -66,6 +116,7 @@ router.get('/pass/me', protect, async (req, res) => {
 
     return res.json({
       amount: await getVisitPassAmount(),
+      bookingConfirmationAmounts: await getBookingConfirmationAmounts(),
       latestPass,
       activePass,
       hasActivePass: Boolean(activePass),
@@ -316,6 +367,7 @@ router.post('/:id/confirm-booking', protect, async (req, res) => {
       emergencyContactName = '',
       emergencyContactPhone = '',
       noteToOwner = '',
+      leaseDurationMonths = 1,
     } = req.body;
     if (!moveInDate) {
       return res.status(400).json({ error: 'Move-in date is required' });
@@ -328,9 +380,14 @@ router.post('/:id/confirm-booking', protect, async (req, res) => {
     }
 
     const parsedMoveInDate = new Date(moveInDate);
+    const rawLeaseDurationMonths = Number(leaseDurationMonths);
     if (Number.isNaN(parsedMoveInDate.getTime())) {
       return res.status(400).json({ error: 'Invalid move-in date' });
     }
+    if (!Number.isInteger(rawLeaseDurationMonths) || rawLeaseDurationMonths < 1 || rawLeaseDurationMonths > 60) {
+      return res.status(400).json({ error: 'Lease duration must be a whole number between 1 and 60 months' });
+    }
+    const normalizedLeaseDurationMonths = rawLeaseDurationMonths;
 
     const visit = await PropertyVisit.findById(req.params.id)
       .populate('property', 'title price type ownerId')
@@ -350,12 +407,24 @@ router.post('/:id/confirm-booking', protect, async (req, res) => {
       return res.status(409).json({ error: 'Booking confirmation already submitted for this visit' });
     }
 
+    const bookingEndDate = addMonthsInclusive(parsedMoveInDate, normalizedLeaseDurationMonths);
+    const overlappingBooking = await findOverlappingApprovedBooking({
+      propertyId: visit.property?._id || visit.property,
+      fromDate: parsedMoveInDate,
+      toDate: bookingEndDate,
+    });
+    if (overlappingBooking) {
+      return res.status(409).json({
+        error: 'This property already has an approved booking for the selected move-in period',
+      });
+    }
+
     const amount = await getBookingConfirmationAmount(visit.property?.type);
     const booking = await Booking.create({
       property: visit.property?._id || visit.property,
       renter: req.user._id,
       fromDate: parsedMoveInDate,
-      toDate: parsedMoveInDate,
+      toDate: bookingEndDate,
       agreedMonthlyRent: Number(visit.property?.price || 0),
       bookingDetails: {
         fullName,
@@ -368,6 +437,7 @@ router.post('/:id/confirm-booking', protect, async (req, res) => {
         emergencyContactName,
         emergencyContactPhone,
         noteToOwner,
+        leaseDurationMonths: normalizedLeaseDurationMonths,
       },
       paymentStatus: 'pending_verification',
       acceptedAt: null,
@@ -394,7 +464,7 @@ router.post('/:id/confirm-booking', protect, async (req, res) => {
         visit.owner,
         'newBooking',
         `${req.user.name || 'Renter'} confirmed booking after visiting "${visit.property?.title || 'property'}".`,
-        '/owner/requests'
+        '/owner/visits'
       );
     }
 
@@ -465,6 +535,20 @@ router.patch('/admin/passes/:id/approve', protect, adminOnly, async (req, res) =
 
     if (visitPass.status === 'active') {
       return res.json({ message: 'Visit pass already approved', pass: visitPass });
+    }
+
+    const existingActivePass = await VisitPass.findOne({
+      renter: visitPass.renter?._id || visitPass.renter,
+      status: 'active',
+      _id: { $ne: visitPass._id },
+    })
+      .select('_id promoCode approvedAt')
+      .lean();
+    if (existingActivePass) {
+      return res.status(409).json({
+        error: 'This renter already has an active visit pass',
+        activePass: existingActivePass,
+      });
     }
 
     visitPass.status = 'active';

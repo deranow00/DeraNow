@@ -2,6 +2,7 @@ import Property from '../models/Property.js';
 import Booking from '../models/Booking.js';
 import PropertyVisit from '../models/PropertyVisit.js';
 import VisitPass from '../models/VisitPass.js';
+import AdminSetting from '../models/AdminSetting.js';
 import User from '../models/User.js';
 import { sendNotification } from '../socket.js';
 import mongoose from 'mongoose';
@@ -56,7 +57,7 @@ const buildAvailabilityMap = async (propertyIds = []) => {
     }).select('property').lean(),
     PropertyVisit.find({
       property: { $in: ids },
-      status: { $in: ['scheduled', 'completed', 'booking_pending'] },
+      status: { $in: ['scheduled', 'booking_pending'] },
       bookingConfirmationStatus: { $ne: 'failed' },
     }).select('property').lean(),
   ]);
@@ -91,6 +92,29 @@ const getApproximateLocation = (property = {}) => {
     .filter(Boolean);
   if (parts.length >= 2) return parts.slice(-2).join(', ');
   return parts[0] || 'Approximate area available after visit booking';
+};
+
+const getNumericSetting = async (key, fallback) => {
+  const setting = await AdminSetting.findOne({ key }).lean();
+  const value = Number(setting?.value);
+  return Number.isFinite(value) && value >= 0 ? value : fallback;
+};
+
+const getVisitPassAmount = () => getNumericSetting('visitCharge', Number(process.env.VISIT_PASS_AMOUNT || 500));
+
+const getBookingChargeAmount = async (propertyType) => {
+  const defaults = {
+    Condo: 2000,
+    Apartment: 2500,
+    House: 4000,
+  };
+  const keyByType = {
+    Condo: 'roomBookingCharge',
+    Apartment: 'flatBookingCharge',
+    House: 'houseBookingCharge',
+  };
+  const normalizedType = keyByType[propertyType] ? propertyType : 'Condo';
+  return getNumericSetting(keyByType[normalizedType], defaults[normalizedType]);
 };
 
 const getValidCoordinates = (coordinates = {}) => {
@@ -429,6 +453,8 @@ export const getPropertyById = async (req, res) => {
       );
       response.userRating = userRating?.rating || null;
     }
+    response.visitPassAmount = await getVisitPassAmount();
+    response.bookingChargeAmount = await getBookingChargeAmount(property.type);
 
     res.status(200).json(response);
   } catch (error) {

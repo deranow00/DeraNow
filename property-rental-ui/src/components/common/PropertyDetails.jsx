@@ -134,7 +134,8 @@ export default function PropertyDetails({ id }) {
     : [property.image || '/default-property.jpg'];
   const activeGalleryImage = galleryImages[activeImageIndex] || galleryImages[0] || '/default-property.jpg';
   const ownerVerified = property.ownerId?.ownerVerificationStatus === 'verified';
-  const bookingCharge = BOOKING_CHARGE_BY_TYPE[property.type] || BOOKING_CHARGE_BY_TYPE.Condo;
+  const bookingCharge = Number(property.bookingChargeAmount || BOOKING_CHARGE_BY_TYPE[property.type] || BOOKING_CHARGE_BY_TYPE.Condo);
+  const visitPassAmount = Number(property.visitPassAmount || 500);
   const availabilityStatus = property.availabilityStatus || 'Available';
   const availabilityClass = availabilityStatus.toLowerCase().replace(/\s+/g, '-');
   const exactCoordinates = !property.exactLocationLocked ? getValidCoordinates(property.locationCoordinates) : null;
@@ -210,7 +211,7 @@ export default function PropertyDetails({ id }) {
 
       <section className="property-quick-grid">
         <article><span>Monthly Rent</span><strong>Rs. {Number(property.price || 0).toLocaleString()}</strong></article>
-        <article><span>Visit Pass</span><strong>Rs. 500</strong></article>
+        <article><span>Visit Pass</span><strong>Rs. {visitPassAmount.toLocaleString()}</strong></article>
         <article><span>Booking Charge</span><strong>Rs. {bookingCharge.toLocaleString()}</strong></article>
         <article><span>Availability</span><strong>{availabilityStatus}</strong></article>
         <article><span>Rooms</span><strong>{property.bedrooms || 0} bed / {property.bathrooms || 0} bath</strong></article>
@@ -241,10 +242,10 @@ export default function PropertyDetails({ id }) {
         <article>
           <h3>Required charges</h3>
           <dl>
-            <dt>Visit pass</dt><dd>Rs. 500 before scheduling visits</dd>
+            <dt>Visit pass</dt><dd>Rs. {visitPassAmount.toLocaleString()} before scheduling visits</dd>
             <dt>Booking charge</dt><dd>Rs. {bookingCharge.toLocaleString()} after visit completion</dd>
             <dt>Monthly rent</dt><dd>Rs. {Number(property.price || 0).toLocaleString()} per month</dd>
-            <dt>Location access</dt><dd>{property.exactLocationLocked ? 'Exact address unlocks after visit payment approval or visit booking.' : 'Exact address available'}</dd>
+            <dt>Location access</dt><dd>{property.exactLocationLocked ? 'Exact address unlocks after your visit pass is approved for this property or after you schedule a visit.' : 'Exact address available'}</dd>
           </dl>
         </article>
       </section>

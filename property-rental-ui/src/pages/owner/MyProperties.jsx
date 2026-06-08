@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { FaCrosshairs, FaMapMarkerAlt, FaTimes } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaCrosshairs, FaMapMarkerAlt, FaTimes } from 'react-icons/fa';
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import './MyProperties.css';
 import { AuthContext } from '../../context/AuthContext';
@@ -11,6 +11,14 @@ const PROPERTY_TYPES = ['Apartment', 'House', 'Condo'];
 const displayPropertyType = (type) => (type === 'Condo' ? 'Room' : type);
 const toBackendPropertyType = (type) => (type === 'Room' ? 'Condo' : type);
 const DEFAULT_MAP_CENTER = { lat: 27.7172, lng: 85.324 };
+const MAX_GALLERY_IMAGES = 5;
+
+const getGalleryImages = (property) =>
+  Array.isArray(property?.images) && property.images.length
+    ? property.images.slice(0, MAX_GALLERY_IMAGES)
+    : property?.image
+      ? [property.image]
+      : ['/default-image.jpg'];
 
 function MapResize() {
   const map = useMap();
@@ -42,6 +50,8 @@ function MapCenterPicker({ onSelect }) {
 
 export default function MyProperties() {
   const [viewProperty, setViewProperty] = useState(null);
+  const [cardImageIndexes, setCardImageIndexes] = useState({});
+  const [detailImageIndex, setDetailImageIndex] = useState(0);
 
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +82,10 @@ export default function MyProperties() {
   const [mapRecenterVersion, setMapRecenterVersion] = useState(0);
   const [mapStatus, setMapStatus] = useState('');
   const [mapSearch, setMapSearch] = useState('');
+
+  useEffect(() => {
+    setDetailImageIndex(0);
+  }, [viewProperty?._id]);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -135,6 +149,37 @@ export default function MyProperties() {
   const formatCoordinates = (coords) =>
     coords ? `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}` : '';
 
+  const getActiveCardImageIndex = (propertyId, total) => {
+    const currentIndex = Number(cardImageIndexes[propertyId] || 0);
+    return Math.min(Math.max(currentIndex, 0), Math.max(total - 1, 0));
+  };
+
+  const shiftCardImage = (propertyId, total, direction, event) => {
+    if (event) event.stopPropagation();
+    if (total <= 1) return;
+    setCardImageIndexes((prev) => {
+      const current = Number(prev[propertyId] || 0);
+      const nextIndex = direction === 'prev'
+        ? (current === 0 ? total - 1 : current - 1)
+        : (current + 1) % total;
+      return { ...prev, [propertyId]: nextIndex };
+    });
+  };
+
+  const setCardImageIndex = (propertyId, index, event) => {
+    if (event) event.stopPropagation();
+    setCardImageIndexes((prev) => ({ ...prev, [propertyId]: index }));
+  };
+
+  const shiftDetailImage = (direction) => {
+    if (!viewProperty) return;
+    const total = getGalleryImages(viewProperty).length;
+    if (total <= 1) return;
+    setDetailImageIndex((prev) => (direction === 'prev'
+      ? (prev === 0 ? total - 1 : prev - 1)
+      : (prev + 1) % total));
+  };
+
   const setExactCoordinates = (coords, options = {}) => {
     const normalized = getValidCoordinates(coords);
     if (!normalized) return;
@@ -145,7 +190,6 @@ export default function MyProperties() {
     setFormData((prev) => ({
       ...prev,
       locationCoordinates: normalized,
-      location: prev.location || formatCoordinates(normalized),
     }));
   };
 
@@ -333,42 +377,87 @@ export default function MyProperties() {
       ) : (
         <div className="properties-grid">
           {properties.map((property) => (
-            <div key={property._id} className="property-card">
-              <img
-                src={property.image || property.images?.[0] || '/default-image.jpg'}
-                alt={property.title}
-                className="property-image"
-              />
-              <div className="property-details">
-                <h3>{property.title}</h3>
-                <p>Location: {property.location}</p>
-                <p>
-                  Rent: <span className="rent-amount">Rs. {property.price}</span>
-                </p>
-                <p>Parking: {property.parkingAvailable ? 'Available' : 'Not available'}</p>
-                <p>Pet Friendly: {property.petFriendly ? 'Yes' : 'No'}</p>
-                <p className="status available">Approval: {property.approvalStatus}</p>
-                <p
-                  className={`status ${
-                    property.bookingStatus === 'Approved' ? 'approved' : 'available'
-                  }`}
-                >
-                  Booking: {property.bookingStatus === 'Approved' ? 'booked' : 'Available'}
-                </p>
+            (() => {
+              const galleryImages = getGalleryImages(property);
+              const activeImageIndex = getActiveCardImageIndex(property._id, galleryImages.length);
+              const activeImage = galleryImages[activeImageIndex] || '/default-image.jpg';
+              const isMultiImage = galleryImages.length > 1;
 
-                <div className="property-actions">
-                  <button className="btn-edit" onClick={() => handleEditClick(property)}>
-                    Edit
-                  </button>
-                  <button className="btn-delete" onClick={() => handleDelete(property._id)}>
-                    Delete
-                  </button>
-                  <button className="btn-view" onClick={() => setViewProperty(property)}>
-                    View Details
-                  </button>
+              return (
+                <div key={property._id} className="property-card">
+                  <div className="property-card-slider">
+                    <img
+                      src={activeImage}
+                      alt={`${property.title} photo ${activeImageIndex + 1}`}
+                      className="property-image"
+                    />
+                    {isMultiImage && (
+                      <>
+                        <button
+                          type="button"
+                          className="property-slide-btn prev"
+                          onClick={(event) => shiftCardImage(property._id, galleryImages.length, 'prev', event)}
+                          aria-label="Previous property photo"
+                        >
+                          <FaChevronLeft aria-hidden="true" />
+                        </button>
+                        <button
+                          type="button"
+                          className="property-slide-btn next"
+                          onClick={(event) => shiftCardImage(property._id, galleryImages.length, 'next', event)}
+                          aria-label="Next property photo"
+                        >
+                          <FaChevronRight aria-hidden="true" />
+                        </button>
+                        <div className="property-slide-dots" aria-label="Property photo position">
+                          {galleryImages.map((imageUrl, index) => (
+                            <button
+                              type="button"
+                              key={`${property._id}-${imageUrl}-${index}`}
+                              className={index === activeImageIndex ? 'active' : ''}
+                              onClick={(event) => setCardImageIndex(property._id, index, event)}
+                              aria-label={`Show photo ${index + 1}`}
+                            />
+                          ))}
+                        </div>
+                        <span className="property-card-count">
+                          {activeImageIndex + 1} / {galleryImages.length}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <div className="property-details">
+                    <h3>{property.title}</h3>
+                    <p>Location: {property.location}</p>
+                    <p>
+                      Rent: <span className="rent-amount">Rs. {property.price}</span>
+                    </p>
+                    <p>Parking: {property.parkingAvailable ? 'Available' : 'Not available'}</p>
+                    <p>Pet Friendly: {property.petFriendly ? 'Yes' : 'No'}</p>
+                    <p className="status available">Approval: {property.approvalStatus}</p>
+                    <p
+                      className={`status ${
+                        property.bookingStatus === 'Approved' ? 'approved' : 'available'
+                      }`}
+                    >
+                      Booking: {property.bookingStatus === 'Approved' ? 'booked' : 'Available'}
+                    </p>
+
+                    <div className="property-actions">
+                      <button className="btn-edit" onClick={() => handleEditClick(property)}>
+                        Edit
+                      </button>
+                      <button className="btn-delete" onClick={() => handleDelete(property._id)}>
+                        Delete
+                      </button>
+                      <button className="btn-view" onClick={() => setViewProperty(property)}>
+                        View Details
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()
           ))}
         </div>
       )}
@@ -524,7 +613,7 @@ export default function MyProperties() {
             <div className="edit-map-picker-header">
               <div>
                 <h3>Update Exact Location</h3>
-                <p>Move the map and keep the pin on the property. This exact point unlocks for renters after visit access.</p>
+                <p>Move the map and keep the pin on the property. This exact point unlocks for renters after their visit access is approved.</p>
               </div>
               <button type="button" onClick={() => setMapOpen(false)} aria-label="Close map picker">
                 <FaTimes aria-hidden="true" />
@@ -618,18 +707,73 @@ export default function MyProperties() {
               ✕
             </button>
             <h2>Property Details</h2>
-            <img
-              src={viewProperty.image || viewProperty.images?.[0] || '/default-image.jpg'}
-              alt={viewProperty.title}
-              className="modal-image"
-            />
-            {Array.isArray(viewProperty.images) && viewProperty.images.length > 1 && (
-              <div className="modal-image-thumbs">
-                {viewProperty.images.slice(1, 5).map((imageUrl, index) => (
-                  <img key={`${imageUrl}-${index}`} src={imageUrl} alt={`${viewProperty.title} ${index + 2}`} />
-                ))}
-              </div>
-            )}
+            {(() => {
+              const galleryImages = getGalleryImages(viewProperty);
+              const activeImageIndex = Math.min(detailImageIndex, galleryImages.length - 1);
+              const activeImage = galleryImages[activeImageIndex] || '/default-image.jpg';
+              const isMultiImage = galleryImages.length > 1;
+
+              return (
+                <>
+                  <div className="modal-image-slider">
+                    <img
+                      src={activeImage}
+                      alt={`${viewProperty.title} photo ${activeImageIndex + 1}`}
+                      className="modal-image"
+                    />
+                    {isMultiImage && (
+                      <>
+                        <button
+                          type="button"
+                          className="property-slide-btn prev"
+                          onClick={() => shiftDetailImage('prev')}
+                          aria-label="Previous property photo"
+                        >
+                          <FaChevronLeft aria-hidden="true" />
+                        </button>
+                        <button
+                          type="button"
+                          className="property-slide-btn next"
+                          onClick={() => shiftDetailImage('next')}
+                          aria-label="Next property photo"
+                        >
+                          <FaChevronRight aria-hidden="true" />
+                        </button>
+                        <div className="property-slide-dots" aria-label="Property photo position">
+                          {galleryImages.map((imageUrl, index) => (
+                            <button
+                              type="button"
+                              key={`${viewProperty._id}-${imageUrl}-${index}`}
+                              className={index === activeImageIndex ? 'active' : ''}
+                              onClick={() => setDetailImageIndex(index)}
+                              aria-label={`Show photo ${index + 1}`}
+                            />
+                          ))}
+                        </div>
+                        <span className="property-card-count modal-card-count">
+                          {activeImageIndex + 1} / {galleryImages.length}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  {isMultiImage && (
+                    <div className="modal-image-thumbs">
+                      {galleryImages.map((imageUrl, index) => (
+                        <button
+                          type="button"
+                          key={`${imageUrl}-${index}`}
+                          className={`modal-thumb ${index === activeImageIndex ? 'active' : ''}`}
+                          onClick={() => setDetailImageIndex(index)}
+                          aria-label={`Show photo ${index + 1}`}
+                        >
+                          <img src={imageUrl} alt={`${viewProperty.title} ${index + 1}`} />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
             <p>
               <strong>Title:</strong> {viewProperty.title}
             </p>

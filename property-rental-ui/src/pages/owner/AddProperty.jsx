@@ -142,7 +142,6 @@ export default function AddProperty() {
     setForm((prev) => ({
       ...prev,
       locationCoordinates: normalized,
-      location: prev.location || formatCoordinates(normalized),
     }));
   };
 
@@ -340,7 +339,7 @@ export default function AddProperty() {
             <span>01</span>
             <div>
               <h3>Listing Details</h3>
-              <p>Exact location stays private until a renter has paid and booked a visit.</p>
+              <p>Exact location stays private until a renter has an approved visit pass for this property or schedules a visit.</p>
             </div>
           </div>
 
@@ -587,7 +586,7 @@ export default function AddProperty() {
             <div className="map-picker-header">
               <div>
                 <h3>Select Exact Location</h3>
-                <p>Move the map with your finger and keep the pin on the property. Renters only see this after visit access.</p>
+                <p>Move the map with your finger and keep the pin on the property. Renters only see this after their visit access is unlocked.</p>
               </div>
               <button type="button" onClick={() => setMapOpen(false)} aria-label="Close map picker">
                 <FaTimes aria-hidden="true" />

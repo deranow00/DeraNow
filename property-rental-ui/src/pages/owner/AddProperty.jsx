@@ -261,7 +261,7 @@ export default function AddProperty() {
     setError('');
     setSuccess('');
 
-    if (!form.title || !form.location || !form.approximateLocation || !form.price || !form.bedrooms || !form.bathrooms || !form.type) {
+    if (!form.title || !form.location || !form.approximateLocation || !form.locationCoordinates || !form.price || !form.bedrooms || !form.bathrooms || !form.type) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -339,7 +339,7 @@ export default function AddProperty() {
             <span>01</span>
             <div>
               <h3>Listing Details</h3>
-              <p>Exact location stays private until a renter has an approved visit pass for this property or schedules a visit.</p>
+              <p>Renters only see the public area first. The exact map location unlocks only after they book a visit for this property.</p>
             </div>
           </div>
 
@@ -355,7 +355,7 @@ export default function AddProperty() {
             </label>
 
             <label className="form-field span-2">
-              <span>Exact Location *</span>
+              <span>Exact Address / Landmark *</span>
               <div className="location-input-row">
                 <input
                   type="text"
@@ -365,12 +365,12 @@ export default function AddProperty() {
                 />
                 <button type="button" onClick={() => setMapOpen(true)}>
                   <FaMapMarkerAlt aria-hidden="true" />
-                  Pick on Map
+                  Pick Precise Map Point
                 </button>
               </div>
               {form.locationCoordinates && (
                 <small className="location-coordinate-note">
-                  Selected coordinates: {formatCoordinates(form.locationCoordinates)}
+                  Precise map point: {formatCoordinates(form.locationCoordinates)}
                 </small>
               )}
             </label>
@@ -379,7 +379,7 @@ export default function AddProperty() {
               <span>Approximate Public Location *</span>
               <input
                 type="text"
-                placeholder="e.g. Balkumari, Lalitpur"
+                placeholder="e.g. Hetauda-6, Chaughada"
                 value={form.approximateLocation}
                 onChange={(e) => updateField('approximateLocation', e.target.value)}
               />
@@ -586,7 +586,7 @@ export default function AddProperty() {
             <div className="map-picker-header">
               <div>
                 <h3>Select Exact Location</h3>
-                <p>Move the map with your finger and keep the pin on the property. Renters only see this after their visit access is unlocked.</p>
+                <p>Move the map with your finger and keep the pin on the exact property point. Renters only see this after they book a visit for this property.</p>
               </div>
               <button type="button" onClick={() => setMapOpen(false)} aria-label="Close map picker">
                 <FaTimes aria-hidden="true" />

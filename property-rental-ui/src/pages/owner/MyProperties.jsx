@@ -63,6 +63,7 @@ export default function MyProperties() {
   const [formData, setFormData] = useState({
     title: '',
     location: '',
+    approximateLocation: '',
     price: '',
     bedrooms: '',
     bathrooms: '',
@@ -118,6 +119,7 @@ export default function MyProperties() {
     setFormData({
       title: property.title || '',
       location: property.location || '',
+      approximateLocation: property.approximateLocation || '',
       price: property.price || '',
       bedrooms: property.bedrooms || '',
       bathrooms: property.bathrooms || '',
@@ -291,6 +293,8 @@ export default function MyProperties() {
     if (
       !formData.title ||
       !formData.location ||
+      !formData.approximateLocation ||
+      !formData.locationCoordinates ||
       !formData.price ||
       !formData.bedrooms ||
       !formData.bathrooms ||
@@ -479,19 +483,28 @@ export default function MyProperties() {
               <input name="title" value={formData.title} onChange={handleInputChange} />
             </div>
             <div className="form-group">
-              <label>Location*</label>
+              <label>Exact Address / Landmark*</label>
               <div className="location-edit-row">
                 <input name="location" value={formData.location} onChange={handleInputChange} />
                 <button type="button" onClick={() => setMapOpen(true)}>
                   <FaMapMarkerAlt aria-hidden="true" />
-                  Pick on Map
+                  Pick Precise Map Point
                 </button>
               </div>
               {formData.locationCoordinates && (
                 <small className="location-coordinate-note">
-                  Selected coordinates: {formatCoordinates(formData.locationCoordinates)}
+                  Precise map point: {formatCoordinates(formData.locationCoordinates)}
                 </small>
               )}
+            </div>
+            <div className="form-group">
+              <label>Approximate Public Location*</label>
+              <input
+                name="approximateLocation"
+                value={formData.approximateLocation}
+                onChange={handleInputChange}
+                placeholder="e.g. Hetauda-6, Chaughada"
+              />
             </div>
             <div className="form-group">
               <label>Price (Rs)*</label>
@@ -613,7 +626,7 @@ export default function MyProperties() {
             <div className="edit-map-picker-header">
               <div>
                 <h3>Update Exact Location</h3>
-                <p>Move the map and keep the pin on the property. This exact point unlocks for renters after their visit access is approved.</p>
+                <p>Move the map and keep the pin on the exact property point. Renters only see this after they book a visit for this property.</p>
               </div>
               <button type="button" onClick={() => setMapOpen(false)} aria-label="Close map picker">
                 <FaTimes aria-hidden="true" />

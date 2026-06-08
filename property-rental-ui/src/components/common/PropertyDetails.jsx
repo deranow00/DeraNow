@@ -141,7 +141,7 @@ export default function PropertyDetails({ id }) {
   const exactCoordinates = !property.exactLocationLocked ? getValidCoordinates(property.locationCoordinates) : null;
   const mapQuery = exactCoordinates
     ? `${exactCoordinates.lat.toFixed(6)},${exactCoordinates.lng.toFixed(6)}`
-    : property.location || property.approximateLocation || 'Nepal';
+    : '';
   const nearbyHints = [
     'Check walking distance to bus stops, markets, pharmacies, and your daily route before final booking.',
     'During your visit, verify water access, noise level, sunlight, and mobile network quality.',
@@ -245,20 +245,29 @@ export default function PropertyDetails({ id }) {
             <dt>Visit pass</dt><dd>Rs. {visitPassAmount.toLocaleString()} before scheduling visits</dd>
             <dt>Booking charge</dt><dd>Rs. {bookingCharge.toLocaleString()} after visit completion</dd>
             <dt>Monthly rent</dt><dd>Rs. {Number(property.price || 0).toLocaleString()} per month</dd>
-            <dt>Location access</dt><dd>{property.exactLocationLocked ? 'Exact address unlocks after your visit pass is approved for this property or after you schedule a visit.' : 'Exact address available'}</dd>
+            <dt>Location access</dt><dd>{property.exactLocationLocked ? 'Exact map location unlocks after you book a visit for this property.' : 'Exact address and map available'}</dd>
           </dl>
         </article>
       </section>
 
       <section className="property-detail-section">
-        <h3>Nearby and map preview</h3>
-        <div className="property-map-preview">
-          <iframe
-            title={`Map preview for ${property.location || property.approximateLocation || 'property'}`}
-            src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=${exactCoordinates ? '17' : '14'}&ie=UTF8&iwloc=&output=embed`}
-            loading="lazy"
-          />
-        </div>
+        <h3>{property.exactLocationLocked ? 'Approximate area' : 'Exact map location'}</h3>
+        {property.exactLocationLocked ? (
+          <div className="property-map-preview property-map-preview-locked">
+            <div>
+              <strong>{property.approximateLocation || property.location || 'Approximate area available'}</strong>
+              <p>Book a visit for this property to unlock the exact map location and address.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="property-map-preview">
+            <iframe
+              title={`Map preview for ${property.location || property.approximateLocation || 'property'}`}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=17&ie=UTF8&iwloc=&output=embed`}
+              loading="lazy"
+            />
+          </div>
+        )}
         <ul className="property-nearby-list">
           {nearbyHints.map((hint) => <li key={hint}>{hint}</li>)}
         </ul>

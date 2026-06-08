@@ -1,7 +1,6 @@
 import Property from '../models/Property.js';
 import Booking from '../models/Booking.js';
 import PropertyVisit from '../models/PropertyVisit.js';
-import VisitPass from '../models/VisitPass.js';
 import AdminSetting from '../models/AdminSetting.js';
 import User from '../models/User.js';
 import { sendNotification } from '../socket.js';
@@ -131,19 +130,12 @@ const canViewExactLocation = async (property, user) => {
   if (String(property.ownerId?._id || property.ownerId) === String(user._id)) return true;
   if (user.role !== 'renter') return false;
 
-  const [visit, activePass] = await Promise.all([
-    PropertyVisit.exists({
-      property: property._id,
-      renter: user._id,
-      status: { $ne: 'cancelled' },
-    }),
-    VisitPass.exists({
-      renter: user._id,
-      requestedForProperty: property._id,
-      status: 'active',
-    }),
-  ]);
-  return Boolean(visit || activePass);
+  const visit = await PropertyVisit.exists({
+    property: property._id,
+    renter: user._id,
+    status: { $ne: 'cancelled' },
+  });
+  return Boolean(visit);
 };
 
 const applyLocationPrivacy = async (input, user) => {
@@ -224,7 +216,7 @@ export const addProperty = async (req, res) => {
     } = req.body;
     const ownerId = req.user._id;
 
-    if (!title || !location || !price || !type || bedrooms == null || bathrooms == null) {
+    if (!title || !location || !approximateLocation || !price || !type || bedrooms == null || bathrooms == null) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -241,12 +233,16 @@ export const addProperty = async (req, res) => {
           }
         : undefined;
 
+    if (!coordinates) {
+      return res.status(400).json({ error: 'Precise map location is required' });
+    }
+
     const newProperty = new Property({
       title,
       description,
       location,
       approximateLocation,
-      ...(coordinates ? { locationCoordinates: coordinates } : {}),
+      locationCoordinates: coordinates,
       price,
       type,
       bedrooms,
@@ -302,6 +298,9 @@ export const updateProperty = async (req, res) => {
     }
 
     const update = { ...req.body };
+    if (update.location != null) {
+      update.location = String(update.location).trim();
+    }
     if (update.approximateLocation != null) {
       update.approximateLocation = String(update.approximateLocation).trim();
     }
@@ -313,6 +312,9 @@ export const updateProperty = async (req, res) => {
       } else {
         delete update.locationCoordinates;
       }
+    }
+    if (Object.prototype.hasOwnProperty.call(update, 'locationCoordinates') && !update.locationCoordinates) {
+      return res.status(400).json({ error: 'Precise map location is required' });
     }
     if (update.parkingType != null) {
       update.parkingType = ['none', 'bike', 'car', 'both'].includes(update.parkingType) ? update.parkingType : 'none';

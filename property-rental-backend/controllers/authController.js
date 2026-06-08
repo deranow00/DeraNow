@@ -440,6 +440,8 @@ const sendResetPasswordEmail = async (toEmail, resetUrl) => {
   });
 };
 
+const PUBLIC_WEB_URL = 'https://deranow.com';
+
 const normalizeBaseUrl = (value) => {
   const raw = String(value || '').trim();
   if (!raw || raw === 'null' || raw === 'undefined') return '';
@@ -451,13 +453,20 @@ const normalizeBaseUrl = (value) => {
 };
 
 const getFrontendBaseUrl = (req) => {
+  const configuredBase = normalizeBaseUrl(
+    process.env.PUBLIC_FRONTEND_URL || process.env.FRONTEND_URL || process.env.CLIENT_URL
+  );
+
+  if (process.env.NODE_ENV === 'production') {
+    return configuredBase || PUBLIC_WEB_URL;
+  }
+
   const origin = normalizeBaseUrl(req?.headers?.origin);
   if (origin) {
     return origin;
   }
 
-  const explicitBase = normalizeBaseUrl(process.env.FRONTEND_URL || process.env.CLIENT_URL);
-  if (explicitBase) return explicitBase.replace(/\/$/, '');
+  if (configuredBase) return configuredBase;
 
   const referer = String(req?.headers?.referer || '').trim();
   if (referer) {
@@ -468,7 +477,7 @@ const getFrontendBaseUrl = (req) => {
     }
   }
 
-  return 'https://deranow.com';
+  return PUBLIC_WEB_URL;
 };
 
 export const forgotPassword = async (req, res) => {

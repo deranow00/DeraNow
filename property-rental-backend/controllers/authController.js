@@ -440,17 +440,23 @@ const sendResetPasswordEmail = async (toEmail, resetUrl) => {
   });
 };
 
+const normalizeBaseUrl = (value) => {
+  const raw = String(value || '').trim();
+  if (!raw || raw === 'null' || raw === 'undefined') return '';
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return raw.replace(/\/$/, '');
+  }
+};
+
 const getFrontendBaseUrl = (req) => {
-  const origin = String(req?.headers?.origin || '').trim();
+  const origin = normalizeBaseUrl(req?.headers?.origin);
   if (origin) {
-    try {
-      return new URL(origin).origin;
-    } catch {
-      // Fall through to referer parsing or localhost fallback.
-    }
+    return origin;
   }
 
-  const explicitBase = process.env.FRONTEND_URL || process.env.CLIENT_URL;
+  const explicitBase = normalizeBaseUrl(process.env.FRONTEND_URL || process.env.CLIENT_URL);
   if (explicitBase) return explicitBase.replace(/\/$/, '');
 
   const referer = String(req?.headers?.referer || '').trim();
@@ -462,7 +468,7 @@ const getFrontendBaseUrl = (req) => {
     }
   }
 
-  return 'http://localhost:5173';
+  return 'https://deranow.com';
 };
 
 export const forgotPassword = async (req, res) => {

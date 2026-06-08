@@ -440,12 +440,37 @@ const sendResetPasswordEmail = async (toEmail, resetUrl) => {
   });
 };
 
+const getFrontendBaseUrl = (req) => {
+  const origin = String(req?.headers?.origin || '').trim();
+  if (origin) {
+    try {
+      return new URL(origin).origin;
+    } catch {
+      // Fall through to referer parsing or localhost fallback.
+    }
+  }
+
+  const explicitBase = process.env.FRONTEND_URL || process.env.CLIENT_URL;
+  if (explicitBase) return explicitBase.replace(/\/$/, '');
+
+  const referer = String(req?.headers?.referer || '').trim();
+  if (referer) {
+    try {
+      return new URL(referer).origin;
+    } catch {
+      // Ignore malformed referer headers.
+    }
+  }
+
+  return 'http://localhost:5173';
+};
+
 export const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ error: 'Email is required' });
+    const normalizedEmail = String(req.body?.email || '').trim().toLowerCase();
+    if (!normalizedEmail) return res.status(400).json({ error: 'Email is required' });
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.json({
         message: 'If an account with that email exists, a reset link has been sent.',
@@ -460,9 +485,7 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpiresAt = resetPasswordExpiresAt;
     await user.save();
 
-    const baseUrl =
-      process.env.FRONTEND_URL || process.env.CLIENT_URL || 'http://localhost:5173';
-    const resetUrl = `${baseUrl.replace(/\/$/, '')}/reset-password/${resetToken}`;
+    const resetUrl = `${getFrontendBaseUrl(req)}/reset-password/${resetToken}`;
 
     let emailSent = false;
     try {
@@ -474,7 +497,7 @@ export const forgotPassword = async (req, res) => {
 
     return res.json({
       message: 'If an account with that email exists, a reset link has been sent.',
-      ...(emailSent ? {} : { resetUrl }),
+      ...(emailSent || process.env.NODE_ENV === 'production' ? {} : { resetUrl }),
     });
   } catch (err) {
     console.error('forgotPassword error:', err);
@@ -488,8 +511,8 @@ export const resetPassword = async (req, res) => {
     const { password } = req.body;
 
     if (!token) return res.status(400).json({ error: 'Reset token is required' });
-    if (!password || password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    if (!password || password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
     }
 
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');

@@ -1,0 +1,13 @@
+CFBundleGetInfoString = "Android Studio 2025.3, 빌드 AI-253.32098.37.__BUILD_NUMBER__. Copyright JetBrains s.r.o., (c) 2000-2026";
+
+NSCameraUsageDescription = "Android Studio의 애플리케이션이 기기의 카메라에 대한 액세스를 요청합니다.";
+NSMicrophoneUsageDescription = "Android Studio의 애플리케이션이 기기의 마이크에 대한 액세스를 요청합니다.";
+NSLocationUsageDescription = "Android Studio의 애플리케이션이 사용자의 위치 정보에 대한 액세스를 요청합니다.";
+NSDesktopFolderUsageDescription = "Android Studio의 애플리케이션이 기기의 데스크톱 폴더에 대한 액세스를 요청합니다.";
+NSDocumentsFolderUsageDescription = "Android Studio의 애플리케이션이 사용자의 문서 폴더에 대한 액세스를 요청합니다.";
+NSDownloadsFolderUsageDescription = "Android Studio의 애플리케이션이 사용자의 다운로드 폴더에 대한 액세스를 요청합니다.";
+NSNetworkVolumesUsageDescription = "Android Studio의 애플리케이션이 네트워크 볼륨상의 파일에 대한 액세스를 요청합니다.";
+NSRemovableVolumesUsageDescription = "Android Studio의 애플리케이션이 이동식 볼륨상의 파일에 대한 액세스를 요청합니다.";
+NSBluetoothAlwaysUsageDescription = "Android Studio의 애플리케이션이 블루투스에 대한 액세스를 요청합니다.";
+NSAppleEventsUsageDescription = "Android Studio의 애플리케이션이 Apple 이벤트를 전송할 권한을 요청합니다.";
+NSLocalNetworkUsageDescription = "SSH 및 데이터베이스 연결과 같은 Android Studio 기능을 사용하려면 로컬 네트워크 액세스 및 브로드캐스트 요청 전송 권한이 필요합니다.";

@@ -1,0 +1,34 @@
+{
+  "name": "Android Studio",
+  "version": "2025.3",
+  "buildNumber": "AI-253.32098.37",
+  "productCode": "AI",
+  "envVarBaseName": "ANDROID_STUDIO",
+  "dataDirectoryName": "AndroidStudio2025.3.4",
+  "svgIconPath": "bin/studio.svg",
+  "productVendor": "JetBrains",
+  "launch": [
+    {
+      "os": "macOS",
+      "arch": "aarch64",
+      "launcherPath": "MacOS/studio",
+      "javaExecutablePath": "jbr/Contents/Home/bin/java",
+      "vmOptionsFilePath": "bin/studio.vmoptions",
+      "bootClassPathJarNames": [
+        "app.jar"
+      ],
+      "mainClass": "com.intellij.idea.Main"
+    },
+    {
+      "os": "macOS",
+      "arch": "amd64",
+      "launcherPath": "MacOS/studio",
+      "javaExecutablePath": "jbr/Contents/Home/bin/java",
+      "vmOptionsFilePath": "bin/studio.vmoptions",
+      "bootClassPathJarNames": [
+        "app.jar"
+      ],
+      "mainClass": "com.intellij.idea.Main"
+    }
+  ]
+}

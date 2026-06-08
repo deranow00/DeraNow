@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import './MyProperties.css';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
+import { compressImageFiles } from '../../utils/imageCompression';
 import 'leaflet/dist/leaflet.css';
 
 const PROPERTY_TYPES = ['Apartment', 'House', 'Condo'];
@@ -206,7 +207,14 @@ export default function MyProperties() {
     }
 
     const formPayload = new FormData();
-    editImageFiles.slice(0, 5).forEach((file) => {
+    const compressedFiles = await compressImageFiles(editImageFiles.slice(0, 5), {
+      maxWidth: 1600,
+      maxHeight: 1600,
+      quality: 0.82,
+      mimeType: 'image/webp',
+    });
+
+    compressedFiles.forEach((file) => {
       formPayload.append('images', file);
     });
 

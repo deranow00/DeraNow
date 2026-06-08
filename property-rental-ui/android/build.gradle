@@ -29,10 +29,12 @@ task clean(type: Delete) {
 }
 
 
+
 subprojects {
     project.configurations.all {
         resolutionStrategy.eachDependency { details ->
-            if (details.requested.group == 'org.jetbrains.kotlin') {
+            if (details.requested.group == 'org.jetbrains.kotlin' &&
+                    details.requested.name.contains('kotlin-stdlib')) {
                 details.useVersion "1.8.22"
             }
         }

@@ -23,7 +23,7 @@ export default function ResetPassword() {
       setError(t('auth.missingResetToken'));
       return;
     }
-    if (!password || password.length < 6) {
+    if (!password || password.length < 8) {
       setError(t('auth.passwordMinLength'));
       return;
     }
@@ -61,6 +61,7 @@ export default function ResetPassword() {
           <input
             type="password"
             placeholder="********"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -69,6 +70,7 @@ export default function ResetPassword() {
           <input
             type="password"
             placeholder="********"
+            autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />

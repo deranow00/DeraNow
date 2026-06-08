@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { useSocket } from './SocketContext';
@@ -13,9 +13,32 @@ const canUseBrowserNotifications = () =>
 const canUseNativePush = () =>
   typeof window !== 'undefined' && Capacitor.isNativePlatform();
 
+const isAndroidPushConfigured = () => {
+  if (!canUseNativePush()) return false;
+  if (Capacitor.getPlatform() !== 'android') return true;
+  return typeof window !== 'undefined' && window.__DERANOW_ANDROID_PUSH_ENABLED__ === true;
+};
+
+const getNativePushErrorMessage = (err) => {
+  if (!err) return '';
+  if (typeof err === 'string') return err;
+  return err.message || err.toString?.() || 'Unknown push error';
+};
+
+const isMissingFirebaseConfigError = (err) => {
+  const message = getNativePushErrorMessage(err).toLowerCase();
+  return (
+    message.includes('firebaseapp is not initialized') ||
+    message.includes('default firebaseapp is not initialized') ||
+    message.includes('google-services.json') ||
+    message.includes('firebase')
+  );
+};
+
 export const NotificationProvider = ({ children }) => {
   const { user, token } = useContext(AuthContext);
   const socket = useSocket();
+  const nativePushDisabledRef = useRef(false);
   const [notifications, setNotifications] = useState([]);
   const [phoneNotificationPermission, setPhoneNotificationPermission] = useState(() =>
     canUseBrowserNotifications() ? Notification.permission : 'unsupported'
@@ -23,6 +46,7 @@ export const NotificationProvider = ({ children }) => {
   const [nativePushPermission, setNativePushPermission] = useState(() =>
     canUseNativePush() ? 'prompt' : 'unsupported'
   );
+  const [nativePushMessage, setNativePushMessage] = useState('');
 
   const savePushToken = async (pushToken) => {
     if (!token || !pushToken) return;
@@ -45,6 +69,20 @@ export const NotificationProvider = ({ children }) => {
       return 'unsupported';
     }
 
+    if (!isAndroidPushConfigured()) {
+      const message =
+        'Android push notifications are not configured in this build yet. Add the Firebase Android config file (google-services.json) for com.deranow.app.';
+      nativePushDisabledRef.current = true;
+      setNativePushPermission('unavailable');
+      setNativePushMessage(message);
+      return 'unavailable';
+    }
+
+    if (nativePushDisabledRef.current) {
+      setNativePushPermission('unavailable');
+      return 'unavailable';
+    }
+
     const permission = await PushNotifications.requestPermissions();
     const status = permission.receive || 'denied';
     setNativePushPermission(status);
@@ -61,8 +99,28 @@ export const NotificationProvider = ({ children }) => {
       }).catch(() => {});
     }
 
-    await PushNotifications.register();
-    return status;
+    try {
+      await PushNotifications.register();
+      setNativePushMessage('');
+      nativePushDisabledRef.current = false;
+      return status;
+    } catch (err) {
+      if (isMissingFirebaseConfigError(err)) {
+        const message =
+          'Android push notifications are not configured in this build yet. Add the Firebase Android config file (google-services.json) for com.deranow.app.';
+        console.error(message, err);
+        nativePushDisabledRef.current = true;
+        setNativePushPermission('unavailable');
+        setNativePushMessage(message);
+        return 'unavailable';
+      }
+
+      const message = getNativePushErrorMessage(err) || 'Push registration failed.';
+      console.error('Push registration failed:', err);
+      setNativePushPermission('denied');
+      setNativePushMessage(message);
+      return 'denied';
+    }
   };
 
   const requestPhoneNotifications = async () => {
@@ -85,7 +143,25 @@ export const NotificationProvider = ({ children }) => {
   }, [user?._id]);
 
   useEffect(() => {
+    if (user && token) return;
+    nativePushDisabledRef.current = false;
+    setNativePushMessage('');
+    if (canUseNativePush()) {
+      setNativePushPermission('prompt');
+    }
+  }, [user, token]);
+
+  useEffect(() => {
     if (!user || !token || !canUseNativePush()) return undefined;
+
+    if (!isAndroidPushConfigured()) {
+      nativePushDisabledRef.current = true;
+      setNativePushPermission('unavailable');
+      setNativePushMessage(
+        'Android push notifications are not configured in this build yet. Add the Firebase Android config file (google-services.json) for com.deranow.app.'
+      );
+      return undefined;
+    }
 
     let mounted = true;
     const listeners = [];
@@ -94,9 +170,12 @@ export const NotificationProvider = ({ children }) => {
       const currentPermission = await PushNotifications.checkPermissions();
       if (!mounted) return;
       setNativePushPermission(currentPermission.receive || 'prompt');
+      if (nativePushDisabledRef.current) return;
 
       listeners.push(
         await PushNotifications.addListener('registration', ({ value }) => {
+          nativePushDisabledRef.current = false;
+          setNativePushMessage('');
           savePushToken(value).catch((err) => {
             console.error('Failed to save push token:', err);
           });
@@ -143,7 +222,27 @@ export const NotificationProvider = ({ children }) => {
             sound: 'default',
           }).catch(() => {});
         }
-        await PushNotifications.register();
+        try {
+          await PushNotifications.register();
+          setNativePushMessage('');
+        } catch (err) {
+          if (isMissingFirebaseConfigError(err)) {
+            nativePushDisabledRef.current = true;
+            setNativePushPermission('unavailable');
+            setNativePushMessage(
+              'Android push notifications are not configured in this build yet. Add the Firebase Android config file (google-services.json) for com.deranow.app.'
+            );
+            console.error(
+              'Android push notifications are not configured in this build yet. Add the Firebase Android config file (google-services.json) for com.deranow.app.',
+              err
+            );
+            return;
+          }
+
+          console.error('Push registration failed:', err);
+          setNativePushPermission('denied');
+          setNativePushMessage(getNativePushErrorMessage(err) || 'Push registration failed.');
+        }
       }
     };
 
@@ -249,6 +348,7 @@ export const NotificationProvider = ({ children }) => {
         markAsRead,
         phoneNotificationPermission,
         nativePushPermission,
+        nativePushMessage,
         requestPhoneNotifications,
       }}
     >

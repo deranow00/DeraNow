@@ -30,7 +30,12 @@ export default function BookingPopup({ property, onClose }) {
   const hasPendingPass = latestPass?.status === 'pending_payment';
 
   const loadVisitState = async () => {
-    if (!token) return;
+    if (!token) {
+      setPassState(null);
+      setVisits([]);
+      setLoadingPass(false);
+      return;
+    }
     setLoadingPass(true);
     try {
       const [passRes, visitsRes] = await Promise.all([

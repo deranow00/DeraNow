@@ -12,7 +12,12 @@ export default function OwnerVisits() {
   const [updatingId, setUpdatingId] = useState('');
 
   const loadVisits = async () => {
-    if (!token) return;
+    if (!token) {
+      setVisits([]);
+      setLoading(false);
+      setError('Please log in to view property visits.');
+      return;
+    }
     setLoading(true);
     setError('');
     try {

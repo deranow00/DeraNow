@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // ✅ Added Link
+import { useNavigate, Link } from 'react-router-dom';
 import { image } from '../../assets/assets';
 import { AuthContext } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -68,6 +68,11 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <div className="login-password-actions">
+              <Link to="/forgot-password" className="forgot-password-link">
+                {t('auth.forgotPassword')}
+              </Link>
+            </div>
 
             <label>{t('auth.loginAs')}</label>
             <select value={role} onChange={(e) => setRole(e.target.value)}>
@@ -82,7 +87,6 @@ export default function Login() {
             </button>
           </form>
           <div className="login-footer">
-            <Link to="/forgot-password">{t('auth.forgotPassword')}</Link>
             <p>
               {t('auth.noAccount')} <Link to="/register">{t('auth.signUp')}</Link>
             </p>

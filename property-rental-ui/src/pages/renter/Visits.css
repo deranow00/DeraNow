@@ -70,6 +70,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.visits-list-head p {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
 }
 
 .visits-list-head span {
@@ -81,6 +87,33 @@
   background: #eef2ff;
   color: #3730a3;
   font-weight: 800;
+}
+
+.visit-tab-bar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-muted);
+  width: fit-content;
+}
+
+.visit-tab-bar button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.visit-tab-bar button.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
 }
 
 .visit-card {
@@ -98,6 +131,10 @@
   height: 84px;
   object-fit: cover;
   border-radius: 12px;
+}
+
+.visit-card.past {
+  background: #f8fafc;
 }
 
 .visit-card h3,
@@ -122,6 +159,57 @@
   border: 1px solid var(--border);
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+.visit-card-topline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.visit-state-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: #ecfeff;
+  color: #0f766e;
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.visit-state-pill.completed,
+.visit-state-pill.booking-pending {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.visit-state-pill.cancelled {
+  background: #fef2f2;
+  color: #b42318;
+}
+
+.visit-state-pill.muted {
+  background: #f1f5f9;
+  color: var(--text-muted);
+}
+
+.visit-card-note {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 10px;
+}
+
+.visit-card-note strong {
+  color: var(--text);
+}
+
+.visit-card-note span {
+  color: var(--text-muted);
+  font-size: 0.92rem;
 }
 
 .visits-alert.error {
@@ -160,6 +248,11 @@
   color: #0f766e;
   font-weight: 800;
   align-self: center;
+}
+
+.visit-booking-link.muted {
+  color: var(--text-muted);
+  font-weight: 700;
 }
 
 .visit-confirm-overlay {
@@ -295,6 +388,20 @@
 
   .visit-pass-summary {
     display: grid;
+  }
+
+  .visits-list-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .visit-tab-bar {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .visit-tab-bar button {
+    flex: 1 1 0;
   }
 
   .visit-card img {

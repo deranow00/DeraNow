@@ -34,6 +34,7 @@ export default function Settings() {
   const {
     phoneNotificationPermission,
     nativePushPermission,
+    nativePushMessage,
     requestPhoneNotifications,
   } = useContext(NotificationContext);
   const { t, openLanguageChooser } = useLanguage();
@@ -42,6 +43,14 @@ export default function Settings() {
   const [appPrefs, setAppPrefs] = useState(DEFAULT_APP);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+
+  const getPhoneNotificationStatus = () => {
+    if (nativePushPermission === 'granted') return 'enabled';
+    if (nativePushPermission === 'denied') return 'denied';
+    if (nativePushPermission === 'unavailable') return 'not configured';
+    if (nativePushPermission === 'prompt') return 'tap to enable';
+    return phoneNotificationPermission;
+  };
 
   useEffect(() => {
     const fetchPrefs = async () => {
@@ -115,8 +124,9 @@ export default function Settings() {
             className="settings-language-trigger"
             onClick={requestPhoneNotifications}
           >
-            {t('settings.phoneNotifications')}: {nativePushPermission !== 'unsupported' ? nativePushPermission : phoneNotificationPermission}
+            {t('settings.phoneNotifications')}: {nativePushPermission !== 'unsupported' ? getPhoneNotificationStatus() : phoneNotificationPermission}
           </button>
+          {nativePushMessage && <p className="settings-message">{nativePushMessage}</p>}
           <label className="toggle">
             <input
               type="checkbox"

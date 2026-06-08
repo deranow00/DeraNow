@@ -12,6 +12,7 @@ import {
 import { AuthContext } from '../../../context/AuthContext';
 import { API_BASE_URL } from '../../../config/api';
 import { useSocket } from '../../../context/SocketContext';
+import { compressImageFiles } from '../../../utils/imageCompression';
 import './ChatWindow.css';
 
 const REACTION_OPTIONS = ['👍', '❤️', '😂', '😮', '🙏'];
@@ -150,7 +151,13 @@ export default function ChatWindow({ selectedUser, onBack }) {
       const formData = new FormData();
       formData.append('recipientId', selectedUser._id);
       formData.append('content', newMessage.trim());
-      selectedFiles.forEach((file) => formData.append('attachments', file));
+      const compressedFiles = await compressImageFiles(selectedFiles, {
+        maxWidth: 1800,
+        maxHeight: 1800,
+        quality: 0.82,
+        mimeType: 'image/webp',
+      });
+      compressedFiles.forEach((file) => formData.append('attachments', file));
 
       const res = await axios.post(`${API_BASE_URL}/api/messages`, formData, {
         headers: { Authorization: `Bearer ${token}` },

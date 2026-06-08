@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './Dashboard.css';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
+import { compressImageFiles } from '../../utils/imageCompression';
 import {
   PieChart,
   Pie,
@@ -69,7 +70,14 @@ export default function Dashboard() {
       setRequesting(true);
       setVerificationMessage('');
       const formData = new FormData();
-      verificationIdFiles.forEach((file) => {
+      const compressedFiles = await compressImageFiles(verificationIdFiles, {
+        maxWidth: 1800,
+        maxHeight: 1800,
+        quality: 0.8,
+        mimeType: 'image/webp',
+      });
+
+      compressedFiles.forEach((file) => {
         formData.append('idImages', file);
       });
       const res = await fetch(`${API_BASE_URL}/api/users/owner/verify-request`, {

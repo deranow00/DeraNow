@@ -18,6 +18,7 @@ export default function Visits() {
   const { token } = useContext(AuthContext);
   const [passInfo, setPassInfo] = useState(null);
   const [visits, setVisits] = useState([]);
+  const [activeTab, setActiveTab] = useState('pending');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -54,7 +55,13 @@ export default function Visits() {
   };
 
   const loadVisits = async () => {
-    if (!token) return;
+    if (!token) {
+      setPassInfo(null);
+      setVisits([]);
+      setLoading(false);
+      setError('Please log in to manage property visits.');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -86,9 +93,141 @@ export default function Visits() {
   const latestPass = passInfo?.latestPass;
   const activePass = passInfo?.activePass;
   const today = new Date().toISOString().split('T')[0];
+  const isVisitCompleted = (visit) =>
+    Boolean(visit?.renterMarkedDoneAt && visit?.ownerMarkedDoneAt) ||
+    visit?.status === 'completed' ||
+    visit?.status === 'booking_pending';
+  const isVisitPast = (visit) => isVisitCompleted(visit) || visit?.status === 'cancelled';
+  const pendingVisits = visits.filter((visit) => !isVisitPast(visit));
+  const pastVisits = visits.filter((visit) => isVisitPast(visit));
+  const visibleVisits = activeTab === 'past' ? pastVisits : pendingVisits;
 
   const getConfirmationAmount = (visit) =>
     BOOKING_CONFIRMATION_AMOUNTS[visit?.property?.type] || BOOKING_CONFIRMATION_AMOUNTS.Condo;
+
+  const getVisitStatusLabel = (visit) => {
+    if (!visit) return 'Visit';
+    if (visit.status === 'cancelled') return 'Cancelled';
+    if (visit.status === 'booking_pending') return 'Booking submitted';
+    if (isVisitCompleted(visit) && visit.booking) return 'Booking submitted';
+    if (isVisitCompleted(visit)) return 'Visit completed';
+    if (visit.renterMarkedDoneAt && !visit.ownerMarkedDoneAt) return 'Waiting for owner';
+    if (visit.ownerMarkedDoneAt && !visit.renterMarkedDoneAt) return 'Waiting for you';
+    return 'Upcoming visit';
+  };
+
+  const getVisitInsight = (visit) => {
+    if (!visit) {
+      return {
+        title: 'Visit',
+        actor: 'DeraNow',
+        next: 'No visit details available.',
+      };
+    }
+
+    if (visit.status === 'cancelled') {
+      return {
+        title: 'Cancelled visit',
+        actor: visit.cancelledByRole || 'User/admin',
+        next: visit.cancellationReason || 'This visit is no longer active.',
+      };
+    }
+
+    if (visit.status === 'booking_pending') {
+      return {
+        title: 'Booking submitted',
+        actor: 'DeraNow admin',
+        next: 'Waiting for admin to verify your booking payment.',
+      };
+    }
+
+    if (isVisitCompleted(visit) && !visit.booking) {
+      return {
+        title: 'Visit completed',
+        actor: 'You and the owner',
+        next: 'Confirm booking once you are ready to move forward.',
+      };
+    }
+
+    if (visit.renterMarkedDoneAt && !visit.ownerMarkedDoneAt) {
+      return {
+        title: 'Waiting for owner',
+        actor: 'Property owner',
+        next: 'The owner needs to mark the visit as done before booking can be confirmed.',
+      };
+    }
+
+    if (visit.ownerMarkedDoneAt && !visit.renterMarkedDoneAt) {
+      return {
+        title: 'Waiting for you',
+        actor: 'You',
+        next: 'Mark the visit as done after the visit ends.',
+      };
+    }
+
+    return {
+      title: 'Upcoming visit',
+      actor: 'You',
+      next: 'Use the visit card actions when you arrive.',
+    };
+  };
+
+  const renderVisitCard = (visit) => {
+    const bothMarkedDone = Boolean(visit.renterMarkedDoneAt && visit.ownerMarkedDoneAt);
+    const canConfirm = bothMarkedDone && visit.bookingConfirmationStatus === 'none' && !visit.booking;
+    const statusLabel = getVisitStatusLabel(visit);
+    const insight = getVisitInsight(visit);
+    const isPastVisit = isVisitPast(visit);
+
+    return (
+      <article className={`visit-card ${isPastVisit ? 'past' : ''}`} key={visit._id}>
+        <img src={visit.property?.image || '/default-property.jpg'} alt={visit.property?.title || 'Property'} />
+        <div>
+          <div className="visit-card-topline">
+            <span className={`visit-state-pill ${String(visit.status || '').toLowerCase()}`}>{statusLabel}</span>
+            {visit.bookingConfirmationStatus !== 'none' && (
+              <span className="visit-state-pill muted">
+                Booking fee {visit.bookingConfirmationStatus.replace(/_/g, ' ')}
+              </span>
+            )}
+          </div>
+          <h3>{visit.property?.title || 'Property'}</h3>
+          <p>{visit.property?.location || 'Location not provided'}</p>
+          <div className="visit-card-meta">
+            <span>{new Date(visit.visitDate).toLocaleDateString()}</span>
+            <span>Promo: {visit.promoCode}</span>
+            <span>Renter: {visit.renterMarkedDoneAt ? 'Done' : 'Pending'}</span>
+            <span>Owner: {visit.ownerMarkedDoneAt ? 'Done' : 'Pending'}</span>
+          </div>
+          <div className="visit-card-note">
+            <strong>{insight.title}</strong>
+            <span>{insight.next}</span>
+          </div>
+          <div className="visit-card-actions">
+            {!visit.renterMarkedDoneAt && !isPastVisit && (
+              <button disabled={updatingId === visit._id} onClick={() => markDone(visit._id)}>
+                {updatingId === visit._id ? 'Updating...' : 'Mark Visit Done'}
+              </button>
+            )}
+            {canConfirm && (
+              <button
+                onClick={() => {
+                  setConfirmVisit(visit);
+                  setConfirmForm(emptyConfirmForm);
+                }}
+              >
+                Confirm Booking
+              </button>
+            )}
+            {visit.booking && <span className="visit-booking-link">Booking submitted</span>}
+            {isPastVisit && !canConfirm && !visit.booking && (
+              <span className="visit-booking-link muted">No further action required</span>
+            )}
+          </div>
+        </div>
+      </article>
+    );
+  };
 
   const markDone = async (visitId) => {
     setUpdatingId(visitId);
@@ -177,60 +316,43 @@ export default function Visits() {
 
       <section className="visits-list">
         <div className="visits-list-head">
-          <h2>Scheduled visits</h2>
-          <span>{visits.length}</span>
+          <div>
+            <h2>{activeTab === 'past' ? 'Past visits' : 'Pending visits'}</h2>
+            <p>{activeTab === 'past' ? 'Visits that are done, booking submitted, or cancelled.' : 'Visits that still need attention.'}</p>
+          </div>
+          <span>{visibleVisits.length}</span>
         </div>
 
-        {visits.length === 0 ? (
+        <div className="visit-tab-bar">
+          <button
+            type="button"
+            className={activeTab === 'pending' ? 'active' : ''}
+            onClick={() => setActiveTab('pending')}
+          >
+            Pending visits ({pendingVisits.length})
+          </button>
+          <button
+            type="button"
+            className={activeTab === 'past' ? 'active' : ''}
+            onClick={() => setActiveTab('past')}
+          >
+            Past visits ({pastVisits.length})
+          </button>
+        </div>
+
+        {visibleVisits.length === 0 ? (
           <div className="visits-state-card">
-            <strong>No visits booked yet.</strong>
-            <p>Open a property, pay the Rs. 500 visit pass, and schedule your first visit.</p>
+            <strong>
+              {activeTab === 'past' ? 'No past visits yet.' : 'No pending visits right now.'}
+            </strong>
+            <p>
+              {activeTab === 'past'
+                ? 'Completed visits, booking submissions, and cancellations will appear here.'
+                : 'Open a property, pay the visit pass, and schedule a visit to get started.'}
+            </p>
           </div>
         ) : (
-          visits.map((visit) => {
-            const bothMarkedDone = Boolean(visit.renterMarkedDoneAt && visit.ownerMarkedDoneAt);
-            const canConfirm =
-              bothMarkedDone &&
-              visit.bookingConfirmationStatus === 'none' &&
-              !visit.booking;
-            return (
-            <article className="visit-card" key={visit._id}>
-              <img src={visit.property?.image || '/default-property.jpg'} alt={visit.property?.title || 'Property'} />
-              <div>
-                <h3>{visit.property?.title || 'Property'}</h3>
-                <p>{visit.property?.location || 'Location not provided'}</p>
-                <div className="visit-card-meta">
-                  <span>{new Date(visit.visitDate).toLocaleDateString()}</span>
-                  <span>{visit.status}</span>
-                  <span>{visit.promoCode}</span>
-                  <span>Renter: {visit.renterMarkedDoneAt ? 'Done' : 'Pending'}</span>
-                  <span>Owner: {visit.ownerMarkedDoneAt ? 'Done' : 'Pending'}</span>
-                  {visit.bookingConfirmationStatus !== 'none' && (
-                    <span>Booking fee: {visit.bookingConfirmationStatus}</span>
-                  )}
-                </div>
-                <div className="visit-card-actions">
-                  {!visit.renterMarkedDoneAt && (
-                    <button disabled={updatingId === visit._id} onClick={() => markDone(visit._id)}>
-                      {updatingId === visit._id ? 'Updating...' : 'Mark Visit Done'}
-                    </button>
-                  )}
-                  {canConfirm && (
-                    <button
-                      onClick={() => {
-                        setConfirmVisit(visit);
-                        setConfirmForm(emptyConfirmForm);
-                      }}
-                    >
-                      Confirm Booking
-                    </button>
-                  )}
-                  {visit.booking && <span className="visit-booking-link">Booking submitted</span>}
-                </div>
-              </div>
-            </article>
-          );
-          })
+          visibleVisits.map(renderVisitCard)
         )}
       </section>
 

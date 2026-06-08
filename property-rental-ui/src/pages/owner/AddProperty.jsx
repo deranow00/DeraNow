@@ -5,6 +5,7 @@ import { Geolocation } from '@capacitor/geolocation';
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
+import { compressImageFiles } from '../../utils/imageCompression';
 import 'leaflet/dist/leaflet.css';
 import './AddProperty.css';
 
@@ -225,7 +226,14 @@ export default function AddProperty() {
     }
 
     const formData = new FormData();
-    form.imageFiles.slice(0, 5).forEach((file) => {
+    const compressedFiles = await compressImageFiles(form.imageFiles.slice(0, 5), {
+      maxWidth: 1600,
+      maxHeight: 1600,
+      quality: 0.82,
+      mimeType: 'image/webp',
+    });
+
+    compressedFiles.forEach((file) => {
       formData.append('images', file);
     });
 

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
+import { compressImageFile, compressImageFiles } from '../../utils/imageCompression';
 import './Profile.css';
 
 const DOC_TYPE_OPTIONS = ['Driving License', 'Citizenship', 'NID'];
@@ -45,13 +46,26 @@ export default function Profile() {
     const formData = new FormData();
     const docTypes = [];
 
-    files.forEach((file) => {
+    const compressedFiles = await compressImageFiles(files, {
+      maxWidth: 1800,
+      maxHeight: 1800,
+      quality: 0.8,
+      mimeType: 'image/webp',
+    });
+
+    compressedFiles.forEach((file) => {
       formData.append('kycDocs', file);
       docTypes.push(docType);
     });
 
     if (passportPhotoFile) {
-      formData.append('kycDocs', passportPhotoFile);
+      const compressedPassportPhoto = await compressImageFile(passportPhotoFile, {
+        maxWidth: 1400,
+        maxHeight: 1400,
+        quality: 0.8,
+        mimeType: 'image/webp',
+      });
+      formData.append('kycDocs', compressedPassportPhoto);
       docTypes.push('Passport Size Photo');
     }
 

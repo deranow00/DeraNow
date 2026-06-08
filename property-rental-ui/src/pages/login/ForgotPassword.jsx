@@ -11,6 +11,7 @@ export default function ForgotPassword() {
   const [success, setSuccess] = useState('');
   const [resetUrl, setResetUrl] = useState('');
   const { t } = useLanguage();
+  const isDev = import.meta.env.DEV;
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +34,7 @@ export default function ForgotPassword() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to submit request');
       setSuccess(data.message || t('auth.resetEmailSent'));
-      if (data.resetUrl) setResetUrl(data.resetUrl);
+      if (isDev && data.resetUrl) setResetUrl(data.resetUrl);
     } catch (err) {
       setError(err.message || 'Failed to submit request');
     } finally {
@@ -46,6 +47,7 @@ export default function ForgotPassword() {
       <div className="forgot-card">
         <h2>{t('auth.forgotPasswordTitle')}</h2>
         <p className="forgot-subtitle">{t('auth.forgotPasswordSubtitle')}</p>
+        <p className="forgot-hint">{t('auth.resetEmailHint')}</p>
 
         <form onSubmit={onSubmit}>
           <label>{t('auth.email')}</label>
@@ -58,7 +60,7 @@ export default function ForgotPassword() {
 
           {error && <p className="forgot-error">{error}</p>}
           {success && <p className="forgot-success">{success}</p>}
-          {resetUrl && (
+          {isDev && resetUrl && (
             <p className="forgot-dev-link">
               {t('auth.devResetLink')}: <a href={resetUrl}>{resetUrl}</a>
             </p>

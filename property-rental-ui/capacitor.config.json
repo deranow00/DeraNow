@@ -1,5 +1,10 @@
 {
   "appId": "com.deranow.app",
   "appName": "DeraNow",
-  "webDir": "dist"
+  "webDir": "dist",
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
 }

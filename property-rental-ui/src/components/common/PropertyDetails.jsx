@@ -3,6 +3,7 @@ import { FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
+import { applySeo } from '../../utils/seo';
 import './PropertyDetails.css';
 
 const BOOKING_CHARGE_BY_TYPE = {
@@ -69,6 +70,24 @@ export default function PropertyDetails({ id }) {
   useEffect(() => {
     setActiveImageIndex(0);
   }, [propertyId]);
+
+  useEffect(() => {
+    if (!routeId || !property) return;
+
+    const typeLabel = displayPropertyType(property.type).toLowerCase();
+    const rent = Number(property.price || 0).toLocaleString();
+    const locationText = property.approximateLocation || property.location || 'Nepal';
+    const description = `${property.title} is a verified ${typeLabel} for rent in ${locationText} on DeraNow. Monthly rent is Rs. ${rent}. View photos, charges, availability, and visit booking details.`;
+
+    applySeo({
+      title: `${property.title} for Rent in ${locationText} | DeraNow`,
+      description,
+      path: `/property/${propertyId}`,
+      image: property.image || property.images?.[0] || '/property.png',
+      type: 'product',
+      robots: property.status === 'Approved' ? 'index, follow, max-image-preview:large' : 'noindex, follow',
+    });
+  }, [property, propertyId, routeId]);
 
   const submitReview = async () => {
     try {

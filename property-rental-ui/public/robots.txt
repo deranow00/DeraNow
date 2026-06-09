@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /owner/
+Disallow: /renter/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://deranow.com/sitemap.xml

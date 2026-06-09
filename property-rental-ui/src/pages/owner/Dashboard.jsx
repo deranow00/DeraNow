@@ -117,6 +117,7 @@ export default function Dashboard() {
 
   const toSlug = (value) => String(value || '').toLowerCase().replace(/\s+/g, '-');
   const verificationStatus = user?.ownerVerificationStatus || 'unverified';
+  const ownerVerified = verificationStatus === 'verified';
   const verificationNoteTone = /failed|please upload/i.test(verificationMessage) ? 'error' : 'success';
   const paidPayments = Array.isArray(stats.ownerPaymentRows)
     ? stats.ownerPaymentRows.filter((row) => toSlug(row.paymentStatus) === 'paid').length
@@ -147,6 +148,22 @@ export default function Dashboard() {
         </div>
       </header>
 
+      {!ownerVerified && (
+        <section className="owner-kyc-required-banner">
+          <div>
+            <span className={`status-pill verification-status ${toSlug(verificationStatus)}`}>
+              Owner KYC: {verificationStatus}
+            </span>
+            <h3>Owner KYC is required to add properties</h3>
+            <p>
+              Verified owners create safer listings, build renter confidence, and can submit
+              properties for DeraNow admin review. Upload your ID photos below to unlock Add Property.
+            </p>
+          </div>
+          <a href="#owner-verification" className="owner-kyc-banner-action">Update KYC</a>
+        </section>
+      )}
+
         <div className="dashboard-cards">
         <div className="dashboard-stat-card">
           <p className="stat-label">Total Properties</p>
@@ -169,7 +186,12 @@ export default function Dashboard() {
             <p>Jump to high-frequency management tasks.</p>
           </div>
           <div className="action-grid">
-            <Link to="/owner/add" className="action-link">Add Property</Link>
+            <Link
+              to={ownerVerified ? '/owner/add' : '/owner#owner-verification'}
+              className={`action-link ${!ownerVerified ? 'action-link-warning' : ''}`}
+            >
+              {ownerVerified ? 'Add Property' : 'Complete KYC to Add Property'}
+            </Link>
             <Link to="/owner/requests" className="action-link">Review Bookings</Link>
             <Link to="/owner/messages" className="action-link">Open Messages</Link>
             <Link to="/owner/payment-status" className="action-link">Check Rent Status</Link>
@@ -214,10 +236,10 @@ export default function Dashboard() {
         </section>
       </div>
 
-      <section className="owner-verification-card">
+      <section className="owner-verification-card" id="owner-verification">
         <div className="section-head">
-          <h3>Owner Verification</h3>
-          <p>Maintain an active verified account status to build renter trust.</p>
+          <h3>Owner KYC Verification</h3>
+          <p>This is a required trust step. Verified owners can add properties and receive stronger renter confidence.</p>
         </div>
         <div className="verification-status-row">
           <span className="verification-label">Current Status</span>

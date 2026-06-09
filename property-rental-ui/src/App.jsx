@@ -8,6 +8,7 @@ import { SocketProvider } from './context/SocketContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { API_BASE_URL } from './config/api';
 import AppLaunchSplash from './components/common/AppLaunchSplash';
+import SeoManager from './components/common/SeoManager';
 
 const isEditableElement = (element) => {
   if (!element) return false;
@@ -144,6 +145,7 @@ function AppShell() {
           <AppViewportSync />
           <AppLaunchSplash />
           <BrowserRouter>
+            <SeoManager />
             <AppRoutes />
           </BrowserRouter>
         </LanguageProvider>

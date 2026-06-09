@@ -1,0 +1,229 @@
+.seo-rental-page {
+  min-height: 100vh;
+  background: #f7f3ec;
+  color: var(--text);
+}
+
+.seo-rental-wrap {
+  width: min(1120px, 92%);
+  margin: 0 auto;
+}
+
+.seo-rental-hero {
+  padding: 4.2rem 0 3.5rem;
+  background:
+    linear-gradient(90deg, rgba(17, 24, 39, 0.76), rgba(17, 24, 39, 0.42)),
+    url('/property.png') center / cover no-repeat;
+  color: #fff;
+}
+
+.seo-rental-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.seo-rental-brand {
+  display: inline-flex;
+  margin-bottom: 1.4rem;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.seo-rental-eyebrow {
+  margin: 0 0 0.65rem;
+  color: #ccfbf1;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.seo-rental-hero h1 {
+  max-width: 12ch;
+  margin: 0 0 0.9rem;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.02;
+}
+
+.seo-rental-hero p {
+  max-width: 62ch;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  line-height: 1.65;
+}
+
+.seo-rental-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.35rem;
+}
+
+.seo-rental-primary,
+.seo-rental-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 999px;
+  padding: 0.62rem 1rem;
+  font-weight: 800;
+}
+
+.seo-rental-primary {
+  background: #fff;
+  color: #115e59;
+}
+
+.seo-rental-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #fff;
+}
+
+.seo-rental-panel {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 18px;
+  padding: 1.2rem;
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+}
+
+.seo-rental-panel h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+}
+
+.seo-rental-panel ul {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-muted);
+}
+
+.seo-rental-section {
+  padding: 3rem 0;
+}
+
+.seo-rental-muted {
+  background: rgba(255, 255, 255, 0.54);
+}
+
+.seo-rental-section-head {
+  max-width: 780px;
+}
+
+.seo-rental-section-head h2,
+.seo-rental-faq h2,
+.seo-rental-related h2 {
+  margin: 0 0 0.55rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.45rem, 3vw, 2.2rem);
+}
+
+.seo-rental-section-head p,
+.seo-rental-faq p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.seo-rental-area-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+}
+
+.seo-rental-area-list a,
+.seo-rental-related-grid a {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text);
+  padding: 0.55rem 0.85rem;
+  font-weight: 800;
+}
+
+.seo-rental-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.seo-rental-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.seo-rental-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.seo-rental-card p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.seo-rental-faq {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 1rem;
+}
+
+.seo-rental-faq-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.seo-rental-faq-list details {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.85rem 0.95rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.seo-rental-faq-list summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.seo-rental-faq-list p {
+  margin-top: 0.5rem;
+}
+
+.seo-rental-related-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 820px) {
+  .seo-rental-hero-grid,
+  .seo-rental-faq,
+  .seo-rental-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .seo-rental-hero {
+    padding: 2.7rem 0;
+  }
+
+  .seo-rental-hero h1 {
+    max-width: 13ch;
+  }
+}

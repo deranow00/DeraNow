@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/login/Login';
 import OwnerLayout from '../layouts/OwnerLayout';
@@ -16,6 +16,7 @@ import Register from '../pages/login/Register';
 import ForgotPassword from '../pages/login/ForgotPassword';
 import ResetPassword from '../pages/login/ResetPassword';
 import Landing from '../pages/Landing';
+import SeoRentalPage from '../pages/SeoRentalPage';
 import { AuthContext } from '../context/AuthContext';
 import PropertyDetails from '../components/common/PropertyDetails';
 import Messages from '../pages/owner/Messages';
@@ -50,26 +51,12 @@ function PrivateRoute({ children, role }) {
 
 function RootEntryRoute() {
   const { user } = useContext(AuthContext);
-  const [isMobileView, setIsMobileView] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth <= 900;
-  });
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth <= 900);
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   if (user?.role === 'owner' || user?.role === 'renter') {
     return <Navigate to={`/${user.role}`} replace />;
   }
 
-  return isMobileView ? <Navigate to="/login" replace /> : <Landing />;
+  return <Landing />;
 }
 
 export default function AppRoutes() {
@@ -80,6 +67,7 @@ export default function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <Route path="/:slug" element={<SeoRentalPage />} />
 
       <Route
         path="/owner/*"

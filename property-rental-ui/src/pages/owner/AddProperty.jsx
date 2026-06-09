@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FaCamera, FaCrosshairs, FaImages, FaMapMarkerAlt, FaPlus, FaTimes } from 'react-icons/fa';
 import { Capacitor } from '@capacitor/core';
 import { Geolocation } from '@capacitor/geolocation';
@@ -78,7 +79,9 @@ export default function AddProperty() {
   const [mapStatus, setMapStatus] = useState('');
   const [mapSearch, setMapSearch] = useState('');
 
-  const { token } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
+  const ownerVerificationStatus = user?.ownerVerificationStatus || 'unverified';
+  const ownerVerified = ownerVerificationStatus === 'verified';
 
   const imagePreviews = useMemo(
     () => form.imageFiles.map((file) => ({
@@ -219,6 +222,10 @@ export default function AddProperty() {
   };
 
   const uploadImageToCloudinary = async () => {
+    if (!ownerVerified) {
+      throw new Error('Owner KYC verification is required before uploading property photos.');
+    }
+
     if (!form.imageFiles.length) {
       const fallbackImages = form.image ? [form.image] : [];
       return { imageUrl: form.image, imageUrls: fallbackImages };
@@ -271,6 +278,11 @@ export default function AddProperty() {
       return;
     }
 
+    if (!ownerVerified) {
+      setError('Owner KYC verification is required before adding a property.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -303,7 +315,7 @@ export default function AddProperty() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || 'Failed to add property.');
+        setError(data.error || data.message || 'Failed to add property.');
       } else {
         setCreatedCount((prev) => prev + 1);
         setSuccess(keepAdding ? 'Property submitted for approval. You can add another listing now.' : 'Property submitted for approval.');
@@ -333,7 +345,29 @@ export default function AddProperty() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="add-property-form">
+      {!ownerVerified && (
+        <section className="add-property-locked">
+          <span className={`owner-kyc-status ${ownerVerificationStatus}`}>
+            Owner KYC: {ownerVerificationStatus}
+          </span>
+          <h3>Verify your owner account before adding properties</h3>
+          <p>
+            DeraNow now requires owner KYC verification before a listing can be created.
+            This protects renters, improves trust, and helps admin approve serious property owners faster.
+          </p>
+          {ownerVerificationStatus === 'pending' ? (
+            <p className="add-property-locked-note">
+              Your verification request is under admin review. You can add properties once it is approved.
+            </p>
+          ) : (
+            <Link to="/owner#owner-verification" className="add-property-locked-action">
+              Complete Owner KYC
+            </Link>
+          )}
+        </section>
+      )}
+
+      <form onSubmit={handleSubmit} className={`add-property-form ${!ownerVerified ? 'is-locked' : ''}`}>
         <section className="add-property-panel details-panel">
           <div className="panel-heading">
             <span>01</span>
@@ -573,7 +607,7 @@ export default function AddProperty() {
             <button type="button" className="reset-btn" onClick={resetForm} disabled={loading || uploadingImage}>
               Reset
             </button>
-            <button type="submit" disabled={loading || uploadingImage}>
+            <button type="submit" disabled={loading || uploadingImage || !ownerVerified}>
               {uploadingImage ? 'Uploading Photos...' : loading ? 'Submitting...' : keepAdding ? 'Submit & Add Another' : 'Submit Property'}
             </button>
           </div>

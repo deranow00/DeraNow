@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Booking from '../models/Booking.js';
 import Property from '../models/Property.js';
+import PropertyVisit from '../models/PropertyVisit.js';
 
 const toObjectId = (value) => {
   if (!value) return null;
@@ -21,7 +22,9 @@ export const canUsersChat = async (userAId, userBId) => {
   const aPropertyIds = aOwnedProperties.map((p) => p._id);
   const bPropertyIds = bOwnedProperties.map((p) => p._id);
 
-  const [aAsRenter, bAsRenter] = await Promise.all([
+  const visitStatuses = { $ne: 'cancelled' };
+
+  const [aAsRenter, bAsRenter, aVisitWithB, bVisitWithA] = await Promise.all([
     bPropertyIds.length
       ? Booking.exists({
           renter: aId,
@@ -36,7 +39,21 @@ export const canUsersChat = async (userAId, userBId) => {
           status: 'Approved',
         })
       : null,
+    bPropertyIds.length
+      ? PropertyVisit.exists({
+          renter: aId,
+          property: { $in: bPropertyIds },
+          status: visitStatuses,
+        })
+      : null,
+    aPropertyIds.length
+      ? PropertyVisit.exists({
+          renter: bId,
+          property: { $in: aPropertyIds },
+          status: visitStatuses,
+        })
+      : null,
   ]);
 
-  return Boolean(aAsRenter || bAsRenter);
+  return Boolean(aAsRenter || bAsRenter || aVisitWithB || bVisitWithA);
 };

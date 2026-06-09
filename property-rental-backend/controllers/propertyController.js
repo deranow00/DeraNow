@@ -169,6 +169,16 @@ const applyLocationPrivacy = async (input, user) => {
 
 export const uploadPropertyImage = async (req, res) => {
   try {
+    if (req.user.role !== 'owner') {
+      return res.status(403).json({ error: 'Only owners can upload property images' });
+    }
+    if (req.user.ownerVerificationStatus !== 'verified') {
+      return res.status(403).json({
+        error: 'Owner verification is required before uploading property photos',
+        code: 'OWNER_VERIFICATION_REQUIRED',
+      });
+    }
+
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
       return res.status(500).json({ error: 'Cloudinary credentials are not configured on server' });
     }
@@ -198,6 +208,16 @@ export const uploadPropertyImage = async (req, res) => {
 
 export const addProperty = async (req, res) => {
   try {
+    if (req.user.role !== 'owner') {
+      return res.status(403).json({ error: 'Only owners can add properties' });
+    }
+    if (req.user.ownerVerificationStatus !== 'verified') {
+      return res.status(403).json({
+        error: 'Owner verification is required before adding a property',
+        code: 'OWNER_VERIFICATION_REQUIRED',
+      });
+    }
+
     const {
       title,
       description,

@@ -1,0 +1,17 @@
+{
+  "name": "DeraNow",
+  "short_name": "DeraNow",
+  "description": "DeraNow, also searched as Dera Now, helps renters find verified rooms, flats, and houses for rent in Nepal.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f766e",
+  "icons": [
+    {
+      "src": "/dera.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

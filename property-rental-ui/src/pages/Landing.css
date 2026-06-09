@@ -219,7 +219,8 @@
 .audience-section,
 .ops-section,
 .workflow-section,
-.security-section {
+.security-section,
+.popular-searches-section {
   padding: 3.5rem 0;
 }
 
@@ -360,6 +361,57 @@
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+}
+
+.popular-searches-section {
+  padding-top: 2rem;
+}
+
+.popular-searches-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 1.2rem;
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.2rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.section-kicker {
+  margin: 0 0 0.35rem;
+  color: #0f766e;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.popular-searches-inner h2 {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+
+.popular-searches-inner p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.popular-search-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.popular-search-links a {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #f7f3ec;
+  color: var(--text);
+  padding: 0.55rem 0.85rem;
+  font-weight: 800;
 }
 
 .pillars-grid {
@@ -713,6 +765,10 @@
   }
 
   .audience-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .popular-searches-inner {
     grid-template-columns: 1fr;
   }
 

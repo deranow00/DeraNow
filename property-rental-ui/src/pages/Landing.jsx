@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
+import { seoLocations } from '../data/seoLocations';
 import './Landing.css';
 
 const displayRentalType = (type) => (type === 'Condo' ? 'Room' : type);
@@ -27,6 +28,7 @@ function Navbar() {
         <nav className={`nav-links ${open ? 'open' : ''}`}>
           <a href="#home" onClick={() => setOpen(false)}>Home</a>
           <a href="#featured" onClick={() => setOpen(false)}>Listings</a>
+          <a href="#popular-searches" onClick={() => setOpen(false)}>Popular Searches</a>
           <a href="#renters" onClick={() => setOpen(false)}>For Renters</a>
           <a href="#how" onClick={() => setOpen(false)}>How It Works</a>
           <a href="#security" onClick={() => setOpen(false)}>Trust</a>
@@ -56,10 +58,10 @@ function Hero({ totalProperties, featuredCount, onSearch }) {
       <div className="landing-wrap hero-grid">
         <div className="hero-copy">
           <p className="eyebrow">DeraNow Verified Rentals</p>
-          <h1>Find verified rooms, flats, and houses</h1>
+          <h1>Find verified rooms, flats, and houses in Nepal</h1>
           <p>
-            Search approved listings, compare prices, message owners, and manage every
-            step from booking request to payment record in one trusted place.
+            Search approved rentals by area, compare prices and photos, book visits,
+            message owners, and manage each step from first enquiry to payment record.
           </p>
           <form className="hero-search" onSubmit={submit}>
             <input
@@ -117,8 +119,8 @@ function Featured({ listings, loading, error }) {
     <section id="featured" className="featured-section">
       <div className="landing-wrap">
         <div className="section-head">
-          <h2>Featured Rentals</h2>
-          <p>Approved rooms, flats, and houses currently available on DeraNow.</p>
+          <h2>Featured Rentals on DeraNow</h2>
+          <p>Approved rooms, flats, and houses currently available for renters in Nepal.</p>
         </div>
         {loading && <p className="status-box">Loading featured listings...</p>}
         {error && <p className="status-box error">{error}</p>}
@@ -172,6 +174,30 @@ function TrustStrip() {
   );
 }
 
+function PopularSearches() {
+  return (
+    <section id="popular-searches" className="popular-searches-section">
+      <div className="landing-wrap popular-searches-inner">
+        <div>
+          <p className="section-kicker">Popular rental searches</p>
+          <h2>Find rooms and rental properties by city</h2>
+          <p>
+            Explore DeraNow pages built around common searches renters make for rooms,
+            flats, and houses in Nepal.
+          </p>
+        </div>
+        <div className="popular-search-links">
+          {seoLocations.map((page) => (
+            <Link key={page.slug} to={`/${page.slug}/`}>
+              {page.searchLabel}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ValuePillars() {
   const pillars = [
     {
@@ -197,7 +223,7 @@ function ValuePillars() {
       <div className="landing-wrap">
         <div className="section-head">
           <h2>Built for real rental decisions</h2>
-          <p>DeraNow keeps renters, owners, and rental records aligned from first search to move-in.</p>
+          <p>DeraNow keeps renters, owners, visits, payments, and rental records aligned from first search to move-in.</p>
         </div>
         <div className="pillars-grid">
           {pillars.map((pillar, index) => (
@@ -322,7 +348,7 @@ function HowItWorks() {
       <div className="landing-wrap">
         <div className="section-head">
           <h2>How DeraNow works</h2>
-          <p>A clear rental process for both renters and owners.</p>
+          <p>A clear rental process for people searching for rooms, flats, and houses, and for owners managing listings.</p>
         </div>
         <div className="steps-grid">
           {steps.map((step, i) => (
@@ -367,7 +393,7 @@ function WorkflowDetail() {
       <div className="landing-wrap">
         <div className="section-head">
           <h2>From search to move-in</h2>
-          <p>DeraNow keeps each rental step visible and easy to follow.</p>
+          <p>DeraNow keeps each rental step visible, from property discovery and visit booking to final booking records.</p>
         </div>
         <div className="workflow-grid">
           {phases.map((phase, index) => (
@@ -483,12 +509,16 @@ function Faq() {
       <div className="landing-wrap faq-grid">
         <div>
           <h2>Common Questions</h2>
-          <p>Quick answers about listings, booking, and payments.</p>
+          <p>Quick answers about verified listings, visit booking, rental payments, and owner-renter communication.</p>
         </div>
         <div className="faq-list">
           <details>
             <summary>Are listings reviewed before renters see them?</summary>
             <p>Yes. Public listing sections use approved listings so renters see reviewed rental options.</p>
+          </details>
+          <details>
+            <summary>When do renters see the exact property location?</summary>
+            <p>Renters first see an approximate area. The exact map location becomes available after they book a visit for that property.</p>
           </details>
           <details>
             <summary>Can I track payments and invoices?</summary>
@@ -510,11 +540,13 @@ function Footer() {
       <div className="landing-wrap footer-inner">
         <div>
           <h4>DeraNow</h4>
-          <p>Verified rooms, flats, and houses with booking, payments, agreements, and messaging.</p>
+          <p>DeraNow, also searched as Dera Now, helps renters find verified rooms, flats, and houses with booking, payments, agreements, and messaging.</p>
         </div>
         <div className="footer-links">
           <Link to="/register">Create Account</Link>
           <Link to="/login">Login</Link>
+          <Link to="/rent-room/">Rent Room</Link>
+          <Link to="/rent-property/">Rent Property</Link>
           <a href="#featured">Listings</a>
           <a href="#renters">For Renters</a>
           <a href="#security">Trust</a>
@@ -637,6 +669,7 @@ export default function Landing() {
       <Navbar />
       <Hero totalProperties={featured.length} featuredCount={Math.min(featured.length, 6)} onSearch={handleSearch} />
       <TrustStrip />
+      <PopularSearches />
       <SearchResults listings={searchResults} loading={searchLoading} error={searchError} searched={searched} />
       <Featured listings={featured} loading={loading} error={error} />
       <ValuePillars />

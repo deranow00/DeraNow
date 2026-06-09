@@ -1,5 +1,6 @@
 import React, { createContext, useState } from 'react';
 import { API_BASE_URL } from '../config/api';
+import { nativeAwareFetch } from '../utils/nativeHttp';
 
 export const AuthContext = createContext();
 
@@ -45,7 +46,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password, role) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const res = await nativeAwareFetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, role }),
@@ -75,14 +76,15 @@ export function AuthProvider({ children }) {
 
       return data;
     } catch (error) {
-      return { error: 'Server error. Please try again later.' };
+      console.error('login request failed:', error);
+      return { error: error?.message || 'Server error. Please try again later.' };
     }
   };
 
   const logout = () => {
     const currentRefreshToken = refreshToken || localStorage.getItem('refreshToken');
     if (currentRefreshToken) {
-      fetch(`${API_BASE_URL}/api/auth/logout`, {
+      nativeAwareFetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken: currentRefreshToken }),
@@ -100,7 +102,7 @@ export function AuthProvider({ children }) {
     const storedRefreshToken = refreshToken || localStorage.getItem('refreshToken');
     if (!storedRefreshToken) return false;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
+      const res = await nativeAwareFetch(`${API_BASE_URL}/api/auth/refresh-token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken: storedRefreshToken }),
@@ -126,7 +128,8 @@ export function AuthProvider({ children }) {
         });
       }
       return true;
-    } catch {
+    } catch (error) {
+      console.error('refresh session failed:', error);
       return false;
     }
   };

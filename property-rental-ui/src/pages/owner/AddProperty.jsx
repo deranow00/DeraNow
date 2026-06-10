@@ -14,6 +14,7 @@ const initialForm = {
   title: '',
   location: '',
   approximateLocation: '',
+  ownerPhone: '',
   locationCoordinates: null,
   price: '',
   bedrooms: '',
@@ -80,8 +81,8 @@ export default function AddProperty() {
   const [mapSearch, setMapSearch] = useState('');
 
   const { token, user } = useContext(AuthContext);
-  const ownerVerificationStatus = user?.ownerVerificationStatus || 'unverified';
-  const ownerVerified = ownerVerificationStatus === 'verified';
+  const kycStatus = user?.kycStatus || 'unsubmitted';
+  const ownerVerified = kycStatus === 'verified';
 
   const imagePreviews = useMemo(
     () => form.imageFiles.map((file) => ({
@@ -223,7 +224,7 @@ export default function AddProperty() {
 
   const uploadImageToCloudinary = async () => {
     if (!ownerVerified) {
-      throw new Error('Owner KYC verification is required before uploading property photos.');
+      throw new Error('KYC verification is required before uploading property photos.');
     }
 
     if (!form.imageFiles.length) {
@@ -268,7 +269,7 @@ export default function AddProperty() {
     setError('');
     setSuccess('');
 
-    if (!form.title || !form.location || !form.approximateLocation || !form.locationCoordinates || !form.price || !form.bedrooms || !form.bathrooms || !form.type) {
+    if (!form.title || !form.location || !form.approximateLocation || !form.ownerPhone || !form.locationCoordinates || !form.price || !form.bedrooms || !form.bathrooms || !form.type) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -279,7 +280,7 @@ export default function AddProperty() {
     }
 
     if (!ownerVerified) {
-      setError('Owner KYC verification is required before adding a property.');
+      setError('KYC verification is required before adding a property.');
       return;
     }
 
@@ -298,6 +299,7 @@ export default function AddProperty() {
           title: form.title,
           location: form.location,
           approximateLocation: form.approximateLocation,
+          ownerPhone: form.ownerPhone,
           locationCoordinates: form.locationCoordinates,
           price: Number(form.price),
           bedrooms: Number(form.bedrooms),
@@ -347,21 +349,21 @@ export default function AddProperty() {
 
       {!ownerVerified && (
         <section className="add-property-locked">
-          <span className={`owner-kyc-status ${ownerVerificationStatus}`}>
-            Owner KYC: {ownerVerificationStatus}
+          <span className={`owner-kyc-status ${kycStatus}`}>
+            KYC: {kycStatus}
           </span>
-          <h3>Verify your owner account before adding properties</h3>
+          <h3>Complete KYC before adding properties</h3>
           <p>
-            DeraNow now requires owner KYC verification before a listing can be created.
-            This protects renters, improves trust, and helps admin approve serious property owners faster.
+            DeraNow uses the same KYC verification already available in your profile.
+            Verified KYC protects renters, improves trust, and unlocks property submission.
           </p>
-          {ownerVerificationStatus === 'pending' ? (
+          {kycStatus === 'pending' ? (
             <p className="add-property-locked-note">
-              Your verification request is under admin review. You can add properties once it is approved.
+              Your KYC request is under admin review. You can add properties once it is approved.
             </p>
           ) : (
-            <Link to="/owner#owner-verification" className="add-property-locked-action">
-              Complete Owner KYC
+            <Link to="/owner/profile" className="add-property-locked-action">
+              Complete KYC
             </Link>
           )}
         </section>
@@ -417,6 +419,20 @@ export default function AddProperty() {
                 value={form.approximateLocation}
                 onChange={(e) => updateField('approximateLocation', e.target.value)}
               />
+            </label>
+
+            <label className="form-field span-2">
+              <span>Owner Phone Number *</span>
+              <input
+                type="tel"
+                inputMode="tel"
+                placeholder="e.g. 98XXXXXXXX"
+                value={form.ownerPhone}
+                onChange={(e) => updateField('ownerPhone', e.target.value)}
+              />
+              <small className="location-coordinate-note">
+                Renters can see this only after they book a visit for this property.
+              </small>
             </label>
 
             <label className="form-field">

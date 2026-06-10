@@ -243,6 +243,16 @@
   overflow-wrap: anywhere;
 }
 
+.property-phone-link {
+  color: var(--accent);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.property-phone-link:hover {
+  text-decoration: underline;
+}
+
 .property-map-preview {
   overflow: hidden;
   border: 1px solid var(--border);

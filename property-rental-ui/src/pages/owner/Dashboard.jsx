@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import './Dashboard.css';
 import { AuthContext } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../config/api';
-import { compressImageFiles } from '../../utils/imageCompression';
 import {
   PieChart,
   Pie,
@@ -21,7 +20,7 @@ import {
 const COLORS = ['#2a9d8f', '#e9c46a', '#e76f51'];
 
 export default function Dashboard() {
-  const { token, user, setUser } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
   const [stats, setStats] = useState({
     totalProperties: 0,
     totalBookings: 0,
@@ -39,9 +38,6 @@ export default function Dashboard() {
       },
     },
   });
-  const [requesting, setRequesting] = useState(false);
-  const [verificationMessage, setVerificationMessage] = useState('');
-  const [verificationIdFiles, setVerificationIdFiles] = useState([]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -60,46 +56,6 @@ export default function Dashboard() {
     fetchStats();
   }, [token]);
 
-  const requestVerification = async () => {
-    if (!token) return;
-    if (!verificationIdFiles.length) {
-      setVerificationMessage('Please upload at least one valid ID photo before submitting verification request.');
-      return;
-    }
-    try {
-      setRequesting(true);
-      setVerificationMessage('');
-      const formData = new FormData();
-      const compressedFiles = await compressImageFiles(verificationIdFiles, {
-        maxWidth: 1800,
-        maxHeight: 1800,
-        quality: 0.8,
-        mimeType: 'image/webp',
-      });
-
-      compressedFiles.forEach((file) => {
-        formData.append('idImages', file);
-      });
-      const res = await fetch(`${API_BASE_URL}/api/users/owner/verify-request`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUser((prev) => ({ ...prev, ownerVerificationStatus: data.status }));
-        setVerificationMessage('Verification request submitted. Please wait for admin approval.');
-        setVerificationIdFiles([]);
-      } else {
-        setVerificationMessage(data.error || 'Failed to submit verification request.');
-      }
-    } catch (error) {
-      setVerificationMessage(error.message || 'Failed to submit verification request.');
-    } finally {
-      setRequesting(false);
-    }
-  };
-
   const formatCurrency = (amount) => {
     const numericAmount = Number(amount);
     if (!Number.isFinite(numericAmount)) return 'N/A';
@@ -116,9 +72,8 @@ export default function Dashboard() {
   };
 
   const toSlug = (value) => String(value || '').toLowerCase().replace(/\s+/g, '-');
-  const verificationStatus = user?.ownerVerificationStatus || 'unverified';
+  const verificationStatus = user?.kycStatus || 'unsubmitted';
   const ownerVerified = verificationStatus === 'verified';
-  const verificationNoteTone = /failed|please upload/i.test(verificationMessage) ? 'error' : 'success';
   const paidPayments = Array.isArray(stats.ownerPaymentRows)
     ? stats.ownerPaymentRows.filter((row) => toSlug(row.paymentStatus) === 'paid').length
     : 0;
@@ -148,19 +103,38 @@ export default function Dashboard() {
         </div>
       </header>
 
+      <section className="owner-add-property-cta" aria-label="Add properties">
+        <div>
+          <span className={`status-pill verification-status ${toSlug(verificationStatus)}`}>
+            KYC: {verificationStatus}
+          </span>
+          <h3>Add Properties</h3>
+          <p>
+            List your room, flat, or house on DeraNow and start receiving renter visits after admin approval.
+          </p>
+        </div>
+        <Link
+          to={ownerVerified ? '/owner/add' : '/owner/profile'}
+          className={`owner-add-property-button ${!ownerVerified ? 'locked' : ''}`}
+        >
+          <span className="owner-add-property-plus">+</span>
+          <span>{ownerVerified ? 'Add Property' : 'Complete KYC First'}</span>
+        </Link>
+      </section>
+
       {!ownerVerified && (
         <section className="owner-kyc-required-banner">
           <div>
             <span className={`status-pill verification-status ${toSlug(verificationStatus)}`}>
-              Owner KYC: {verificationStatus}
+              KYC: {verificationStatus}
             </span>
-            <h3>Owner KYC is required to add properties</h3>
+            <h3>KYC is required to add properties</h3>
             <p>
-              Verified owners create safer listings, build renter confidence, and can submit
-              properties for DeraNow admin review. Upload your ID photos below to unlock Add Property.
+              DeraNow uses the existing profile KYC flow for owner trust. Once your KYC is verified,
+              you can submit properties for admin review.
             </p>
           </div>
-          <a href="#owner-verification" className="owner-kyc-banner-action">Update KYC</a>
+          <Link to="/owner/profile" className="owner-kyc-banner-action">Update KYC</Link>
         </section>
       )}
 
@@ -187,7 +161,7 @@ export default function Dashboard() {
           </div>
           <div className="action-grid">
             <Link
-              to={ownerVerified ? '/owner/add' : '/owner#owner-verification'}
+              to={ownerVerified ? '/owner/add' : '/owner/profile'}
               className={`action-link ${!ownerVerified ? 'action-link-warning' : ''}`}
             >
               {ownerVerified ? 'Add Property' : 'Complete KYC to Add Property'}
@@ -238,8 +212,8 @@ export default function Dashboard() {
 
       <section className="owner-verification-card" id="owner-verification">
         <div className="section-head">
-          <h3>Owner KYC Verification</h3>
-          <p>This is a required trust step. Verified owners can add properties and receive stronger renter confidence.</p>
+          <h3>KYC Verification</h3>
+          <p>This uses the existing profile KYC flow. Verified owners can add properties and receive stronger renter confidence.</p>
         </div>
         <div className="verification-status-row">
           <span className="verification-label">Current Status</span>
@@ -247,56 +221,20 @@ export default function Dashboard() {
             {verificationStatus}
           </span>
         </div>
-        {user?.ownerVerificationStatus === 'rejected' && user?.ownerVerificationRejectReason && (
+        {verificationStatus === 'rejected' && user?.kycRejectReason && (
           <p className="verification-note error">
-            Last rejection reason: {user.ownerVerificationRejectReason}
+            Last rejection reason: {user.kycRejectReason}
           </p>
         )}
-        {(user?.ownerVerificationStatus === 'unverified' ||
-          user?.ownerVerificationStatus === 'rejected') && (
-          <div className="verification-form">
-            <div className="verification-input-group">
-              <span className="photo-upload-label">Upload Valid ID Photo(s)</span>
-              <div className="photo-upload-actions">
-                <label className="photo-upload-button" htmlFor="owner-id-gallery">
-                  Choose from Photos
-                </label>
-                <label className="photo-upload-button" htmlFor="owner-id-camera">
-                  Take Live Photo
-                </label>
-              </div>
-              <input
-                id="owner-id-gallery"
-                className="photo-upload-input"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(e) => setVerificationIdFiles(Array.from(e.target.files || []))}
-              />
-              <input
-                id="owner-id-camera"
-                className="photo-upload-input"
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={(e) => setVerificationIdFiles(Array.from(e.target.files || []))}
-              />
-              {verificationIdFiles.length > 0 && (
-                <p className="verification-files-selected">{verificationIdFiles.length} file(s) selected</p>
-              )}
-            </div>
-            <button className="verification-btn" onClick={requestVerification} disabled={requesting}>
-              {requesting ? 'Requesting...' : 'Request Verification'}
-            </button>
-          </div>
+        {(verificationStatus === 'unsubmitted' || verificationStatus === 'rejected') && (
+          <Link to="/owner/profile" className="verification-btn">
+            Submit KYC from Profile
+          </Link>
         )}
-        {user?.ownerVerificationStatus === 'pending' && (
+        {verificationStatus === 'pending' && (
           <p className="verification-note warning">
-            Your verification request is pending admin review.
+            Your KYC request is pending admin review.
           </p>
-        )}
-        {verificationMessage && (
-          <p className={`verification-note ${verificationNoteTone}`}>{verificationMessage}</p>
         )}
       </section>
 

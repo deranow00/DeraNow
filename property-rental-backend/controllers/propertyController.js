@@ -124,6 +124,12 @@ const getValidCoordinates = (coordinates = {}) => {
   return { lat, lng };
 };
 
+const normalizePhone = (value = '') =>
+  String(value || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .slice(0, 32);
+
 const canViewExactLocation = async (property, user) => {
   if (!user?._id || !property?._id) return false;
   if (user.role === 'admin') return true;
@@ -150,9 +156,11 @@ const applyLocationPrivacy = async (input, user) => {
         ...plain,
         location: exactLocation,
         exactLocation,
+        ownerPhone: normalizePhone(plain.ownerPhone),
         locationCoordinates: getValidCoordinates(plain.locationCoordinates),
         approximateLocation: plain.approximateLocation || getApproximateLocation(plain),
         exactLocationLocked: false,
+        ownerPhoneLocked: false,
       };
     }
     return {
@@ -160,8 +168,10 @@ const applyLocationPrivacy = async (input, user) => {
       location: getApproximateLocation(plain),
       approximateLocation: plain.approximateLocation || getApproximateLocation(plain),
       exactLocation: '',
+      ownerPhone: '',
       locationCoordinates: null,
       exactLocationLocked: true,
+      ownerPhoneLocked: true,
     };
   }));
   return Array.isArray(input) ? mapped : mapped[0];
@@ -172,10 +182,10 @@ export const uploadPropertyImage = async (req, res) => {
     if (req.user.role !== 'owner') {
       return res.status(403).json({ error: 'Only owners can upload property images' });
     }
-    if (req.user.ownerVerificationStatus !== 'verified') {
+    if (req.user.kycStatus !== 'verified') {
       return res.status(403).json({
-        error: 'Owner verification is required before uploading property photos',
-        code: 'OWNER_VERIFICATION_REQUIRED',
+        error: 'KYC verification is required before uploading property photos',
+        code: 'KYC_VERIFICATION_REQUIRED',
       });
     }
 
@@ -211,10 +221,10 @@ export const addProperty = async (req, res) => {
     if (req.user.role !== 'owner') {
       return res.status(403).json({ error: 'Only owners can add properties' });
     }
-    if (req.user.ownerVerificationStatus !== 'verified') {
+    if (req.user.kycStatus !== 'verified') {
       return res.status(403).json({
-        error: 'Owner verification is required before adding a property',
-        code: 'OWNER_VERIFICATION_REQUIRED',
+        error: 'KYC verification is required before adding a property',
+        code: 'KYC_VERIFICATION_REQUIRED',
       });
     }
 
@@ -229,6 +239,7 @@ export const addProperty = async (req, res) => {
       image,
       images = [],
       approximateLocation = '',
+      ownerPhone = '',
       locationCoordinates = {},
       parkingAvailable = false,
       parkingType = parkingAvailable ? 'both' : 'none',
@@ -236,7 +247,9 @@ export const addProperty = async (req, res) => {
     } = req.body;
     const ownerId = req.user._id;
 
-    if (!title || !location || !approximateLocation || !price || !type || bedrooms == null || bathrooms == null) {
+    const normalizedOwnerPhone = normalizePhone(ownerPhone);
+
+    if (!title || !location || !approximateLocation || !normalizedOwnerPhone || !price || !type || bedrooms == null || bathrooms == null) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -262,6 +275,7 @@ export const addProperty = async (req, res) => {
       description,
       location,
       approximateLocation,
+      ownerPhone: normalizedOwnerPhone,
       locationCoordinates: coordinates,
       price,
       type,
@@ -323,6 +337,12 @@ export const updateProperty = async (req, res) => {
     }
     if (update.approximateLocation != null) {
       update.approximateLocation = String(update.approximateLocation).trim();
+    }
+    if (update.ownerPhone != null) {
+      update.ownerPhone = normalizePhone(update.ownerPhone);
+      if (!update.ownerPhone) {
+        return res.status(400).json({ error: 'Owner phone number is required' });
+      }
     }
     if (update.locationCoordinates) {
       const lat = Number(update.locationCoordinates.lat);
@@ -449,7 +469,7 @@ export const getProperty = async (req, res) => {
     }
 
     const properties = await Property.find(filter)
-      .populate('ownerId', 'name ownerVerificationStatus')
+      .populate('ownerId', 'name kycStatus')
       .sort(sortMap[sort] || { createdAt: -1 });
 
     const propertiesWithAvailability = await attachAvailability(properties);
@@ -464,7 +484,7 @@ export const getProperty = async (req, res) => {
 export const getPropertyById = async (req, res) => {
   try {
     const property = await Property.findById(req.params.id)
-      .populate('ownerId', 'name email ownerVerificationStatus')
+      .populate('ownerId', 'name email kycStatus')
       .populate('reviews.user', 'name email');
     if (!property) return res.status(404).json({ error: 'Property not found' });
 
@@ -587,7 +607,7 @@ export const adminGetPendingProperties = async (req, res) => {
   try {
     const properties = await Property.find({ status: 'Pending' }).populate(
       'ownerId',
-      'name email ownerVerificationStatus'
+      'name email kycStatus'
     );
     res.json(properties);
   } catch (err) {

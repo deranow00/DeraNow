@@ -37,6 +37,75 @@
   line-height: 1.5;
 }
 
+.owner-dashboard .owner-add-property-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: -0.25rem 0 1.1rem;
+  padding: clamp(1rem, 2.4vw, 1.35rem);
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
+  background:
+    radial-gradient(circle at 100% 0%, rgba(217, 119, 6, 0.16), transparent 34%),
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--surface)), var(--surface));
+  box-shadow: 0 18px 36px rgba(15, 118, 110, 0.16);
+}
+
+.owner-dashboard .owner-add-property-cta h3 {
+  margin: 0.55rem 0 0.25rem;
+  color: var(--text);
+  font-size: clamp(1.18rem, 2.2vw, 1.55rem);
+}
+
+.owner-dashboard .owner-add-property-cta p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 72ch;
+}
+
+.owner-dashboard .owner-add-property-button {
+  flex: 0 0 auto;
+  min-height: 52px;
+  border-radius: 999px;
+  padding: 0.72rem 1.05rem 0.72rem 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.62rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 16px 28px rgba(15, 118, 110, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+}
+
+.owner-dashboard .owner-add-property-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 34px rgba(15, 118, 110, 0.34);
+  filter: saturate(1.06);
+}
+
+.owner-dashboard .owner-add-property-button.locked {
+  background: linear-gradient(135deg, #b45309, #92400e);
+  box-shadow: 0 16px 28px rgba(180, 83, 9, 0.2);
+}
+
+.owner-dashboard .owner-add-property-plus {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
 .owner-dashboard .owner-kyc-required-banner {
   display: flex;
   align-items: center;
@@ -410,6 +479,16 @@
 }
 
 @media (max-width: 720px) {
+  .owner-dashboard .owner-add-property-cta {
+    align-items: stretch;
+    flex-direction: column;
+    margin-top: -0.35rem;
+  }
+
+  .owner-dashboard .owner-add-property-button {
+    width: 100%;
+  }
+
   .owner-dashboard .owner-kyc-required-banner {
     align-items: stretch;
     flex-direction: column;

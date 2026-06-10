@@ -248,7 +248,7 @@ function OpsSnapshot({ pool }) {
       ? pool.reduce((sum, item) => sum + Number(item.rating || 0), 0) / total
       : 0;
     const avgRating = Number(avgRatingRaw || 0).toFixed(1);
-    const verifiedOwners = pool.filter((item) => item.owner?.ownerVerificationStatus === 'verified').length;
+    const verifiedOwners = pool.filter((item) => item.owner?.kycStatus === 'verified').length;
     return { total, avgPrice, avgRating, verifiedOwners };
   }, [pool]);
 

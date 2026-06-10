@@ -152,7 +152,7 @@ export default function PropertyDetails({ id }) {
     ? property.images
     : [property.image || '/default-property.jpg'];
   const activeGalleryImage = galleryImages[activeImageIndex] || galleryImages[0] || '/default-property.jpg';
-  const ownerVerified = property.ownerId?.ownerVerificationStatus === 'verified';
+  const ownerVerified = property.ownerId?.kycStatus === 'verified';
   const bookingCharge = Number(property.bookingChargeAmount || BOOKING_CHARGE_BY_TYPE[property.type] || BOOKING_CHARGE_BY_TYPE.Condo);
   const visitPassAmount = Number(property.visitPassAmount || 500);
   const availabilityStatus = property.availabilityStatus || 'Available';
@@ -161,6 +161,7 @@ export default function PropertyDetails({ id }) {
   const mapQuery = exactCoordinates
     ? `${exactCoordinates.lat.toFixed(6)},${exactCoordinates.lng.toFixed(6)}`
     : '';
+  const ownerPhone = String(property.ownerPhone || '').trim();
   const nearbyHints = [
     'Check walking distance to bus stops, markets, pharmacies, and your daily route before final booking.',
     'During your visit, verify water access, noise level, sunlight, and mobile network quality.',
@@ -255,6 +256,18 @@ export default function PropertyDetails({ id }) {
           <dl>
             <dt>Owner</dt><dd>{property.ownerId?.name || 'Not provided'}</dd>
             <dt>Email</dt><dd>{property.ownerId?.email || 'Not provided'}</dd>
+            <dt>Phone</dt>
+            <dd>
+              {ownerPhone ? (
+                <a className="property-phone-link" href={`tel:${ownerPhone.replace(/\s+/g, '')}`}>
+                  {ownerPhone}
+                </a>
+              ) : property.ownerPhoneLocked ? (
+                'Visible after you book a visit'
+              ) : (
+                'Not provided'
+              )}
+            </dd>
             <dt>Verification</dt><dd>{ownerVerified ? 'Verified by DeraNow' : 'Not verified yet'}</dd>
           </dl>
         </article>

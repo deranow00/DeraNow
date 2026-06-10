@@ -11,6 +11,8 @@ export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [files, setFiles] = useState([]);
   const [passportPhotoFile, setPassportPhotoFile] = useState(null);
+  const [idPreviews, setIdPreviews] = useState([]);
+  const [passportPreview, setPassportPreview] = useState(null);
   const [docType, setDocType] = useState(DOC_TYPE_OPTIONS[0]);
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -33,6 +35,56 @@ export default function Profile() {
     loadProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  useEffect(() => {
+    const previews = files.map((file, index) => ({
+      id: `${file.name}-${file.size}-${file.lastModified}-${index}`,
+      name: file.name,
+      size: file.size,
+      url: URL.createObjectURL(file),
+    }));
+    setIdPreviews(previews);
+
+    return () => {
+      previews.forEach((preview) => URL.revokeObjectURL(preview.url));
+    };
+  }, [files]);
+
+  useEffect(() => {
+    if (!passportPhotoFile) {
+      setPassportPreview(null);
+      return undefined;
+    }
+
+    const preview = {
+      name: passportPhotoFile.name,
+      size: passportPhotoFile.size,
+      url: URL.createObjectURL(passportPhotoFile),
+    };
+    setPassportPreview(preview);
+
+    return () => URL.revokeObjectURL(preview.url);
+  }, [passportPhotoFile]);
+
+  const formatFileSize = (bytes) => {
+    const size = Number(bytes || 0);
+    if (size < 1024 * 1024) return `${Math.max(1, Math.round(size / 1024))} KB`;
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const handleIdFileSelect = (event) => {
+    setFiles(Array.from(event.target.files || []));
+    event.target.value = '';
+  };
+
+  const handlePassportPhotoSelect = (event) => {
+    setPassportPhotoFile(event.target.files?.[0] || null);
+    event.target.value = '';
+  };
+
+  const removeIdFile = (indexToRemove) => {
+    setFiles((current) => current.filter((_, index) => index !== indexToRemove));
+  };
 
   const submitKyc = async () => {
     if (!files.length) {
@@ -188,7 +240,7 @@ export default function Profile() {
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) => setFiles(Array.from(e.target.files || []))}
+                  onChange={handleIdFileSelect}
                 />
                 <input
                   id="kyc-doc-camera"
@@ -196,7 +248,7 @@ export default function Profile() {
                   type="file"
                   accept="image/*"
                   capture="environment"
-                  onChange={(e) => setFiles(Array.from(e.target.files || []))}
+                  onChange={handleIdFileSelect}
                 />
               </div>
 
@@ -215,7 +267,7 @@ export default function Profile() {
                   className="photo-upload-input"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setPassportPhotoFile(e.target.files?.[0] || null)}
+                  onChange={handlePassportPhotoSelect}
                 />
                 <input
                   id="passport-photo-camera"
@@ -223,7 +275,7 @@ export default function Profile() {
                   type="file"
                   accept="image/*"
                   capture="user"
-                  onChange={(e) => setPassportPhotoFile(e.target.files?.[0] || null)}
+                  onChange={handlePassportPhotoSelect}
                 />
               </div>
             </div>
@@ -232,6 +284,35 @@ export default function Profile() {
               <p>{files.length ? `${files.length} ID file(s) selected` : 'No ID files selected'}</p>
               <p>{passportPhotoFile ? `Passport photo: ${passportPhotoFile.name}` : 'No passport photo selected'}</p>
             </div>
+
+            {(idPreviews.length > 0 || passportPreview) && (
+              <div className="kyc-selected-preview-grid" aria-label="Selected KYC image previews">
+                {idPreviews.map((preview, index) => (
+                  <article className="kyc-selected-preview-card" key={preview.id}>
+                    <img src={preview.url} alt={`Selected ID document ${index + 1}`} />
+                    <div>
+                      <strong>{preview.name}</strong>
+                      <span>{docType} - {formatFileSize(preview.size)}</span>
+                    </div>
+                    <button type="button" onClick={() => removeIdFile(index)}>
+                      Remove
+                    </button>
+                  </article>
+                ))}
+                {passportPreview && (
+                  <article className="kyc-selected-preview-card">
+                    <img src={passportPreview.url} alt="Selected passport size" />
+                    <div>
+                      <strong>{passportPreview.name}</strong>
+                      <span>Passport Size Photo - {formatFileSize(passportPreview.size)}</span>
+                    </div>
+                    <button type="button" onClick={() => setPassportPhotoFile(null)}>
+                      Remove
+                    </button>
+                  </article>
+                )}
+              </div>
+            )}
 
             <button onClick={submitKyc} disabled={uploading} className="kyc-submit-btn">
               {uploading ? 'Submitting...' : 'Submit KYC'}

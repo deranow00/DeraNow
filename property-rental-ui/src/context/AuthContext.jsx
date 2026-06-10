@@ -61,7 +61,8 @@ export function AuthProvider({ children }) {
         email: data.user.email,
         role: data.user.role,
         name: data.user.name,
-        ownerVerificationStatus: data.user.ownerVerificationStatus,
+        kycStatus: data.user.kycStatus,
+        kycRejectReason: data.user.kycRejectReason,
       };
 
       updateUser(userData);
@@ -124,7 +125,8 @@ export function AuthProvider({ children }) {
           email: data.user.email,
           role: data.user.role,
           name: data.user.name,
-          ownerVerificationStatus: data.user.ownerVerificationStatus,
+          kycStatus: data.user.kycStatus,
+          kycRejectReason: data.user.kycRejectReason,
         });
       }
       return true;

@@ -64,6 +64,7 @@ export default function MyProperties() {
     title: '',
     location: '',
     approximateLocation: '',
+    ownerPhone: '',
     price: '',
     bedrooms: '',
     bathrooms: '',
@@ -120,6 +121,7 @@ export default function MyProperties() {
       title: property.title || '',
       location: property.location || '',
       approximateLocation: property.approximateLocation || '',
+      ownerPhone: property.ownerPhone || '',
       price: property.price || '',
       bedrooms: property.bedrooms || '',
       bathrooms: property.bathrooms || '',
@@ -294,6 +296,7 @@ export default function MyProperties() {
       !formData.title ||
       !formData.location ||
       !formData.approximateLocation ||
+      !formData.ownerPhone ||
       !formData.locationCoordinates ||
       !formData.price ||
       !formData.bedrooms ||
@@ -505,6 +508,20 @@ export default function MyProperties() {
                 onChange={handleInputChange}
                 placeholder="e.g. Hetauda-6, Chaughada"
               />
+            </div>
+            <div className="form-group">
+              <label>Owner Phone Number*</label>
+              <input
+                name="ownerPhone"
+                type="tel"
+                inputMode="tel"
+                value={formData.ownerPhone}
+                onChange={handleInputChange}
+                placeholder="e.g. 98XXXXXXXX"
+              />
+              <small className="location-coordinate-note">
+                Renters can see this only after they book a visit for this property.
+              </small>
             </div>
             <div className="form-group">
               <label>Price (Rs)*</label>
@@ -792,6 +809,9 @@ export default function MyProperties() {
             </p>
             <p>
               <strong>Location:</strong> {viewProperty.location}
+            </p>
+            <p>
+              <strong>Owner Phone:</strong> {viewProperty.ownerPhone || 'Not added'}
             </p>
             <p>
               <strong>Rent:</strong> Rs. {viewProperty.price}

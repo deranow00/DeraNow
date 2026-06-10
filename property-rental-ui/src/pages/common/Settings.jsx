@@ -12,10 +12,32 @@ const DEFAULT_TYPES = {
   bookingRejected: true,
   newListing: true,
   listingApproval: true,
-  ownerVerification: true,
+  kyc: true,
   message: true,
   review: true,
 };
+
+const NOTIFICATION_TYPE_LABELS = {
+  payment: 'Payments',
+  newBooking: 'New bookings',
+  bookingAccepted: 'Booking accepted',
+  bookingRejected: 'Booking rejected',
+  newListing: 'New listings',
+  listingApproval: 'Listing approval',
+  kyc: 'KYC updates',
+  ownerVerification: 'Legacy owner verification',
+  message: 'Messages',
+  review: 'Reviews',
+  leaseRenewal: 'Lease renewal',
+  workflowReminder: 'Workflow reminders',
+  payoutReminder: 'Payout reminders',
+};
+
+const normalizeNotificationTypes = (types = {}) =>
+  Object.keys(DEFAULT_TYPES).reduce((acc, key) => {
+    acc[key] = types[key] ?? DEFAULT_TYPES[key];
+    return acc;
+  }, {});
 
 const DEFAULT_PRIVACY = {
   showEmailToOwnerOrRenter: true,
@@ -63,7 +85,7 @@ export default function Settings() {
         setPrefs({
           inApp: data.notificationPreferences?.inApp ?? true,
           email: data.notificationPreferences?.email ?? false,
-          types: { ...DEFAULT_TYPES, ...(data.notificationPreferences?.types || {}) },
+          types: normalizeNotificationTypes(data.notificationPreferences?.types || {}),
         });
         setPrivacyPrefs({
           ...DEFAULT_PRIVACY,
@@ -150,7 +172,7 @@ export default function Settings() {
           {Object.keys(prefs.types).map((key) => (
             <label key={key} className="checkbox">
               <input type="checkbox" checked={prefs.types[key]} onChange={() => toggleType(key)} />
-              <span>{key}</span>
+              <span>{NOTIFICATION_TYPE_LABELS[key] || key}</span>
             </label>
           ))}
         </div>

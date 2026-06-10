@@ -15,6 +15,7 @@ const propertySchema = new mongoose.Schema(
     title: { type: String, required: true },
     location: { type: String, required: true },
     approximateLocation: { type: String, trim: true, default: '' },
+    ownerPhone: { type: String, trim: true, default: '' },
     locationCoordinates: {
       lat: { type: Number, default: null },
       lng: { type: Number, default: null },

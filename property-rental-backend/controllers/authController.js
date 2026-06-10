@@ -18,7 +18,8 @@ const toPublicUser = (user) => ({
   email: user.email,
   role: user.role,
   name: user.name,
-  ownerVerificationStatus: user.ownerVerificationStatus,
+  kycStatus: user.kycStatus,
+  kycRejectReason: user.kycRejectReason,
 });
 
 const issueSessionTokens = async (user) => {

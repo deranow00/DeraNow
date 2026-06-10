@@ -133,7 +133,7 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
           <span>{property.petFriendly ? 'Pet friendly' : 'No pets'}</span>
         </div>
 
-        {property.ownerId?.ownerVerificationStatus === 'verified' && (
+        {property.ownerId?.kycStatus === 'verified' && (
           <span className="verified-badge">Verified Owner</span>
         )}
 

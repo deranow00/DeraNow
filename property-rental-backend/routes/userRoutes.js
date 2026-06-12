@@ -240,11 +240,25 @@ router.post('/me/kyc-submit', protect, upload.array('kycDocs', 5), async (req, r
       });
     }
 
+    const passportPhotoDoc = uploadedDocs.find(
+      (doc) => String(doc.docType || '').toLowerCase() === 'passport size photo'
+    );
+    const profileImageUpdate = passportPhotoDoc
+      ? {
+          profileImage: {
+            imageUrl: passportPhotoDoc.imageUrl,
+            publicId: passportPhotoDoc.publicId,
+            updatedAt: new Date(),
+          },
+        }
+      : {};
+
     const user = await User.findByIdAndUpdate(
       req.user._id,
       {
         kycStatus: 'pending',
         kycRejectReason: '',
+        ...profileImageUpdate,
         $push: { kycDocuments: { $each: uploadedDocs } },
       },
       { new: true }
@@ -265,7 +279,11 @@ router.post('/me/kyc-submit', protect, upload.array('kycDocs', 5), async (req, r
       }
     }
 
-    return res.json({ message: 'KYC submitted successfully', kycStatus: user.kycStatus });
+    return res.json({
+      message: 'KYC submitted successfully',
+      kycStatus: user.kycStatus,
+      profileImage: user.profileImage,
+    });
   } catch (err) {
     console.error('me/kyc-submit error:', err);
     return res.status(500).json({ error: err.message || 'Failed to submit KYC' });

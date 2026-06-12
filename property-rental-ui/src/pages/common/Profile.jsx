@@ -151,6 +151,7 @@ export default function Profile() {
     .slice(0, 2)
     .map((part) => part.charAt(0).toUpperCase())
     .join('');
+  const profileImageUrl = profile?.profileImage?.imageUrl || user?.profileImage?.imageUrl || '';
 
   if (!profile) return <p className="profile-loading">Loading profile...</p>;
 
@@ -158,7 +159,9 @@ export default function Profile() {
     <div className="profile-page">
       <div className="profile-header-card surface-card">
         <div className="profile-hero">
-          <div className="profile-avatar" aria-hidden="true">{initials || 'U'}</div>
+          <div className={`profile-avatar ${profileImageUrl ? 'has-image' : ''}`} aria-hidden="true">
+            {profileImageUrl ? <img src={profileImageUrl} alt="" /> : (initials || 'U')}
+          </div>
           <div className="profile-hero-copy">
             <span className="profile-eyebrow">Account Center</span>
             <h2>My Profile</h2>

@@ -63,6 +63,7 @@ export function AuthProvider({ children }) {
         name: data.user.name,
         kycStatus: data.user.kycStatus,
         kycRejectReason: data.user.kycRejectReason,
+        profileImage: data.user.profileImage,
       };
 
       updateUser(userData);
@@ -127,6 +128,7 @@ export function AuthProvider({ children }) {
           name: data.user.name,
           kycStatus: data.user.kycStatus,
           kycRejectReason: data.user.kycRejectReason,
+          profileImage: data.user.profileImage,
         });
       }
       return true;

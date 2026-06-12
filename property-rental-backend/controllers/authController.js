@@ -20,6 +20,7 @@ const toPublicUser = (user) => ({
   name: user.name,
   kycStatus: user.kycStatus,
   kycRejectReason: user.kycRejectReason,
+  profileImage: user.profileImage,
 });
 
 const issueSessionTokens = async (user) => {

@@ -133,8 +133,12 @@ export default function RenterLayout() {
             <p>{user?.name || t('common.renter')}</p>
           </div>
           <div className="user-menu">
-            <div className="topbar-avatar">
-              <span>{(user?.name || 'R').trim().charAt(0).toUpperCase()}</span>
+            <div className={`topbar-avatar ${user?.profileImage?.imageUrl ? 'has-image' : ''}`}>
+              {user?.profileImage?.imageUrl ? (
+                <img src={user.profileImage.imageUrl} alt="" />
+              ) : (
+                <span>{(user?.name || 'R').trim().charAt(0).toUpperCase()}</span>
+              )}
             </div>
             <NotificationList />
           </div>

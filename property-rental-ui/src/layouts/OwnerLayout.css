@@ -200,6 +200,18 @@
   border: 1px solid rgba(249, 115, 22, 0.18);
   color: #c2410c;
   font-weight: 700;
+  overflow: hidden;
+}
+
+.owner-layout .topbar-avatar.has-image {
+  padding: 0;
+  background: var(--surface-muted);
+}
+
+.owner-layout .topbar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .owner-layout .dashboard-content {

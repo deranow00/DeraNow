@@ -26,6 +26,9 @@ export default function MobileBottomNav({
       return true;
     });
   }, [primaryItems, secondaryItems]);
+  const splitIndex = Math.ceil(primaryItems.length / 2);
+  const leftPrimaryItems = primaryItems.slice(0, splitIndex);
+  const rightPrimaryItems = primaryItems.slice(splitIndex);
 
   const handleLogout = () => {
     logout();
@@ -127,7 +130,7 @@ export default function MobileBottomNav({
         className={`mobile-bottom-nav${isCollapsed ? ' collapsed' : ''}${moreOpen ? ' menu-open' : ''}`}
         aria-label="Bottom navigation"
       >
-        {primaryItems.map((item) => (
+        {leftPrimaryItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -153,6 +156,19 @@ export default function MobileBottomNav({
           </span>
           <span className="mobile-bottom-nav-label">{t('common.more')}</span>
         </button>
+        {rightPrimaryItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.end}
+            className={({ isActive }) =>
+              `mobile-bottom-nav-link${isActive ? ' active' : ''}`
+            }
+          >
+            <span className="mobile-bottom-nav-icon">{item.icon}</span>
+            <span className="mobile-bottom-nav-label">{item.labelKey ? t(item.labelKey) : item.label}</span>
+          </NavLink>
+        ))}
       </nav>
     </>
   );

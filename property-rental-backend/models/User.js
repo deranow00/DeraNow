@@ -118,6 +118,11 @@ const userSchema = new mongoose.Schema({
     type: [kycDocumentSchema],
     default: [],
   },
+  profileImage: {
+    imageUrl: { type: String, default: '' },
+    publicId: { type: String, default: '' },
+    updatedAt: { type: Date },
+  },
   notificationPreferences: {
     type: notificationPreferencesSchema,
     default: () => ({}),

@@ -37,6 +37,10 @@
   border-color: rgba(55, 65, 81, 0.9) !important;
 }
 
+:root[data-theme='dark'] .mobile-bottom-nav::before {
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0), rgba(17, 24, 39, 0.96) 52%) !important;
+}
+
 :root[data-theme='dark'] .mobile-bottom-nav-link {
   color: #9ca3af !important;
 }
@@ -45,6 +49,12 @@
 :root[data-theme='dark'] .mobile-bottom-nav-link[aria-expanded='true'] {
   background: linear-gradient(180deg, rgba(20, 184, 166, 0.22), rgba(20, 184, 166, 0.1)) !important;
   color: #ccfbf1 !important;
+}
+
+:root[data-theme='dark'] .mobile-bottom-nav-more .mobile-bottom-nav-icon {
+  box-shadow:
+    0 16px 26px rgba(20, 184, 166, 0.24),
+    0 0 0 7px rgba(17, 24, 39, 0.96) !important;
 }
 
 :root[data-theme='dark'] .mobile-nav-sheet-link {

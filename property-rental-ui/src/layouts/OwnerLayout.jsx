@@ -132,8 +132,12 @@ export default function OwnerLayout() {
             <p>{user?.name || t('common.owner')}</p>
           </div>
           <div className="user-menu">
-            <div className="topbar-avatar">
-              <span>{(user?.name || 'O').trim().charAt(0).toUpperCase()}</span>
+            <div className={`topbar-avatar ${user?.profileImage?.imageUrl ? 'has-image' : ''}`}>
+              {user?.profileImage?.imageUrl ? (
+                <img src={user.profileImage.imageUrl} alt="" />
+              ) : (
+                <span>{(user?.name || 'O').trim().charAt(0).toUpperCase()}</span>
+              )}
             </div>
             <NotificationList />
           </div>

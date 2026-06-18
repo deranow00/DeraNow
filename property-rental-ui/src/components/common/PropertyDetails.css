@@ -117,6 +117,22 @@
   font-weight: 900;
 }
 
+.details-image-label {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  max-width: calc(100% - 98px);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.68);
+  color: #fff;
+  padding: 0.34rem 0.68rem;
+  font-size: 0.8rem;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .property-details-thumbs {
   display: grid;
   grid-template-columns: 1fr;
@@ -130,6 +146,7 @@
   background: transparent;
   cursor: pointer;
   overflow: hidden;
+  display: grid;
 }
 
 .property-details-thumbs button.active {
@@ -142,6 +159,16 @@
   height: 82px;
   object-fit: cover;
   display: block;
+}
+
+.property-details-thumbs button span {
+  padding: 0.28rem 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .property-details-popup h2 {

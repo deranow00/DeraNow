@@ -151,7 +151,9 @@ export default function PropertyDetails({ id }) {
   const galleryImages = Array.isArray(property.images) && property.images.length
     ? property.images
     : [property.image || '/default-property.jpg'];
+  const galleryLabels = Array.isArray(property.imageLabels) ? property.imageLabels : [];
   const activeGalleryImage = galleryImages[activeImageIndex] || galleryImages[0] || '/default-property.jpg';
+  const activeGalleryLabel = galleryLabels[activeImageIndex] || `Photo ${activeImageIndex + 1}`;
   const ownerVerified = property.ownerId?.kycStatus === 'verified';
   const bookingCharge = Number(property.bookingChargeAmount || BOOKING_CHARGE_BY_TYPE[property.type] || BOOKING_CHARGE_BY_TYPE.Condo);
   const visitPassAmount = Number(property.visitPassAmount || 500);
@@ -192,6 +194,7 @@ export default function PropertyDetails({ id }) {
       <div className="property-details-gallery">
         <div className="property-details-slider">
           <img src={activeGalleryImage} alt={`${property.title} photo ${activeImageIndex + 1}`} />
+          <span className="details-image-label">{activeGalleryLabel}</span>
           {galleryImages.length > 1 && (
             <>
               <button
@@ -224,6 +227,7 @@ export default function PropertyDetails({ id }) {
               aria-label={`Show property photo ${index + 1}`}
             >
               <img src={imageUrl} alt={`${property.title} ${index + 1}`} />
+              <span>{galleryLabels[index] || `Photo ${index + 1}`}</span>
             </button>
           ))}
         </div>
@@ -235,11 +239,13 @@ export default function PropertyDetails({ id }) {
         <article><span>Booking Charge</span><strong>Rs. {bookingCharge.toLocaleString()}</strong></article>
         <article><span>Availability</span><strong>{availabilityStatus}</strong></article>
         <article><span>Rooms</span><strong>{property.bedrooms || 0} bed / {property.bathrooms || 0} bath</strong></article>
+        <article><span>Kitchen</span><strong>{property.kitchenAvailable ? 'Available' : 'Not listed'}</strong></article>
       </section>
 
       <section className="property-badge-row">
         <span>{parkingLabel(property.parkingType, property.parkingAvailable)}</span>
         <span>{property.petFriendly ? 'Pet friendly' : 'Pets not listed'}</span>
+        <span>{property.kitchenAvailable ? 'Kitchen available' : 'Kitchen not listed'}</span>
         <span>{ownerVerified ? 'Verified owner' : 'Owner verification pending'}</span>
         <span>{availabilityStatus}</span>
         <span>{property.status === 'Approved' ? 'Approved listing' : property.status}</span>

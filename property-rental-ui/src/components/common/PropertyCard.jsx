@@ -18,8 +18,10 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
   const galleryImages = Array.isArray(property.images) && property.images.length
     ? property.images
     : [property.image || '/default-property.jpg'];
+  const galleryLabels = Array.isArray(property.imageLabels) ? property.imageLabels : [];
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const activeImage = galleryImages[activeImageIndex] || galleryImages[0] || '/default-property.jpg';
+  const activeImageLabel = galleryLabels[activeImageIndex] || `Photo ${activeImageIndex + 1}`;
   const availabilityStatus = property.availabilityStatus || property.bookingStatus || 'Available';
   const availabilityClass = availabilityStatus.toLowerCase().replace(/\s+/g, '-');
   const isOccupied = availabilityStatus === 'Occupied';
@@ -97,6 +99,7 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
     <div className="property-card">
       <div className="property-card-slider">
         <img src={activeImage} alt={property.title} />
+        <span className="property-image-label">{activeImageLabel}</span>
         {galleryImages.length > 1 && (
           <>
             <button type="button" className="property-slide-btn prev" onClick={showPreviousImage} aria-label="Previous property photo">
@@ -131,6 +134,7 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
         <div className="property-amenities">
           <span>{parkingLabel(property.parkingType, property.parkingAvailable)}</span>
           <span>{property.petFriendly ? 'Pet friendly' : 'No pets'}</span>
+          <span>{property.kitchenAvailable ? 'Kitchen' : 'No kitchen'}</span>
         </div>
 
         {property.ownerId?.kycStatus === 'verified' && (

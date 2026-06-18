@@ -6,6 +6,7 @@ import { AuthContext } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { SocketProvider } from './context/SocketContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { ToastProvider } from './context/ToastContext';
 import { API_BASE_URL } from './config/api';
 import AppLaunchSplash from './components/common/AppLaunchSplash';
 import SeoManager from './components/common/SeoManager';
@@ -157,7 +158,9 @@ function AppShell() {
 const App = () => {
   return (
     <AuthProvider>
-      <AppShell />
+      <ToastProvider>
+        <AppShell />
+      </ToastProvider>
     </AuthProvider>
   );
 };

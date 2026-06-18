@@ -354,6 +354,7 @@
   background: transparent;
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease;
+  display: grid;
 }
 
 .modal-thumb:hover,
@@ -370,9 +371,41 @@
   display: block;
 }
 
+.modal-thumb span {
+  padding: 0.3rem 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .modal-card-count {
   top: 14px;
   left: 14px;
+}
+
+.owner-image-label {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+  max-width: calc(100% - 28px);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  padding: 0.34rem 0.68rem;
+  font-size: 0.78rem;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-image-label {
+  top: auto;
+  bottom: 14px;
 }
 
 .form-group { margin-bottom: 1.5rem; }
@@ -417,7 +450,7 @@
 
 .amenity-edit-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -443,6 +476,37 @@
 
 .amenity-edit-toggle span {
   font-weight: 700;
+}
+
+.edit-photo-label-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.edit-photo-label-grid label {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.edit-photo-label-grid label span {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.edit-photo-label-grid select {
+  width: 100%;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0.68rem 0.75rem;
 }
 
 .form-error { background-color: #fee2e2; border: 1px solid #fecaca; color: var(--danger); padding: 0.75rem; border-radius: 0.5rem; margin: 1rem 0; font-size: 0.875rem; font-weight: 500; text-align: center; }

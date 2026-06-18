@@ -45,6 +45,24 @@ const getNumericSetting = async (key, fallback) => {
 
 const getVisitPassAmount = () => getNumericSetting('visitCharge', DEFAULT_VISIT_PASS_AMOUNT);
 
+const notifyUser = async (userId, type, message, link) => {
+  if (!userId) return;
+  try {
+    await sendNotification(userId, type, message, link);
+  } catch (err) {
+    console.error('visit notification failed:', {
+      userId: userId?.toString?.() || userId,
+      type,
+      message: err.message,
+    });
+  }
+};
+
+const notifyAdmins = async (type, message, link) => {
+  const admins = await User.find({ role: 'admin' }).select('_id');
+  await Promise.all(admins.map((admin) => notifyUser(admin._id, type, message, link)));
+};
+
 const getBookingConfirmationAmount = async (propertyType) => {
   const keyByType = {
     Condo: 'roomBookingCharge',
@@ -215,17 +233,13 @@ router.post('/pass/payment-request', protect, async (req, res) => {
       paidNotifiedAt: new Date(),
     });
 
-    const admins = await User.find({ role: 'admin' }).select('_id');
-    for (const admin of admins) {
-      await sendNotification(
-        admin._id,
-        'payment',
-        `${req.user.name || 'A renter'} submitted visit pass payment for "${property.title}".`,
-        '/admin/visits'
-      );
-    }
+    await notifyAdmins(
+      'payment',
+      `${req.user.name || 'A renter'} submitted visit pass payment for "${property.title}".`,
+      '/admin/visits'
+    );
 
-    await sendNotification(
+    await notifyUser(
       req.user._id,
       'payment',
       'Your visit pass payment was submitted. DeraNow admin will verify it soon.',
@@ -276,21 +290,27 @@ router.post('/', protect, async (req, res) => {
       note,
     });
 
-    await sendNotification(
+    await notifyUser(
       req.user._id,
-      'newBooking',
+      'visit',
       `Visit booked for "${property.title}" on ${parsedVisitDate.toLocaleDateString()}.`,
       '/renter/visits'
     );
 
     if (property.ownerId) {
-      await sendNotification(
+      await notifyUser(
         property.ownerId,
-        'newBooking',
+        'visit',
         `${req.user.name || 'A renter'} booked a visit for "${property.title}".`,
-        '/owner/requests'
+        '/owner/visits'
       );
     }
+
+    await notifyAdmins(
+      'visit',
+      `${req.user.name || 'A renter'} booked a visit for "${property.title}" on ${parsedVisitDate.toLocaleDateString()}.`,
+      '/admin/visits'
+    );
 
     return res.status(201).json({
       message: 'Visit booked successfully',
@@ -321,9 +341,9 @@ router.patch('/:id/mark-done', protect, async (req, res) => {
 
     if (visit.renterMarkedDoneAt && visit.ownerMarkedDoneAt && visit.status === 'scheduled') {
       visit.status = 'completed';
-      await sendNotification(
+      await notifyUser(
         visit.renter?._id || visit.renter,
-        'newBooking',
+        'visit',
         `Visit completed for "${visit.property?.title || 'property'}". You can now confirm booking.`,
         '/renter/visits'
       );
@@ -333,9 +353,9 @@ router.patch('/:id/mark-done', protect, async (req, res) => {
 
     const notifyUserId = isRenter ? visit.owner : visit.renter?._id || visit.renter;
     if (notifyUserId) {
-      await sendNotification(
+      await notifyUser(
         notifyUserId,
-        'newBooking',
+        'visit',
         `${req.user.name || 'User'} marked the visit for "${visit.property?.title || 'property'}" as done.`,
         isRenter ? '/owner/visits' : '/renter/visits'
       );
@@ -460,25 +480,21 @@ router.post('/:id/confirm-booking', protect, async (req, res) => {
     }
 
     if (visit.owner) {
-      await sendNotification(
+      await notifyUser(
         visit.owner,
-        'newBooking',
+        'visit',
         `${req.user.name || 'Renter'} confirmed booking after visiting "${visit.property?.title || 'property'}".`,
         '/owner/visits'
       );
     }
 
-    const admins = await User.find({ role: 'admin' }).select('_id');
-    for (const admin of admins) {
-      await sendNotification(
-        admin._id,
-        'payment',
-        `Post-visit booking payment of Rs. ${amount} submitted for "${visit.property?.title || 'property'}".`,
-        '/admin/visits'
-      );
-    }
+    await notifyAdmins(
+      'payment',
+      `Post-visit booking payment of Rs. ${amount} submitted for "${visit.property?.title || 'property'}".`,
+      '/admin/visits'
+    );
 
-    await sendNotification(
+    await notifyUser(
       req.user._id,
       'payment',
       `Booking confirmation submitted. Your visit promo code has been consumed.`,
@@ -560,7 +576,7 @@ router.patch('/admin/passes/:id/approve', protect, adminOnly, async (req, res) =
     visitPass.adminRemark = String(req.body?.adminRemark || visitPass.adminRemark || '').trim();
     await visitPass.save();
 
-    await sendNotification(
+    await notifyUser(
       visitPass.renter._id || visitPass.renter,
       'payment',
       `Your DeraNow visit pass is approved. Promo code: ${visitPass.promoCode}`,
@@ -588,7 +604,7 @@ router.patch('/admin/passes/:id/reject', protect, adminOnly, async (req, res) =>
     visitPass.adminRemark = String(req.body?.adminRemark || '').trim();
     await visitPass.save();
 
-    await sendNotification(
+    await notifyUser(
       visitPass.renter._id || visitPass.renter,
       'payment',
       `Your visit pass payment could not be approved.${visitPass.adminRemark ? ` ${visitPass.adminRemark}` : ''}`,

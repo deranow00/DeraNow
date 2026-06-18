@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { API_BASE_URL } from '../../config/api';
 import './ComplaintPage.css';
 
 export default function ComplaintPage() {
   const { user, token } = useContext(AuthContext);
+  const { showToast } = useToast();
   const renterEmail = user?.email || '';
 
   const [formData, setFormData] = useState({
@@ -78,6 +80,7 @@ export default function ComplaintPage() {
 
       if (res.ok) {
         setSubmitted(true);
+        showToast('The form submitted successfully.');
         setFormData({
           name: user?.name || '',
           email: renterEmail,
@@ -86,10 +89,14 @@ export default function ComplaintPage() {
           complaint: '',
         });
       } else {
-        setError(data.message || 'Something went wrong');
+        const nextError = data.message || 'Something went wrong';
+        setError(nextError);
+        showToast(nextError, { type: 'error' });
       }
     } catch (err) {
-      setError('Server not reachable. Please try again later.');
+      const nextError = 'Server not reachable. Please try again later.';
+      setError(nextError);
+      showToast(nextError, { type: 'error' });
     }
   };
 

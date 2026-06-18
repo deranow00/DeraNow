@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { API_BASE_URL } from '../../config/api';
 import { compressImageFile, compressImageFiles } from '../../utils/imageCompression';
 import './Profile.css';
@@ -8,6 +9,7 @@ const DOC_TYPE_OPTIONS = ['Driving License', 'Citizenship', 'NID'];
 
 export default function Profile() {
   const { token, user, setUser } = useContext(AuthContext);
+  const { showToast } = useToast();
   const [profile, setProfile] = useState(null);
   const [files, setFiles] = useState([]);
   const [passportPhotoFile, setPassportPhotoFile] = useState(null);
@@ -89,6 +91,7 @@ export default function Profile() {
   const submitKyc = async () => {
     if (!files.length) {
       setMessage('Please select at least one ID document image.');
+      showToast('Please select at least one ID document image.', { type: 'error' });
       return;
     }
 
@@ -132,11 +135,13 @@ export default function Profile() {
 
     if (!res.ok) {
       setMessage(data.error || 'Failed to submit KYC');
+      showToast(data.error || 'Failed to submit KYC', { type: 'error' });
       setUploading(false);
       return;
     }
 
     setMessage('KYC submitted successfully. Admin will review your request soon.');
+    showToast('The form submitted successfully.');
     setFiles([]);
     setPassportPhotoFile(null);
     await loadProfile();

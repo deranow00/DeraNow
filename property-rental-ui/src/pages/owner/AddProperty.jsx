@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { Geolocation } from '@capacitor/geolocation';
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import { AuthContext } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { API_BASE_URL } from '../../config/api';
 import { compressImageFiles } from '../../utils/imageCompression';
 import 'leaflet/dist/leaflet.css';
@@ -23,8 +24,10 @@ const initialForm = {
   type: 'Apartment',
   image: '',
   imageFiles: [],
+  imageLabels: [],
   parkingType: 'none',
   petFriendly: false,
+  kitchenAvailable: false,
 };
 
 const DEFAULT_MAP_CENTER = { lat: 27.7172, lng: 85.324 };
@@ -35,6 +38,9 @@ const parkingOptions = [
   { value: 'car', label: 'Car' },
   { value: 'both', label: 'Both' },
 ];
+
+const imageLabelOptions = ['Room 1', 'Room 2', 'Bathroom', 'Kitchen', 'Living area', 'Entrance', 'Balcony', 'Other'];
+const defaultImageLabel = (index) => imageLabelOptions[index] || `Photo ${index + 1}`;
 
 function MapResize() {
   const map = useMap();
@@ -81,6 +87,7 @@ export default function AddProperty() {
   const [mapSearch, setMapSearch] = useState('');
 
   const { token, user } = useContext(AuthContext);
+  const { showToast } = useToast();
   const kycStatus = user?.kycStatus || 'unsubmitted';
   const ownerVerified = kycStatus === 'verified';
 
@@ -120,7 +127,8 @@ export default function AddProperty() {
           )) === index
         ))
         .slice(0, 5);
-      return { ...prev, imageFiles: merged };
+      const imageLabels = merged.map((_, index) => prev.imageLabels[index] || defaultImageLabel(index));
+      return { ...prev, imageFiles: merged, imageLabels };
     });
   };
 
@@ -128,7 +136,19 @@ export default function AddProperty() {
     setForm((prev) => ({
       ...prev,
       imageFiles: prev.imageFiles.filter((file) => `${file.name}-${file.lastModified}-${file.size}` !== id),
+      imageLabels: prev.imageFiles
+        .map((file, index) => ({ file, label: prev.imageLabels[index] }))
+        .filter(({ file }) => `${file.name}-${file.lastModified}-${file.size}` !== id)
+        .map(({ label }, index) => label || defaultImageLabel(index)),
     }));
+  };
+
+  const updateImageLabel = (index, value) => {
+    setForm((prev) => {
+      const imageLabels = [...prev.imageLabels];
+      imageLabels[index] = value;
+      return { ...prev, imageLabels };
+    });
   };
 
   const formatCoordinates = (coords) =>
@@ -288,6 +308,10 @@ export default function AddProperty() {
 
     try {
       const uploaded = await uploadImageToCloudinary();
+      const imageCount = uploaded.imageUrls.length || (uploaded.imageUrl ? 1 : 0);
+      const imageLabels = Array.from({ length: imageCount }, (_, index) => (
+        form.imageLabels[index] || defaultImageLabel(index)
+      ));
 
       const response = await fetch(`${API_BASE_URL}/api/properties`, {
         method: 'POST',
@@ -308,26 +332,34 @@ export default function AddProperty() {
           type: form.type,
           image: uploaded.imageUrl,
           images: uploaded.imageUrls,
+          imageLabels,
           parkingAvailable: form.parkingType !== 'none',
           parkingType: form.parkingType,
           petFriendly: form.petFriendly,
+          kitchenAvailable: form.kitchenAvailable,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || data.message || 'Failed to add property.');
+        const nextError = data.error || data.message || 'Failed to add property.';
+        setError(nextError);
+        showToast(nextError, { type: 'error' });
       } else {
         setCreatedCount((prev) => prev + 1);
-        setSuccess(keepAdding ? 'Property submitted for approval. You can add another listing now.' : 'Property submitted for approval.');
+        const nextSuccess = keepAdding ? 'Property submitted for approval. You can add another listing now.' : 'Property submitted for approval.';
+        setSuccess(nextSuccess);
+        showToast('The form submitted successfully.');
         if (keepAdding) {
           setForm(initialForm);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       }
     } catch (err) {
-      setError(err.message || 'Server error. Please try again later.');
+      const nextError = err.message || 'Server error. Please try again later.';
+      setError(nextError);
+      showToast(nextError, { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -502,6 +534,14 @@ export default function AddProperty() {
               />
               <span>Pet Friendly</span>
             </label>
+            <label className="amenity-toggle">
+              <input
+                type="checkbox"
+                checked={form.kitchenAvailable}
+                onChange={(e) => updateField('kitchenAvailable', e.target.checked)}
+              />
+              <span>Kitchen Available</span>
+            </label>
           </div>
 
           <label className="form-field">
@@ -573,6 +613,17 @@ export default function AddProperty() {
                   <figcaption>
                     <span>{index === 0 ? 'Cover photo' : `Photo ${index + 1}`}</span>
                     <small>{(preview.size / 1024 / 1024).toFixed(1)} MB</small>
+                    <label className="photo-label-field">
+                      <span>Photo label</span>
+                      <select
+                        value={form.imageLabels[index] || defaultImageLabel(index)}
+                        onChange={(e) => updateImageLabel(index, e.target.value)}
+                      >
+                        {imageLabelOptions.map((label) => (
+                          <option value={label} key={label}>{label}</option>
+                        ))}
+                      </select>
+                    </label>
                   </figcaption>
                   <button type="button" onClick={() => removeImageFile(preview.id)} aria-label={`Remove ${preview.name}`}>
                     <FaTimes aria-hidden="true" />

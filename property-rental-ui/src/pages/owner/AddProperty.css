@@ -424,7 +424,7 @@
 
 .photo-preview-card figcaption {
   display: grid;
-  gap: 0.1rem;
+  gap: 0.28rem;
   padding: 0.5rem 0.6rem;
 }
 
@@ -437,6 +437,35 @@
 .photo-preview-card figcaption small {
   color: var(--text-muted);
   font-size: 0.72rem;
+}
+
+.photo-label-field {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+}
+
+.photo-label-field span {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.photo-label-field select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.45rem 0.5rem;
+}
+
+.photo-label-field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
 }
 
 .photo-preview-card button {

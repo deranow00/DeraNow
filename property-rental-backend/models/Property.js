@@ -34,6 +34,14 @@ const propertySchema = new mongoose.Schema(
         message: 'A property can have up to 5 images',
       },
     },
+    imageLabels: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: (value) => !Array.isArray(value) || value.length <= 5,
+        message: 'A property can have up to 5 image labels',
+      },
+    },
     parkingAvailable: { type: Boolean, default: false },
     parkingType: {
       type: String,
@@ -41,6 +49,7 @@ const propertySchema = new mongoose.Schema(
       default: 'none',
     },
     petFriendly: { type: Boolean, default: false },
+    kitchenAvailable: { type: Boolean, default: false },
     ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     status: {
       type: String,

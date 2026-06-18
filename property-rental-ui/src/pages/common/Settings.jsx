@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { NotificationContext } from '../../context/NotificationContext';
+import { useToast } from '../../context/ToastContext';
 import { API_BASE_URL } from '../../config/api';
 import { useLanguage } from '../../context/LanguageContext';
 import './Settings.css';
@@ -12,6 +13,7 @@ const DEFAULT_TYPES = {
   bookingRejected: true,
   newListing: true,
   listingApproval: true,
+  visit: true,
   kyc: true,
   message: true,
   review: true,
@@ -24,6 +26,7 @@ const NOTIFICATION_TYPE_LABELS = {
   bookingRejected: 'Booking rejected',
   newListing: 'New listings',
   listingApproval: 'Listing approval',
+  visit: 'Visit updates',
   kyc: 'KYC updates',
   ownerVerification: 'Legacy owner verification',
   message: 'Messages',
@@ -60,6 +63,7 @@ export default function Settings() {
     requestPhoneNotifications,
   } = useContext(NotificationContext);
   const { t, openLanguageChooser } = useLanguage();
+  const { showToast } = useToast();
   const [prefs, setPrefs] = useState({ inApp: true, email: false, types: DEFAULT_TYPES });
   const [privacyPrefs, setPrivacyPrefs] = useState(DEFAULT_PRIVACY);
   const [appPrefs, setAppPrefs] = useState(DEFAULT_APP);
@@ -122,6 +126,7 @@ export default function Settings() {
 
     if (res.ok) {
       setMessage(t('settings.updated'));
+      showToast('The form submitted successfully.');
       setUser({
         ...(user || {}),
         notificationPreferences: prefs,
@@ -130,6 +135,7 @@ export default function Settings() {
       });
     } else {
       setMessage(t('settings.failed'));
+      showToast(t('settings.failed'), { type: 'error' });
     }
     setSaving(false);
   };

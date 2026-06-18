@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { API_BASE_URL } from '../../config/api';
 import './BookingPopup.css';
 
@@ -10,6 +11,7 @@ const QR_IMAGE_URL =
 
 export default function BookingPopup({ property, onClose }) {
   const { token } = useContext(AuthContext);
+  const { showToast } = useToast();
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const [visitDate, setVisitDate] = useState('');
@@ -101,9 +103,11 @@ export default function BookingPopup({ property, onClose }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to submit visit pass payment');
       setSuccess('Payment notification sent. Admin will verify and send your promo code.');
+      showToast('The form submitted successfully.');
       await loadVisitState();
     } catch (err) {
       setMessage(err.message);
+      showToast(err.message, { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -136,10 +140,12 @@ export default function BookingPopup({ property, onClose }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to book visit');
       setSuccess('Visit booked successfully.');
+      showToast('Visit booked successfully.');
       await loadVisitState();
       setTimeout(onClose, 1200);
     } catch (err) {
       setMessage(err.message);
+      showToast(err.message, { type: 'error' });
     } finally {
       setLoading(false);
     }

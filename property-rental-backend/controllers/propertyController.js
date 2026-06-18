@@ -83,6 +83,14 @@ const attachAvailability = async (input) => {
   return Array.isArray(input) ? mapped : mapped[0];
 };
 
+const normalizeImageLabels = (labels = [], imageCount = 5) => {
+  if (!Array.isArray(labels)) return [];
+  const maxLabels = Math.min(Math.max(Number(imageCount) || 0, 0), 5);
+  return labels
+    .slice(0, maxLabels)
+    .map((label) => String(label || '').trim().slice(0, 40));
+};
+
 const getApproximateLocation = (property = {}) => {
   if (property.approximateLocation) return property.approximateLocation;
   const parts = String(property.location || '')
@@ -238,12 +246,14 @@ export const addProperty = async (req, res) => {
       bathrooms,
       image,
       images = [],
+      imageLabels = [],
       approximateLocation = '',
       ownerPhone = '',
       locationCoordinates = {},
       parkingAvailable = false,
       parkingType = parkingAvailable ? 'both' : 'none',
       petFriendly = false,
+      kitchenAvailable = false,
     } = req.body;
     const ownerId = req.user._id;
 
@@ -257,6 +267,8 @@ export const addProperty = async (req, res) => {
       ? images.filter(Boolean).slice(0, 5)
       : [];
     const primaryImage = image || normalizedImages[0] || '';
+    const savedImages = normalizedImages.length ? normalizedImages : primaryImage ? [primaryImage] : [];
+    const normalizedImageLabels = normalizeImageLabels(imageLabels, savedImages.length);
     const normalizedParkingType = ['none', 'bike', 'car', 'both'].includes(parkingType) ? parkingType : 'none';
     const coordinates =
       Number.isFinite(Number(locationCoordinates?.lat)) && Number.isFinite(Number(locationCoordinates?.lng))
@@ -282,10 +294,12 @@ export const addProperty = async (req, res) => {
       bedrooms,
       bathrooms,
       image: primaryImage,
-      images: normalizedImages.length ? normalizedImages : primaryImage ? [primaryImage] : [],
+      images: savedImages,
+      imageLabels: normalizedImageLabels,
       parkingAvailable: normalizedParkingType !== 'none',
       parkingType: normalizedParkingType,
       petFriendly: Boolean(petFriendly),
+      kitchenAvailable: Boolean(kitchenAvailable),
       ownerId,
       status: 'Pending',
     });
@@ -363,6 +377,15 @@ export const updateProperty = async (req, res) => {
     if (Array.isArray(update.images)) {
       update.images = update.images.filter(Boolean).slice(0, 5);
       update.image = update.image || update.images[0] || property.image;
+    }
+    if (Array.isArray(update.imageLabels)) {
+      const imageCount = Array.isArray(update.images) && update.images.length
+        ? update.images.length
+        : (property.images?.length || (property.image ? 1 : 0));
+      update.imageLabels = normalizeImageLabels(update.imageLabels, imageCount);
+    }
+    if (Object.prototype.hasOwnProperty.call(update, 'kitchenAvailable')) {
+      update.kitchenAvailable = Boolean(update.kitchenAvailable);
     }
 
     Object.assign(property, update);

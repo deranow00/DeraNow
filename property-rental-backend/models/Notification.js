@@ -12,6 +12,7 @@ const notificationSchema = new mongoose.Schema(
         'bookingRejected',
         'newListing',
         'listingApproval',
+        'visit',
         'kyc',
         'ownerVerification',
         'message',

@@ -11,6 +11,7 @@ const notificationPreferencesSchema = new mongoose.Schema(
       bookingRejected: { type: Boolean, default: true },
       newListing: { type: Boolean, default: true },
       listingApproval: { type: Boolean, default: true },
+      visit: { type: Boolean, default: true },
       kyc: { type: Boolean, default: true },
       ownerVerification: { type: Boolean, default: true },
       message: { type: Boolean, default: true },

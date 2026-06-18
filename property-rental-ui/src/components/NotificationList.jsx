@@ -21,8 +21,12 @@ export default function NotificationList() {
     const normalized = link.startsWith('/') ? link : `/${link}`;
 
     // Legacy backend links that don't exist in current UI routes.
-    if (normalized.startsWith('/bookings/')) {
+    if (normalized === '/bookings' || normalized.startsWith('/bookings/')) {
       return user?.role === 'owner' ? '/owner/requests' : '/renter/bookings';
+    }
+    if (type === 'visit') {
+      if (user?.role === 'owner') return '/owner/visits';
+      if (user?.role === 'renter') return '/renter/visits';
     }
     if (normalized.startsWith('/payments/')) {
       return '/renter/payments';

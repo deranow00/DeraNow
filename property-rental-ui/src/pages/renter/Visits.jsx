@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { API_BASE_URL } from '../../config/api';
 import './Visits.css';
 
@@ -10,6 +11,7 @@ const QR_IMAGE_URL =
 
 export default function Visits() {
   const { token } = useContext(AuthContext);
+  const { showToast } = useToast();
   const [passInfo, setPassInfo] = useState(null);
   const [visits, setVisits] = useState([]);
   const [activeTab, setActiveTab] = useState('pending');
@@ -263,11 +265,14 @@ export default function Visits() {
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error || 'Failed to confirm booking');
       setSuccess('Booking confirmation submitted. Your visit promo code has ended.');
+      showToast('The form submitted successfully.');
       setConfirmVisit(null);
       setConfirmForm(emptyConfirmForm);
       await loadVisits();
     } catch (err) {
-      setError(err.message || 'Failed to confirm booking');
+      const nextError = err.message || 'Failed to confirm booking';
+      setError(nextError);
+      showToast(nextError, { type: 'error' });
     } finally {
       setUpdatingId('');
     }

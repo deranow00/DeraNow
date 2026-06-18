@@ -12,6 +12,8 @@ const displayPropertyType = (type) => (type === 'Condo' ? 'Room' : type);
 const toBackendPropertyType = (type) => (type === 'Room' ? 'Condo' : type);
 const DEFAULT_MAP_CENTER = { lat: 27.7172, lng: 85.324 };
 const MAX_GALLERY_IMAGES = 5;
+const IMAGE_LABEL_OPTIONS = ['Room 1', 'Room 2', 'Bathroom', 'Kitchen', 'Living area', 'Entrance', 'Balcony', 'Other'];
+const defaultImageLabel = (index) => IMAGE_LABEL_OPTIONS[index] || `Photo ${index + 1}`;
 
 const getGalleryImages = (property) =>
   Array.isArray(property?.images) && property.images.length
@@ -19,6 +21,11 @@ const getGalleryImages = (property) =>
     : property?.image
       ? [property.image]
       : ['/default-image.jpg'];
+
+const getGalleryLabels = (property, imageCount) => {
+  const labels = Array.isArray(property?.imageLabels) ? property.imageLabels : [];
+  return Array.from({ length: imageCount }, (_, index) => labels[index] || defaultImageLabel(index));
+};
 
 function MapResize() {
   const map = useMap();
@@ -72,9 +79,11 @@ export default function MyProperties() {
     type: PROPERTY_TYPES[0],
     image: '',
     images: [],
+    imageLabels: [],
     locationCoordinates: null,
     parkingAvailable: false,
     petFriendly: false,
+    kitchenAvailable: false,
   });
   const [formError, setFormError] = useState('');
   const [editImageFiles, setEditImageFiles] = useState([]);
@@ -129,9 +138,11 @@ export default function MyProperties() {
       type: toBackendPropertyType(property.type || PROPERTY_TYPES[0]),
       image: property.image || '',
       images: Array.isArray(property.images) ? property.images : property.image ? [property.image] : [],
+      imageLabels: getGalleryLabels(property, getGalleryImages(property).length),
       locationCoordinates: selectedCoordinates,
       parkingAvailable: Boolean(property.parkingAvailable),
       petFriendly: Boolean(property.petFriendly),
+      kitchenAvailable: Boolean(property.kitchenAvailable),
     });
     setMapCenter(selectedCoordinates || DEFAULT_MAP_CENTER);
     setMapRecenterVersion((prev) => prev + 1);
@@ -291,6 +302,27 @@ export default function MyProperties() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const updateFormImageLabel = (index, value) => {
+    setFormData((prev) => {
+      const imageLabels = [...(prev.imageLabels || [])];
+      imageLabels[index] = value;
+      return { ...prev, imageLabels };
+    });
+  };
+
+  const handleEditImageFiles = (files) => {
+    const incoming = Array.from(files || [])
+      .filter((file) => file.type.startsWith('image/'))
+      .slice(0, MAX_GALLERY_IMAGES);
+    setEditImageFiles(incoming);
+    setFormData((prev) => ({
+      ...prev,
+      imageLabels: incoming.length
+        ? incoming.map((_, index) => prev.imageLabels?.[index] || defaultImageLabel(index))
+        : getGalleryLabels({ imageLabels: prev.imageLabels, images: prev.images, image: prev.image }, getGalleryImages(prev).length),
+    }));
+  };
+
   const handleSave = async () => {
     if (
       !formData.title ||
@@ -309,6 +341,7 @@ export default function MyProperties() {
 
     try {
       const uploaded = await uploadImageToCloudinary();
+      const imageCount = uploaded.imageUrls.length || (uploaded.imageUrl ? 1 : 0);
       const res = await fetch(`${API_BASE_URL}/api/properties/${currentProperty._id}`, {
         method: 'PUT',
         headers: {
@@ -320,11 +353,13 @@ export default function MyProperties() {
           type: toBackendPropertyType(formData.type),
           image: uploaded.imageUrl,
           images: uploaded.imageUrls,
+          imageLabels: Array.from({ length: imageCount }, (_, index) => formData.imageLabels?.[index] || defaultImageLabel(index)),
           price: Number(formData.price),
           bedrooms: Number(formData.bedrooms),
           bathrooms: Number(formData.bathrooms),
           parkingAvailable: Boolean(formData.parkingAvailable),
           petFriendly: Boolean(formData.petFriendly),
+          kitchenAvailable: Boolean(formData.kitchenAvailable),
         }),
       });
 
@@ -386,8 +421,10 @@ export default function MyProperties() {
           {properties.map((property) => (
             (() => {
               const galleryImages = getGalleryImages(property);
+              const galleryLabels = getGalleryLabels(property, galleryImages.length);
               const activeImageIndex = getActiveCardImageIndex(property._id, galleryImages.length);
               const activeImage = galleryImages[activeImageIndex] || '/default-image.jpg';
+              const activeImageLabel = galleryLabels[activeImageIndex] || defaultImageLabel(activeImageIndex);
               const isMultiImage = galleryImages.length > 1;
 
               return (
@@ -398,6 +435,7 @@ export default function MyProperties() {
                       alt={`${property.title} photo ${activeImageIndex + 1}`}
                       className="property-image"
                     />
+                    <span className="owner-image-label">{activeImageLabel}</span>
                     {isMultiImage && (
                       <>
                         <button
@@ -441,6 +479,7 @@ export default function MyProperties() {
                     </p>
                     <p>Parking: {property.parkingAvailable ? 'Available' : 'Not available'}</p>
                     <p>Pet Friendly: {property.petFriendly ? 'Yes' : 'No'}</p>
+                    <p>Kitchen: {property.kitchenAvailable ? 'Available' : 'Not listed'}</p>
                     <p className="status available">Approval: {property.approvalStatus}</p>
                     <p
                       className={`status ${
@@ -590,6 +629,16 @@ export default function MyProperties() {
                 />
                 <span>Pet Friendly</span>
               </label>
+              <label className="amenity-edit-toggle">
+                <input
+                  type="checkbox"
+                  checked={Boolean(formData.kitchenAvailable)}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, kitchenAvailable: e.target.checked }))
+                  }
+                />
+                <span>Kitchen Available</span>
+              </label>
             </div>
             <div className="form-group">
               <span className="photo-upload-label">Upload New Images</span>
@@ -607,7 +656,7 @@ export default function MyProperties() {
                 type="file"
                 accept="image/*"
                 multiple
-                onChange={(e) => setEditImageFiles(Array.from(e.target.files || []).slice(0, 5))}
+                onChange={(e) => handleEditImageFiles(e.target.files)}
               />
               <input
                 id="edit-property-image-camera"
@@ -615,11 +664,29 @@ export default function MyProperties() {
                 type="file"
                 accept="image/*"
                 capture="environment"
-                onChange={(e) => setEditImageFiles(Array.from(e.target.files || []).slice(0, 5))}
+                onChange={(e) => handleEditImageFiles(e.target.files)}
               />
               <small className="photo-upload-selected">
                 {editImageFiles.length ? `${editImageFiles.length} image${editImageFiles.length > 1 ? 's' : ''} selected` : 'No image selected'}
               </small>
+            </div>
+            <div className="form-group">
+              <span className="photo-upload-label">Photo Labels</span>
+              <div className="edit-photo-label-grid">
+                {(editImageFiles.length ? editImageFiles : getGalleryImages(formData)).map((imageItem, index) => (
+                  <label key={`${typeof imageItem === 'string' ? imageItem : imageItem.name}-${index}`}>
+                    <span>{index === 0 ? 'Cover photo' : `Photo ${index + 1}`}</span>
+                    <select
+                      value={formData.imageLabels?.[index] || defaultImageLabel(index)}
+                      onChange={(e) => updateFormImageLabel(index, e.target.value)}
+                    >
+                      {IMAGE_LABEL_OPTIONS.map((label) => (
+                        <option value={label} key={label}>{label}</option>
+                      ))}
+                    </select>
+                  </label>
+                ))}
+              </div>
             </div>
             <div className="form-group">
               <label>Image URL (Optional)</label>
@@ -739,8 +806,10 @@ export default function MyProperties() {
             <h2>Property Details</h2>
             {(() => {
               const galleryImages = getGalleryImages(viewProperty);
+              const galleryLabels = getGalleryLabels(viewProperty, galleryImages.length);
               const activeImageIndex = Math.min(detailImageIndex, galleryImages.length - 1);
               const activeImage = galleryImages[activeImageIndex] || '/default-image.jpg';
+              const activeImageLabel = galleryLabels[activeImageIndex] || defaultImageLabel(activeImageIndex);
               const isMultiImage = galleryImages.length > 1;
 
               return (
@@ -751,6 +820,7 @@ export default function MyProperties() {
                       alt={`${viewProperty.title} photo ${activeImageIndex + 1}`}
                       className="modal-image"
                     />
+                    <span className="owner-image-label modal-image-label">{activeImageLabel}</span>
                     {isMultiImage && (
                       <>
                         <button
@@ -797,6 +867,7 @@ export default function MyProperties() {
                           aria-label={`Show photo ${index + 1}`}
                         >
                           <img src={imageUrl} alt={`${viewProperty.title} ${index + 1}`} />
+                          <span>{galleryLabels[index] || defaultImageLabel(index)}</span>
                         </button>
                       ))}
                     </div>
@@ -833,6 +904,9 @@ export default function MyProperties() {
             </p>
             <p>
               <strong>Pet Friendly:</strong> {viewProperty.petFriendly ? 'Yes' : 'No'}
+            </p>
+            <p>
+              <strong>Kitchen:</strong> {viewProperty.kitchenAvailable ? 'Available' : 'Not listed'}
             </p>
             <div className="modal-buttons">
               <button className="btn-cancel" onClick={() => setViewProperty(null)}>

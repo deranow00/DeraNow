@@ -20,6 +20,7 @@ const initialForm = {
   price: '',
   bedrooms: '',
   bathrooms: '',
+  bathroomType: 'general',
   description: '',
   type: 'Apartment',
   image: '',
@@ -39,8 +40,23 @@ const parkingOptions = [
   { value: 'both', label: 'Both' },
 ];
 
-const imageLabelOptions = ['Room 1', 'Room 2', 'Bathroom', 'Kitchen', 'Living area', 'Entrance', 'Balcony', 'Other'];
+const roomImageLabelOptions = Array.from({ length: 5 }, (_, index) => `Room ${index + 1}`);
+const bathroomImageLabelOptions = ['Bathroom', 'General Bathroom', 'Personal Bathroom'];
+const kitchenImageLabelOptions = ['Kitchen', 'Kitchen 1', 'Kitchen 2'];
+const imageLabelOptions = [
+  ...roomImageLabelOptions,
+  ...bathroomImageLabelOptions,
+  ...kitchenImageLabelOptions,
+  'Living area',
+  'Entrance',
+  'Balcony',
+  'Other',
+];
 const defaultImageLabel = (index) => imageLabelOptions[index] || `Photo ${index + 1}`;
+const bathroomTypeOptions = [
+  { value: 'general', label: 'General bathroom' },
+  { value: 'personal', label: 'Personal bathroom' },
+];
 
 function MapResize() {
   const map = useMap();
@@ -328,6 +344,7 @@ export default function AddProperty() {
           price: Number(form.price),
           bedrooms: Number(form.bedrooms),
           bathrooms: Number(form.bathrooms),
+          bathroomType: form.bathroomType,
           description: form.description,
           type: form.type,
           image: uploaded.imageUrl,
@@ -507,6 +524,15 @@ export default function AddProperty() {
                 value={form.bathrooms}
                 onChange={(e) => updateField('bathrooms', e.target.value)}
               />
+            </label>
+
+            <label className="form-field">
+              <span>Bathroom Type *</span>
+              <select value={form.bathroomType} onChange={(e) => updateField('bathroomType', e.target.value)}>
+                {bathroomTypeOptions.map((option) => (
+                  <option value={option.value} key={option.value}>{option.label}</option>
+                ))}
+              </select>
             </label>
           </div>
 

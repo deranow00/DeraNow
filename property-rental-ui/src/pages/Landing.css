@@ -1,5 +1,7 @@
 .landing-page {
-  background: #f6f1e9;
+  background:
+    radial-gradient(circle at top right, rgba(15, 118, 110, 0.07), transparent 24%),
+    linear-gradient(180deg, #fffdf9 0%, #f6f1e8 100%);
   color: var(--text);
   min-height: 100vh;
 }
@@ -11,24 +13,29 @@
 
 .landing-nav {
   position: sticky;
-  top: 0;
+  top: 16px;
   z-index: 50;
   border-bottom: 1px solid transparent;
   transition: all 180ms ease;
 }
 
 .landing-nav.scrolled {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom-color: var(--border);
+  background: transparent;
 }
 
 .nav-inner {
-  min-height: 72px;
+  min-height: 74px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  padding: 0 18px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 18px 40px rgba(49, 37, 19, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .brand {
@@ -36,6 +43,7 @@
   font-weight: 700;
   font-size: 1.35rem;
   color: var(--text);
+  letter-spacing: -0.03em;
 }
 
 .menu-btn {
@@ -63,28 +71,28 @@
 
 .nav-links a {
   color: var(--text-muted);
-  font-weight: 600;
-  padding: 0.45rem 0.7rem;
-  border-radius: 8px;
+  font-weight: 700;
+  padding: 0.52rem 0.82rem;
+  border-radius: 999px;
   transition: all 180ms ease;
 }
 
 .nav-links a:hover {
-  background: #f6f1e9;
+  background: rgba(255, 255, 255, 0.82);
   color: var(--text);
 }
 
 .nav-links .nav-cta {
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  background: #17324d;
   color: #fff;
 }
 
 .hero-section {
   position: relative;
-  padding: 4.6rem 0 3.4rem;
+  padding: 4rem 0 3.4rem;
   overflow: hidden;
   background:
-    linear-gradient(90deg, rgba(17, 24, 39, 0.74) 0%, rgba(17, 24, 39, 0.54) 48%, rgba(17, 24, 39, 0.22) 100%),
+    linear-gradient(105deg, rgba(250, 247, 242, 0.96) 0%, rgba(250, 247, 242, 0.88) 46%, rgba(250, 247, 242, 0.3) 100%),
     url('/property.png') center / cover no-repeat;
 }
 
@@ -123,21 +131,23 @@
 
 .hero-copy {
   padding-left: 0;
-  color: #fff;
+  color: var(--text);
 }
 
 .hero-panel {
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.66);
-  border-radius: 18px;
-  box-shadow: var(--shadow-soft);
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .eyebrow {
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.76);
+  color: var(--accent-strong);
   margin-bottom: 0.6rem;
 }
 
@@ -146,11 +156,11 @@
   font-size: clamp(1.8rem, 4vw, 3rem);
   line-height: 1.05;
   margin-bottom: 0.85rem;
-  color: #fff;
+  color: #1f1a16;
 }
 
 .hero-copy p {
-  color: rgba(255, 255, 255, 0.84);
+  color: var(--text-muted);
   max-width: 58ch;
 }
 
@@ -172,21 +182,21 @@
 }
 
 .hero-stats div {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  border-radius: 18px;
   padding: 0.7rem;
-  background: rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
 }
 
 .hero-stats strong {
   display: block;
   font-size: 1.25rem;
-  color: #fff;
+  color: var(--text);
 }
 
 .hero-stats span {
-  color: rgba(255, 255, 255, 0.76);
+  color: var(--text-muted);
   font-size: 0.82rem;
 }
 
@@ -205,7 +215,7 @@
 .hero-panel-btn {
   margin-top: 1rem;
   display: inline-block;
-  background: #1f1b17;
+  background: #17324d;
   color: #fff;
   border-radius: 999px;
   padding: 0.62rem 1.05rem;
@@ -244,10 +254,11 @@
 
 .status-box {
   text-align: center;
-  border: 1px solid var(--border);
-  background: #fff;
-  border-radius: 12px;
+  border: 1px solid rgba(231, 223, 211, 0.92);
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: 18px;
   padding: 1rem;
+  box-shadow: var(--shadow-soft);
 }
 
 .status-box.error {

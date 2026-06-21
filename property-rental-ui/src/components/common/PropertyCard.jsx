@@ -10,6 +10,11 @@ const parkingLabel = (type, available) => {
   if (type === 'both') return 'Car & bike parking';
   return available ? 'Parking' : 'No parking';
 };
+const bathroomTypeLabel = (type) => {
+  if (type === 'general') return 'General bathroom';
+  if (type === 'personal') return 'Personal bathroom';
+  return 'Bathroom type not listed';
+};
 
 function PropertyCard({ property, onViewDetails, onApplyBooking }) {
   const { token } = useContext(AuthContext);
@@ -133,6 +138,7 @@ function PropertyCard({ property, onViewDetails, onApplyBooking }) {
         <p>Rs. {property.price}/month</p>
         <div className="property-amenities">
           <span>{parkingLabel(property.parkingType, property.parkingAvailable)}</span>
+          <span>{bathroomTypeLabel(property.bathroomType)}</span>
           <span>{property.petFriendly ? 'Pet friendly' : 'No pets'}</span>
           <span>{property.kitchenAvailable ? 'Kitchen' : 'No kitchen'}</span>
         </div>

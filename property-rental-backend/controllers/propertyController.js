@@ -91,6 +91,9 @@ const normalizeImageLabels = (labels = [], imageCount = 5) => {
     .map((label) => String(label || '').trim().slice(0, 40));
 };
 
+const normalizeBathroomType = (value) =>
+  ['general', 'personal', 'not_specified'].includes(value) ? value : 'not_specified';
+
 const getApproximateLocation = (property = {}) => {
   if (property.approximateLocation) return property.approximateLocation;
   const parts = String(property.location || '')
@@ -244,6 +247,7 @@ export const addProperty = async (req, res) => {
       type,
       bedrooms,
       bathrooms,
+      bathroomType = 'not_specified',
       image,
       images = [],
       imageLabels = [],
@@ -293,6 +297,7 @@ export const addProperty = async (req, res) => {
       type,
       bedrooms,
       bathrooms,
+      bathroomType: normalizeBathroomType(bathroomType),
       image: primaryImage,
       images: savedImages,
       imageLabels: normalizedImageLabels,
@@ -373,6 +378,9 @@ export const updateProperty = async (req, res) => {
     if (update.parkingType != null) {
       update.parkingType = ['none', 'bike', 'car', 'both'].includes(update.parkingType) ? update.parkingType : 'none';
       update.parkingAvailable = update.parkingType !== 'none';
+    }
+    if (update.bathroomType != null) {
+      update.bathroomType = normalizeBathroomType(update.bathroomType);
     }
     if (Array.isArray(update.images)) {
       update.images = update.images.filter(Boolean).slice(0, 5);

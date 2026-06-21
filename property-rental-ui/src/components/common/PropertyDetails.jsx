@@ -19,6 +19,11 @@ const parkingLabel = (type, available) => {
   if (type === 'both') return 'Car and bike parking available';
   return available ? 'Parking available' : 'No parking listed';
 };
+const bathroomTypeLabel = (type) => {
+  if (type === 'general') return 'General bathroom';
+  if (type === 'personal') return 'Personal bathroom';
+  return 'Not specified';
+};
 const getValidCoordinates = (coordinates = {}) => {
   const lat = Number(coordinates?.lat);
   const lng = Number(coordinates?.lng);
@@ -239,11 +244,13 @@ export default function PropertyDetails({ id }) {
         <article><span>Booking Charge</span><strong>Rs. {bookingCharge.toLocaleString()}</strong></article>
         <article><span>Availability</span><strong>{availabilityStatus}</strong></article>
         <article><span>Rooms</span><strong>{property.bedrooms || 0} bed / {property.bathrooms || 0} bath</strong></article>
+        <article><span>Bathroom Type</span><strong>{bathroomTypeLabel(property.bathroomType)}</strong></article>
         <article><span>Kitchen</span><strong>{property.kitchenAvailable ? 'Available' : 'Not listed'}</strong></article>
       </section>
 
       <section className="property-badge-row">
         <span>{parkingLabel(property.parkingType, property.parkingAvailable)}</span>
+        <span>{bathroomTypeLabel(property.bathroomType)}</span>
         <span>{property.petFriendly ? 'Pet friendly' : 'Pets not listed'}</span>
         <span>{property.kitchenAvailable ? 'Kitchen available' : 'Kitchen not listed'}</span>
         <span>{ownerVerified ? 'Verified owner' : 'Owner verification pending'}</span>

@@ -1,5 +1,5 @@
 import React, { useContext, useMemo, useState } from 'react';
-import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   HiOutlineBanknotes,
   HiOutlineBuildingOffice2,
@@ -121,17 +121,69 @@ export default function OwnerLayout() {
 
       <div className="main">
         <header className="topbar">
-          <div className="topbar-copy desktop-copy">
-            <span className="topbar-eyebrow">{t('layout.ownerApp')}</span>
-            <h3>{t('layout.welcome', { name: user?.name || t('common.owner') })}</h3>
-            <p>{user?.email || t('layout.manageProperties')}</p>
+          <div className="desktop-nav-shell">
+            <div className="desktop-nav-bar">
+              <Link className="desktop-brand" to="/owner">
+                <span className="desktop-brand-mark">D</span>
+                <span className="desktop-brand-copy">
+                  <strong>{t('common.appName')}</strong>
+                  <small>{t('layout.ownerWorkspace')}</small>
+                </span>
+              </Link>
+
+              <nav className="desktop-primary-nav" aria-label="Primary owner navigation">
+                {ownerPrimaryItems.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) => `desktop-nav-link${isActive ? ' active' : ''}`}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{t(item.labelKey)}</span>
+                  </NavLink>
+                ))}
+              </nav>
+
+              <div className="desktop-nav-tools">
+                <div className="desktop-welcome-chip">
+                  <span className="desktop-welcome-label">{t('layout.ownerApp')}</span>
+                  <strong>{user?.name || t('common.owner')}</strong>
+                </div>
+                <div className={`topbar-avatar ${user?.profileImage?.imageUrl ? 'has-image' : ''}`}>
+                  {user?.profileImage?.imageUrl ? (
+                    <img src={user.profileImage.imageUrl} alt="" />
+                  ) : (
+                    <span>{(user?.name || 'O').trim().charAt(0).toUpperCase()}</span>
+                  )}
+                </div>
+                <NotificationList />
+                <button type="button" className="desktop-logout-btn" onClick={handleLogout}>
+                  {t('common.logout')}
+                </button>
+              </div>
+            </div>
+
+            <nav className="desktop-secondary-nav" aria-label="Secondary owner navigation">
+              {ownerSecondaryItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) => `desktop-subnav-link${isActive ? ' active' : ''}`}
+                >
+                  <span>{item.icon}</span>
+                  <span>{t(item.labelKey)}</span>
+                </NavLink>
+              ))}
+            </nav>
           </div>
           <div className="topbar-copy mobile-copy">
             <span className="topbar-eyebrow">{t('common.appName')}</span>
             <h3>{mobileTitle}</h3>
             <p>{user?.name || t('common.owner')}</p>
           </div>
-          <div className="user-menu">
+          <div className="user-menu mobile-user-menu">
             <div className={`topbar-avatar ${user?.profileImage?.imageUrl ? 'has-image' : ''}`}>
               {user?.profileImage?.imageUrl ? (
                 <img src={user.profileImage.imageUrl} alt="" />

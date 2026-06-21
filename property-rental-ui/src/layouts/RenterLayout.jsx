@@ -1,5 +1,5 @@
 import React, { useContext, useMemo, useState } from 'react';
-import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   HiOutlineCalendarDays,
   HiOutlineChatBubbleOvalLeftEllipsis,
@@ -123,16 +123,69 @@ export default function RenterLayout() {
 
       <div className="main">
         <header className="topbar">
-          <div className="topbar-copy desktop-copy">
-            <span className="topbar-eyebrow">{t('layout.renterApp')}</span>
-            <h3>{t('layout.welcome', { name: user?.name || t('common.renter') })}</h3>
+          <div className="desktop-nav-shell">
+            <div className="desktop-nav-bar">
+              <Link className="desktop-brand" to="/renter">
+                <span className="desktop-brand-mark">D</span>
+                <span className="desktop-brand-copy">
+                  <strong>{t('common.appName')}</strong>
+                  <small>{t('layout.renterWorkspace')}</small>
+                </span>
+              </Link>
+
+              <nav className="desktop-primary-nav" aria-label="Primary renter navigation">
+                {renterPrimaryItems.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) => `desktop-nav-link${isActive ? ' active' : ''}`}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.labelKey ? t(item.labelKey) : item.label}</span>
+                  </NavLink>
+                ))}
+              </nav>
+
+              <div className="desktop-nav-tools">
+                <div className="desktop-welcome-chip">
+                  <span className="desktop-welcome-label">{t('layout.renterApp')}</span>
+                  <strong>{user?.name || t('common.renter')}</strong>
+                </div>
+                <div className={`topbar-avatar ${user?.profileImage?.imageUrl ? 'has-image' : ''}`}>
+                  {user?.profileImage?.imageUrl ? (
+                    <img src={user.profileImage.imageUrl} alt="" />
+                  ) : (
+                    <span>{(user?.name || 'R').trim().charAt(0).toUpperCase()}</span>
+                  )}
+                </div>
+                <NotificationList />
+                <button type="button" className="desktop-logout-btn" onClick={handleLogout}>
+                  {t('common.logout')}
+                </button>
+              </div>
+            </div>
+
+            <nav className="desktop-secondary-nav" aria-label="Secondary renter navigation">
+              {renterSecondaryItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) => `desktop-subnav-link${isActive ? ' active' : ''}`}
+                >
+                  <span>{item.icon}</span>
+                  <span>{item.labelKey ? t(item.labelKey) : item.label}</span>
+                </NavLink>
+              ))}
+            </nav>
           </div>
           <div className="topbar-copy mobile-copy">
             <span className="topbar-eyebrow">{t('common.appName')}</span>
             <h3>{mobileTitle}</h3>
             <p>{user?.name || t('common.renter')}</p>
           </div>
-          <div className="user-menu">
+          <div className="user-menu mobile-user-menu">
             <div className={`topbar-avatar ${user?.profileImage?.imageUrl ? 'has-image' : ''}`}>
               {user?.profileImage?.imageUrl ? (
                 <img src={user.profileImage.imageUrl} alt="" />

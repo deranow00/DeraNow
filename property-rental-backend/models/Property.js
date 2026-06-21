@@ -23,6 +23,11 @@ const propertySchema = new mongoose.Schema(
     price: { type: Number, required: true },
     bedrooms: { type: Number, required: true },
     bathrooms: { type: Number, required: true },
+    bathroomType: {
+      type: String,
+      enum: ['general', 'personal', 'not_specified'],
+      default: 'not_specified',
+    },
     description: { type: String },
     type: { type: String, enum: ['Apartment', 'House', 'Condo'], required: true },
     image: { type: String },

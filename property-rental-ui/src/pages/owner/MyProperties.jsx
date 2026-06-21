@@ -12,8 +12,26 @@ const displayPropertyType = (type) => (type === 'Condo' ? 'Room' : type);
 const toBackendPropertyType = (type) => (type === 'Room' ? 'Condo' : type);
 const DEFAULT_MAP_CENTER = { lat: 27.7172, lng: 85.324 };
 const MAX_GALLERY_IMAGES = 5;
-const IMAGE_LABEL_OPTIONS = ['Room 1', 'Room 2', 'Bathroom', 'Kitchen', 'Living area', 'Entrance', 'Balcony', 'Other'];
+const ROOM_IMAGE_LABEL_OPTIONS = Array.from({ length: 5 }, (_, index) => `Room ${index + 1}`);
+const BATHROOM_IMAGE_LABEL_OPTIONS = ['Bathroom', 'General Bathroom', 'Personal Bathroom'];
+const KITCHEN_IMAGE_LABEL_OPTIONS = ['Kitchen', 'Kitchen 1', 'Kitchen 2'];
+const IMAGE_LABEL_OPTIONS = [
+  ...ROOM_IMAGE_LABEL_OPTIONS,
+  ...BATHROOM_IMAGE_LABEL_OPTIONS,
+  ...KITCHEN_IMAGE_LABEL_OPTIONS,
+  'Living area',
+  'Entrance',
+  'Balcony',
+  'Other',
+];
 const defaultImageLabel = (index) => IMAGE_LABEL_OPTIONS[index] || `Photo ${index + 1}`;
+const BATHROOM_TYPE_OPTIONS = [
+  { value: 'general', label: 'General bathroom' },
+  { value: 'personal', label: 'Personal bathroom' },
+  { value: 'not_specified', label: 'Not specified' },
+];
+const bathroomTypeLabel = (type) =>
+  BATHROOM_TYPE_OPTIONS.find((option) => option.value === type)?.label || 'Not specified';
 
 const getGalleryImages = (property) =>
   Array.isArray(property?.images) && property.images.length
@@ -75,6 +93,7 @@ export default function MyProperties() {
     price: '',
     bedrooms: '',
     bathrooms: '',
+    bathroomType: 'not_specified',
     description: '',
     type: PROPERTY_TYPES[0],
     image: '',
@@ -134,6 +153,7 @@ export default function MyProperties() {
       price: property.price || '',
       bedrooms: property.bedrooms || '',
       bathrooms: property.bathrooms || '',
+      bathroomType: property.bathroomType || 'not_specified',
       description: property.description || '',
       type: toBackendPropertyType(property.type || PROPERTY_TYPES[0]),
       image: property.image || '',
@@ -357,6 +377,7 @@ export default function MyProperties() {
           price: Number(formData.price),
           bedrooms: Number(formData.bedrooms),
           bathrooms: Number(formData.bathrooms),
+          bathroomType: formData.bathroomType,
           parkingAvailable: Boolean(formData.parkingAvailable),
           petFriendly: Boolean(formData.petFriendly),
           kitchenAvailable: Boolean(formData.kitchenAvailable),
@@ -478,6 +499,7 @@ export default function MyProperties() {
                       Rent: <span className="rent-amount">Rs. {property.price}</span>
                     </p>
                     <p>Parking: {property.parkingAvailable ? 'Available' : 'Not available'}</p>
+                    <p>Bathroom Type: {bathroomTypeLabel(property.bathroomType)}</p>
                     <p>Pet Friendly: {property.petFriendly ? 'Yes' : 'No'}</p>
                     <p>Kitchen: {property.kitchenAvailable ? 'Available' : 'Not listed'}</p>
                     <p className="status available">Approval: {property.approvalStatus}</p>
@@ -588,6 +610,14 @@ export default function MyProperties() {
                 value={formData.bathrooms}
                 onChange={handleInputChange}
               />
+            </div>
+            <div className="form-group">
+              <label>Bathroom Type*</label>
+              <select name="bathroomType" value={formData.bathroomType} onChange={handleInputChange}>
+                {BATHROOM_TYPE_OPTIONS.map((option) => (
+                  <option value={option.value} key={option.value}>{option.label}</option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label>Description</label>
@@ -892,6 +922,9 @@ export default function MyProperties() {
             </p>
             <p>
               <strong>Bathrooms:</strong> {viewProperty.bathrooms}
+            </p>
+            <p>
+              <strong>Bathroom Type:</strong> {bathroomTypeLabel(viewProperty.bathroomType)}
             </p>
             <p>
               <strong>Description:</strong> {viewProperty.description || 'N/A'}

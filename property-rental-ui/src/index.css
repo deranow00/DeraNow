@@ -7,19 +7,19 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
-  --bg: #f6f3ee;
-  --bg-strong: #efe9e1;
+  --bg: #faf7f2;
+  --bg-strong: #f1ebe3;
   --surface: #ffffff;
-  --surface-muted: #f7f4ef;
-  --text: #1e1a16;
-  --text-muted: #5f584f;
-  --text-subtle: #8a837a;
+  --surface-muted: #f8f4ee;
+  --text: #1d1915;
+  --text-muted: #5d564c;
+  --text-subtle: #8a8378;
   --accent: #0f766e;
   --accent-strong: #115e59;
-  --accent-warm: #d97706;
-  --border: #e3ddd2;
-  --shadow: 0 10px 30px rgba(25, 20, 12, 0.08);
-  --shadow-soft: 0 6px 18px rgba(25, 20, 12, 0.08);
+  --accent-warm: #b7791f;
+  --border: #e7dfd3;
+  --shadow: 0 20px 46px rgba(49, 37, 19, 0.08);
+  --shadow-soft: 0 10px 26px rgba(49, 37, 19, 0.07);
   --success-bg: #d1fae5;
   --success-text: #065f46;
   --success-border: #6ee7b7;
@@ -95,7 +95,10 @@ body {
   min-height: var(--app-height);
   font-family: var(--font-body);
   color: var(--text);
-  background: radial-gradient(circle at top, var(--surface) 0%, var(--bg) 45%, var(--bg-strong) 100%);
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.08), transparent 26%),
+    radial-gradient(circle at top right, rgba(183, 121, 31, 0.07), transparent 22%),
+    linear-gradient(180deg, #fffdf9 0%, var(--bg) 44%, var(--bg-strong) 100%);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -135,7 +138,7 @@ button {
   color: #fff;
   cursor: pointer;
   transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.16);
 }
 
 button:hover {
@@ -274,10 +277,12 @@ p {
 }
 
 .surface-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(231, 223, 211, 0.92);
+  border-radius: calc(var(--radius-lg) + 2px);
   box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .ios-app-shell,
@@ -295,6 +300,25 @@ p {
 
 .ios-app-shell .dashboard-content {
   overflow-x: clip;
+}
+
+.dashboard-container,
+.listings-page,
+.favorites-container,
+.payment-page,
+.add-property-container,
+.my-properties-container,
+.bookings-container,
+.owner-payment-page,
+.owner-complaints-container,
+.complaint-container,
+.message-page,
+.settings-page,
+.profile-page,
+.document-center-page,
+.agreements-page {
+  display: grid;
+  gap: 1.2rem;
 }
 
 @media (max-width: 900px) {

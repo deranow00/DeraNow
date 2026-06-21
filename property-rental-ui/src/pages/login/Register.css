@@ -5,7 +5,9 @@
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg);
+  background:
+    radial-gradient(circle at top right, rgba(15, 118, 110, 0.08), transparent 24%),
+    linear-gradient(180deg, #fffdf9 0%, #f5efe7 100%);
   margin: 0;
   padding: 0;
   padding-top: var(--safe-top);
@@ -14,7 +16,9 @@
 /* Left side - Join section */
 .register-left {
   flex: 1;
-  background: linear-gradient(135deg, rgba(15, 118, 110, 0.95) 0%, rgba(246, 243, 238, 0.95) 100%);
+  background:
+    linear-gradient(145deg, rgba(28, 48, 68, 0.92) 0%, rgba(28, 48, 68, 0.68) 42%, rgba(28, 48, 68, 0.34) 100%),
+    url('/property.png') center / cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,7 +36,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.1);
+  background: linear-gradient(180deg, rgba(19, 33, 48, 0.18), rgba(19, 33, 48, 0.38));
   z-index: 1;
 }
 
@@ -53,7 +57,7 @@
 }
 
 .green {
-  color: #34d399;
+  color: #d4a24c;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
@@ -79,7 +83,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background-color: #ffffff;
+  background: transparent;
   overflow-y: auto;
   transition: padding-bottom 180ms ease;
 }
@@ -95,8 +99,8 @@
 }
 
 .logo {
-  color: #10b981;
-  background: linear-gradient(135deg, #10b981, #059669);
+  color: #17324d;
+  background: linear-gradient(135deg, #17324d, #0f766e);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -116,6 +120,12 @@
 .register-right form {
   width: 100%;
   max-width: 400px;
+  padding: 2.3rem;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(231, 223, 211, 0.92);
+  border-radius: 1.4rem;
+  box-shadow: 0 24px 44px rgba(49, 37, 19, 0.08);
+  backdrop-filter: blur(14px);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -217,7 +227,7 @@
 .register-right button[type="submit"] {
   width: 100%;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #17324d, #0f766e);
   color: #ffffff;
   border: none;
   border-radius: 0.5rem;
